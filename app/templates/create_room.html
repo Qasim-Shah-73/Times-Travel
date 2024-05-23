@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Room</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url("{{ url_for('static', filename='images/landingpage.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            text-align: center;
+            padding-top: 100px; /* Adjust as needed */
+        }
+        .toggle-label::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: background-color 0.3s;
+            border-radius: 9999px;
+        }
+
+        input:checked + .toggle-label::before {
+            background-color: #4f46e5;
+        }
+
+        input:checked + .toggle-label + .toggle-dot {
+            transform: translateX(1.25rem);
+        }
+    </style>
+</head>
+<body class="bg-white">
+<div class="max-w-2xl mx-auto my-8 bg-blue-400 p-6 rounded-lg shadow-md">
+    <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">Create Room</h1>
+    <form method="post">
+        {{ form.hidden_tag() }}
+        <input type="hidden" name="hotel_id" value="{{ form.hotel_id.data }}">
+        <div class="mb-4">
+            {{ form.type.label(class="block text-gray-700 font-bold mb-2") }}
+            {{ form.type(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline", size=32) }}
+            {% for error in form.type.errors %}
+            <span class="text-red-500">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-4 flex items-center">
+            <label for="availability" class="block text-gray-700 font-bold mr-4">Availability</label>
+            <div class="relative inline-block w-10 align-middle select-none">
+                {{ form.availability(class="sr-only", id="availability") }}
+                <label for="availability"
+                       class="block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer toggle-label"></label>
+                <div
+                    class="toggle-dot absolute left-0.5 top-0.5 bg-white w-5 h-5 rounded-full transition-transform duration-300 ease-in-out"></div>
+            </div>
+        </div>
+        <div class="mb-4">
+            {{ form.rooms_available.label(class="block text-gray-700 font-bold mb-2") }}
+            {{ form.rooms_available(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+            {% for error in form.rooms_available.errors %}
+            <span class="text-red-500">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-6 grid grid-cols-2 gap-8">
+            <div>
+                <label class="block text-gray-700 font-bold mb-2">Base Rates</label>
+                {% for field in form.rates %}
+                <div class="flex items-center mb-2">
+                    {% if field.label.text != 'CSRF Token' %}
+                    {{ field.label(class="w-24 text-gray-700") }}
+                    {% endif %}
+                    {{ field(class="flex-1 shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+                </div>
+                {% endfor %}
+                {% for error in form.rates.errors %}
+                <span class="text-red-500">{{ error }}</span>
+                {% endfor %}
+            </div>
+            <div>
+                <label class="block text-gray-700 font-bold mb-2">Weekend Addition</label>
+                {% for field in form.weekend_rates_addition %}
+                <div class="flex items-center mb-2">
+                    {{ field(class="flex-1 shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+                </div>
+                {% endfor %}
+                {% for error in form.weekend_rates_addition.errors %}
+                <span class="text-red-500">{{ error }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="text-center">
+            {{ form.submit(class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline") }}
+        </div>
+    </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-image: url("{{ url_for('static', filename='images/pg1.jpg') }}");
+        background-size: cover;
+        background-position: center;
+        text-align: center;
+        padding-top: 100px; /* Adjust as needed */
+    }
+
+    h1 {
+        color: white;
+        font-size: 3rem;
+        margin-bottom: 30px;
+    }
+
+    .search-form {
+        max-width: 400px;
+        margin: 0 auto;
+        background-color: rgba(0, 0, 0, 0.5);
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    label {
+        color: white;
+        display: block;
+        text-align: left;
+        margin-bottom: 5px;
+    }
+
+    input[type="date"],
+    input[type="number"],
+    select,
+    button {
+        width: 100%;
+        margin-bottom: 10px;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        font-size: 1rem;
+        color: gray;
+    }
+
+    button {
+        background-color: #007bff;
+        color: #007bff;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    .popular-hotels {
+        margin-top: 50px;
+    }
+
+    .hotel-card {
+        background-color: rgba(0, 0, 0, 0.5);
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .hotel-image {
+        width: 100%;
+        border-radius: 10px;
+        margin-bottom: 10px;
+    }
+
+    .hotel-details {
+        text-align: left;
+    }
+
+    .hotel-details h3 {
+        color: #007bff;
+        margin-bottom: 5px;
+    }
+
+    .hotel-details p {
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 5px;
+    }
+
+    .view-rooms-link {
+        display: block;
+        text-align: right;
+        margin-top: 10px;
+    }
+
+    .view-rooms-link a {
+        color: #007bff;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .view-rooms-link a:hover {
+        color: #0056b3;
+    }
+
+    .contact-section {
+        background-color: rgba(0, 0, 0, 0.5);
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin-top: 50px;
+        text-align: left;
+        color: white;
+    }
+
+    .contact-section h2 {
+        color: #007bff;
+        font-size: 2rem;
+        margin-bottom: 20px;
+    }
+
+    .contact-section h3 {
+        color: #007bff;
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+    }
+
+    .contact-section p {
+        margin-bottom: 15px;
+    }
+
+    .social-icons {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        justify-content: center; /* Horizontally center the items */
+    }
+
+    .social-icons li {
+        margin: 5px 10px; /* Adjust spacing between icons */
+    }
+</style>
+
+<h1 style="font-family: fangsong; font-size: 3rem; font-weight: bold; color: #007bff;">Welcome to Times Travel</h1>
+<div class="search-form">
+    <form action="{{ url_for('main.view_hotels') }}" method="GET">
+        <label for="check_in">Check-in</label>
+        <input type="date" name="check_in" id="check_in" required>
+
+        <label for="check_out">Check-out</label>
+        <input type="date" name="check_out" id="check_out" required>
+
+        <div class="guests-container">
+            <label for="adults">Adults</label>
+            <input type="number" name="adults" id="adults" placeholder="Number of Adults" required>
+        </div>
+
+        <div class="guests-container">
+            <label for="infants">Infants</label>
+            <input type="number" name="infants" id="infants" placeholder="Number of Infants">
+        </div>
+
+        <label for="location">Location</label>
+        <select name="location" id="location" required>
+            <option value="" disabled selected>Select Location</option>
+            <option value="Mecca">Mecca</option>
+            <option value="Medina">Medina</option>
+            <!-- Add more options as needed -->
+        </select>
+
+        <button style="font-family: fangsong; font-size: 1.5rem; color: white;" type="submit">Search Hotels</button>
+    </form>
+</div>
+
+<div class="popular-hotels">
+    <h2 style="font-size: 2rem; font-weight: bold; color: #007bff;;">Popular Hotels</h2>
+    <div class="hotel-card bg-blue-200">
+        <img src="{{ url_for('static', filename='images/pg_1.jpg') }}" alt="Hotel 1" class="hotel-image">
+        <div class="hotel-details">
+            <h3>Hotel Name</h3>
+            <p>Price: $XXX/night</p>
+            <p>Location: City, Country</p>
+            <p>Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            <p>Availability: Available</p>
+            <div class="view-rooms-link">
+                <a href="{{ url_for('main.view_rooms', hotel_id = 2) }}">View Rooms</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="hotel-card">
+        <img src="{{ url_for('static', filename='images/pg_1.jpg') }}" alt="Hotel 1" class="hotel-image">
+        <div class="hotel-details">
+            <h3>Hotel Name</h3>
+            <p>Price: $XXX/night</p>
+            <p>Location: City, Country</p>
+            <p>Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            <p>Availability: Available</p>
+            <div class="view-rooms-link">
+                <a href="{{ url_for('main.view_rooms', hotel_id = 2) }}">View Rooms</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Repeat the hotel card structure for each popular hotel -->
+</div>
+
+<div class="contact-section">
+    <h2>Contact Us</h2>
+    <p>About Times Travel</p>
+    <p>Since 1985 Times travel has been serving customers by booking flights and hotels to multiple destinations around the world. Initiated in United Kingdom by a team of three people who worked to provide flights tickets, the team strived to bring continuous improvements and innovations in their services. Times Travel has excelled from providing flights to the Middle East and South Asia to delivering flights and holidays to destinations all around the world. In 2012 its head office moved from Oxford Street to Croydon and it now comprises of a team of over 50 qualified, dedicated, and skilled individuals who aim to give their customers memories to last a lifetime.</p>
+    
+    <h3>Office Address</h3>
+    <address>
+        13 Station Road London, SE25 5AH<br>
+        0207 447 5000<br><br>
+
+        81 Erleigh Road Reading Berkshire, RG1 5NN<br>
+        0118 464 0000<br><br>
+
+        <a href="mailto:sales@timestravel.com">sales@timestravel.com</a>
+    </address>
+
+    <h3>Useful Links</h3>
+    <ul>
+        <li><a href="#">Contact Us</a></li>
+        <li><a href="#">Terms & Conditions</a></li>
+        <li><a href="#">Umrah Visa Procedure</a></li>
+    </ul>
+
+    <ul class="social-icons">
+        <h3>Follow us at:</h3>
+        <li><a href="#"><i class="fab fa-facebook"></i></a></li>
+        <li><a href="#"><i class="fab fa-twitter"></i></a></li>
+        <li><a href="#"><i class="fab fa-linkedin"></i></a></li>
+        <li><a href="#"><i class="fab fa-instagram"></i></a></li>
+    </ul>
+</div>
+
+{% endblock %}

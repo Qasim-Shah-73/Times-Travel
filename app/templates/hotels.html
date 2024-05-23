@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Hotels{% endblock %}
+{% block content %}
+<div class="bg-gray-300 container mx-auto mt-10">
+    <!-- Header section -->
+    <div class="bg-blue-500 text-white py-2 px-6 flex justify-between items-center rounded-t-lg shadow-md">
+        <h1 class="font-bold text-3xl">Hotels</h1>
+        <a href="{{ url_for('main.create_hotel') }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition-colors duration-200">New Hotel</a>
+    </div>
+    
+    <!-- Content section with the same container class -->
+    <div class="py-8 shadow-md rounded-lg mt-4">
+        <ul class="divide-y divide-gray-200">
+            {% for hotel in hotels %}
+            <li class="py-4 px-6 flex items-center justify-between bg-blue-400 mb-4 rounded-lg">
+                <a href="{{ url_for('main.view_rooms', hotel_id=hotel.id) }}" class="flex items-center">
+                    <div class="mr-4">
+                        <img src="https://via.placeholder.com/48" alt="Hotel Image" class="w-12 h-12 rounded-full" />
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-semibold">{{ hotel.name }}</h2>
+                        <p class="text-gray-600">{{ hotel.location }}</p>
+                    </div>
+                </a>
+                <div class="flex items-center">
+                    <a href="{{ url_for('main.update_hotel', hotel_id=hotel.id) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2 transition-colors duration-200">Update</a>
+                    <form action="{{ url_for('main.delete_hotel', hotel_id=hotel.id) }}" method="post" class="inline">
+                        <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors duration-200">Delete</button>
+                    </form>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

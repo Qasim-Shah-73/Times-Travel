@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Travel Website{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                      'primary': '#3490dc',
+                      'yellow': '#fcd34d'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="flex justify-center items-center h-screen bg-gray-100">
+        <div class="bg-white rounded-lg shadow-md p-8 max-w-md w-full">
+            <h1 class="text-2xl font-bold mb-6 text-center text-primary">Login</h1>
+            <form method="POST" action="{{ url_for('main.login') }}">
+                {{ form.hidden_tag() }}
+                <div class="mb-4">
+                    {{ form.username.label(class="block text-gray-700 font-bold mb-2") }}
+                    {{ form.username(size=32, class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+                </div>
+                <div class="mb-4">
+                    {{ form.password.label(class="block text-gray-700 font-bold mb-2") }}
+                    {{ form.password(size=32, class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+                </div>
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center">
+                        {{ form.remember_me(class="mr-2") }}
+                        {{ form.remember_me.label(class="text-gray-700 font-bold") }}
+                    </div>
+                    <a href="{{ url_for('main.signup') }}" class="text-blue-500 hover:text-blue-700 text-sm font-bold">Sign Up</a>
+                </div>
+                {{ form.submit(class="bg-primary hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full") }}
+            </form>
+        </div>
+    </div>
+</body>

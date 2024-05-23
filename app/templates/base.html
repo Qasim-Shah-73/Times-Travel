@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Travel Website{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                      'primary': '#3490dc',
+                      'yellow': '#fcd34d'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url("{{ url_for('static', filename='images/landingpage.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            text-align: center;
+            padding-top: 100px; /* Adjust as needed */
+        }
+    </style>
+</head>
+<body class="bg-primary-100">
+    <nav class="bg-yellow-400 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                      <a href="{{ url_for('main.index') }}">
+                        <img src="{{ url_for('static', filename='images/Times_logo-high.png') }}" alt="Times Travel Logo" class="h-12 w-auto mr-2">
+                      </a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <div class="hidden md:block">
+                        <div class="ml-4 flex items-center md:ml-6">
+                            {% if current_user.is_authenticated %}
+                                {% if current_user.is_admin %}
+                                    <a href="{{ url_for('main.view_hotels') }}" class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">View Hotels</a>
+                                {% endif %}
+                                <a href="{{ url_for('main.logout') }}" class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">Logout</a>
+                            {% else %}
+                                <a href="{{ url_for('main.login') }}" class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">Login</a>
+                                <a href="{{ url_for('main.signup') }}" class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">Sign Up</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- <div class="mt-3 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"> 
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="{{ category }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div> -->
+
+    <div class="mt-6 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"> 
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

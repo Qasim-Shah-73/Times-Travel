@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-2xl mx-auto my-8 bg-blue-400 p-6 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-4 text-center text-gray-800">Update Hotel</h2>
+    <form method="post">
+        {{ form.hidden_tag() }}
+        <div class="mb-4">
+            {{ form.name.label(class="block text-gray-700 font-bold mb-2") }}
+            {{ form.name(size=32, class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+            {% for error in form.name.errors %}
+            <span class="text-red-500">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-4">
+            {{ form.description.label(class="block text-gray-700 font-bold mb-2") }}
+            {{ form.description(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+            {% for error in form.description.errors %}
+            <span class="text-red-500">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-4">
+            {{ form.location.label(class="block text-gray-700 font-bold mb-2") }}
+            {{ form.location(size=32, class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+            {% for error in form.location.errors %}
+            <span class="text-red-500">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-4">
+          <h3 class="text-xl font-bold mb-2">Availability:</h3>
+          <div class="grid grid-cols-2 gap-4">
+            {% for field in form.availability %}
+            <div class="flex items-center">
+              {% if field.label.text != 'CSRF Token' %}
+              <label class="inline-block text-gray-700 font-bold mr-2">{{ field.label }}</label>
+              {% endif %}
+              {{ field(class="form-checkbox h-5 w-5 text-indigo-600") }}
+            </div>
+            {% endfor %}
+          </div>
+        </div>        
+        <div class="text-center">
+            {{ form.submit(class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline") }}
+        </div>
+    </form>
+</div>
+{% endblock %}

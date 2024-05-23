@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %} {{ hotel.name }} - Rooms {% endblock %}
+{% block content %}
+<div class="container mx-auto mt-10">
+    <div class="flex flex-col justify-center items-center">
+        <!-- Header section -->
+        <div class="bg-blue-500 text-white py-2 px-6 flex justify-between items-center rounded-t-lg shadow-md w-full">
+            <h1 class="font-bold text-3xl">{{ hotel.name }} - Rooms</h1>
+            <a href="{{ url_for('main.create_room', hotel_id=hotel.id) }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition-colors duration-200">New Room</a>
+        </div>
+        
+        <!-- Content section -->
+        <div class="py-8 shadow-md rounded-lg mt-4 w-full">
+            {% if rooms %}
+            <ul class="divide-y divide-gray-200">
+                {% for room in rooms %}
+                <li class="py-6 px-8 bg-blue-400 mb-4 rounded-lg">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center">
+                            <p class="mr-4"><span class="font-bold">Type:</span> <span class="ml-2 text-right">{{ room.type }}</span></p>
+                            <p class="mr-4"><span class="font-bold">Availability:</span> <span class="ml-2 text-right">{{ 'Available' if room.availability else 'Not Available' }}</span></p>
+                            <p><span class="font-bold">Rooms Available:</span> <span class="ml-2 text-right">{{ room.rooms_available }}</span></p>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-bold mb-4">Rates:</h3>
+                    <ul class="grid grid-cols-2 gap-4">
+                        {% for month, rate in room.rates.items() %}
+                        {% if month != 'csrf_token' %}
+                        <li class="bg-white rounded-lg p-4 shadow">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-bold">{{ month }}:</span>
+                                <div>
+                                    <span>Base Rate: £{{ rate }}</span>
+                                    {% if room.weekend_rates_addition[month] %}
+                                    <span class="ml-4">Weekend Addition: £{{ room.weekend_rates_addition[month] }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                    <div class="flex items-center justify-end mt-4">
+                        <a href="{{ url_for('main.update_room', hotel_id=hotel.id, room_id=room.id) }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">Update</a>
+                        <form action="{{ url_for('main.delete_room', hotel_id=hotel.id, room_id=room.id) }}" method="post" class="inline">
+                            <input type="hidden" name="hotel_id" value="{{ hotel.id }}">
+                            <input type="hidden" name="room_id" value="{{ room.id }}">
+                            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete</button>
+                        </form>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="text-gray-600 text-center py-4">No rooms available.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
