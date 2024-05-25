@@ -3,6 +3,8 @@ from flask_login import current_user, login_user, logout_user, login_required
 from app import db
 from app.models import User, Hotel, Room
 from app.forms import LoginForm, RegistrationForm, HotelForm, RoomForm, UpdateHotelForm
+from datetime import datetime
+from sqlalchemy import func
 
 bp = Blueprint('main', __name__)
 
@@ -252,3 +254,25 @@ def view_rooms(hotel_id):
     rooms = Room.query.filter_by(hotel_id=hotel_id).all()
     return render_template('rooms.html', hotel=hotel, rooms=rooms)
 
+@bp.route('/search_hotels', methods=['GET'])
+@login_required
+def search_hotels():
+    location = request.args.get('location')
+    check_in_date_str = request.args.get('check_in')
+    check_in_date = datetime.strptime(check_in_date_str, '%Y-%m-%d')  # Convert to datetime object
+    check_in_month = check_in_date.strftime('%B')  # Get the month name
+
+    # Query database for hotels available at the specified location
+    hotels = Hotel.query.filter_by(location=location).all()
+
+    # Filter available hotels based on availability for the check-in month
+    available_hotels = [hotel for hotel in hotels if is_month_available(hotel, check_in_month)]
+
+    return render_template('search_hotels.html', hotels=available_hotels, month= check_in_month)
+
+def is_month_available(hotel, check_in_month):
+    """
+    Check if the hotel has availability for the given month.
+    """
+    availability = hotel.availability.get(check_in_month)
+    return availability is not None and availability > 0

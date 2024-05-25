@@ -1,0 +1,51 @@
+{% extends "index.html" %}
+
+{% block title %}Hotel Results{% endblock %}
+
+{% block content %}
+<div class="container mx-auto">
+    <h1 class="text-4xl font-bold text-center text-blue-700 my-8">Available Hotels</h1>
+    <div class="grid gap-8">
+        {% for hotel in hotels %}
+        <div class="bg-white rounded-lg shadow-md overflow-hidden transform transition-transform hover:scale-105">
+            <img src="{{ url_for('static', filename='images/hotel1.jpg') }}" alt="{{ hotel.name }}" class="w-full h-64 object-cover" />
+            <div class="p-6">
+                <h2 class="text-2xl font-semibold text-blue-700 mb-2">{{ hotel.name }}</h2>
+                <div class="flex items-center mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 2a8 8 0 0 0-8 8c0 4.418 5.373 9.282 7.04 10.95a.485.485 0 0 0 .92 0C12.627 19.282 18 14.418 18 10a8 8 0 0 0-8-8zm0 13.375c-1.898-2.161-4-4.588-4-6.375A6 6 0 0 1 10 4a6 6 0 0 1 4 10.375c0 1.787-2.102 4.214-4 6.375zM10 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                    </svg>
+                    <span class="text-gray-600">{{ hotel.location }}</span>
+                </div>
+                <div class="flex items-center mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 2c-.22 0-.427.088-.573.232L3.232 9.427a1 1 0 0 0-.232.342l-.465 2.326A1 1 0 0 0 4 13h12a1 1 0 0 0 .465-1.905l-.465-2.326a1 1 0 0 0-.232-.342l-6.195-7.195A1 1 0 0 0 10 2zm0 2.264l4.3 5.011H5.7L10 4.264zM7 17a2 2 0 0 1-2-2h12a2 2 0 0 1-2 2H7z"/>
+                    </svg>
+                    <span class="text-gray-600">{{ hotel.description }}</span>
+                </div>
+                <hr class="my-2 border-gray-200">
+                <button onclick="toggleRoomDetails({{ hotel.id }})" class="block text-center mt-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md transition duration-300 ease-in-out">Get More Details</button>
+                <ul id="room-details-{{ hotel.id }}" class="hidden mt-4">
+                    {% for room in hotel.rooms %}
+                    <li class="flex items-center text-gray-700 mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 2c-.22 0-.427.088-.573.232L3.232 9.427a1 1 0 0 0-.232.342l-.465 2.326A1 1 0 0 0 4 13h12a1 1 0 0 0 .465-1.905l-.465-2.326a1 1 0 0 0-.232-.342l-6.195-7.195A1 1 0 0 0 10 2zm0 2.264l4.3 5.011H5.7L10 4.264zM7 17a2 2 0 0 1-2-2h12a2 2 0 0 1-2 2H7z"/>
+                        </svg>
+                        <span>{{ room.type }} - £{{ room.rates[month] }} per night</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    function toggleRoomDetails(hotelId) {
+        var roomDetails = document.getElementById("room-details-" + hotelId);
+        roomDetails.classList.toggle("hidden");
+    }
+</script>
+
+{% endblock %}
