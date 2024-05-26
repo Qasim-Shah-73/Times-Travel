@@ -259,7 +259,9 @@ def view_rooms(hotel_id):
 def search_hotels():
     location = request.args.get('location')
     check_in_date_str = request.args.get('check_in')
+    check_out_date_str = request.args.get('check_out')
     check_in_date = datetime.strptime(check_in_date_str, '%Y-%m-%d')  # Convert to datetime object
+    check_out_date = datetime.strptime(check_out_date_str, '%Y-%m-%d')  # Convert to datetime object
     check_in_month = check_in_date.strftime('%B')  # Get the month name
 
     # Query database for hotels available at the specified location
@@ -268,7 +270,14 @@ def search_hotels():
     # Filter available hotels based on availability for the check-in month
     available_hotels = [hotel for hotel in hotels if is_month_available(hotel, check_in_month)]
 
-    return render_template('search_hotels.html', hotels=available_hotels, month= check_in_month)
+    return render_template('search_hotels.html', 
+                           hotels=available_hotels, 
+                           month= check_in_month, 
+                           check_in = check_in_date,
+                           check_out = check_out_date,
+                           location = location,
+                           adults = request.args.get('adults'),
+                           infants = request.args.get('infants'))
 
 def is_month_available(hotel, check_in_month):
     """
@@ -276,3 +285,36 @@ def is_month_available(hotel, check_in_month):
     """
     availability = hotel.availability.get(check_in_month)
     return availability is not None and availability > 0
+
+
+@bp.route('/booking/<int:hotel_id>/<int:room_id>', methods=['GET'])
+@login_required
+def booking_form(hotel_id, room_id):
+    hotel = Hotel.query.get_or_404(hotel_id)
+    room = Room.query.get_or_404(room_id)
+    location = request.args.get('location')
+    check_in = request.args.get('check_in')
+    check_out = request.args.get('check_out')
+    adults = request.args.get('adults')
+    infants = request.args.get('infants')
+
+    return render_template('booking_form.html', hotel=hotel, room=room, location=location, check_in=check_in, check_out=check_out, adults=adults, infants=infants)
+
+@bp.route('/book/<int:hotel_id>/<int:room_id>', methods=['GET', 'POST'])
+@login_required
+def book(hotel_id, room_id):
+    hotel = Hotel.query.get_or_404(hotel_id)
+    room = Room.query.get_or_404(room_id)
+    first_name = request.form.get('first_name')
+    last_name = request.form.get('last_name')
+    location = request.form.get('location')
+    check_in = request.form.get('check_in')
+    check_out = request.form.get('check_out')
+    adults = request.form.get('adults')
+    infants = request.form.get('infants')
+
+    # Save booking data to Google Sheet
+    row = [hotel.name, room.type, first_name, last_name, location, check_in, check_out, adults, infants]
+    # sheet.append_row(row)
+
+    return redirect(url_for('main.index'))

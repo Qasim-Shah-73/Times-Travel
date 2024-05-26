@@ -1,0 +1,163 @@
+{% extends "index.html" %}
+
+{% block content %}
+<style>
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    h1 {
+        color: #007bff;
+        font-size: 2rem;
+        margin-bottom: 30px;
+        font-family: fangsong;
+        font-weight: bold;
+    }
+
+    .search-form {
+        width: 100%;
+    }
+
+    .form-group {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        flex: 1;
+        color: #333;
+        display: block;
+        text-align: left;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    .form-group input {
+        flex: 2;
+        width: 100%;
+        margin-bottom: 20px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 1rem;
+        color: #333;
+    }
+
+    button {
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        font-family: fangsong;
+        width: 100%;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    /* Modal Styles */
+    .modal {
+        display: none; 
+        position: fixed; 
+        z-index: 1; 
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto; 
+        background-color: rgba(0, 0, 0, 0.4); 
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto; 
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 500px;
+        text-align: center;
+        border-radius: 10px;
+        font-family: Arial, sans-serif;
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+</style>
+
+<div class="container mx-auto">
+    <h1 class="text-4xl font-bold text-center text-blue-700 my-8">Booking Form</h1>
+    <form id="bookingForm" action="{{ url_for('main.book', hotel_id=hotel.id, room_id=room.id) }}" method="POST" class="search-form">
+        <input type="hidden" name="location" value="{{ location }}">
+        <input type="hidden" name="check_in" value="{{ check_in }}">
+        <input type="hidden" name="check_out" value="{{ check_out }}">
+        <input type="hidden" name="adults" value="{{ adults }}">
+        <input type="hidden" name="infants" value="{{ infants }}">
+
+        <div class="form-group">
+            <label for="first_name" class="block text-gray-700 font-bold mb-2">First Name</label>
+            <input type="text" id="first_name" name="first_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+        </div>
+
+        <div class="form-group">
+            <label for="last_name" class="block text-gray-700 font-bold mb-2">Last Name</label>
+            <input type="text" id="last_name" name="last_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+        </div>
+
+        <div class="form-group">
+            <label for="referred_by" class="block text-gray-700 font-bold mb-2">Referred by</label>
+            <input type="text" id="referred_by" name="referred_by" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+
+        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+            Book Now
+        </button>
+    </form>
+</div>
+
+<!-- The Modal -->
+<div id="bookingModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <p>Your booking has been submitted</p>
+    </div>
+</div>
+
+<script>
+    document.getElementById('bookingForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        // Show the modal
+        document.getElementById('bookingModal').style.display = "block";
+
+        // Close the modal after 2 seconds and submit the form
+        setTimeout(function() {
+            document.getElementById('bookingModal').style.display = "none";
+            document.getElementById('bookingForm').submit();
+        }, 2000);
+    });
+
+    function closeModal() {
+        document.getElementById('bookingModal').style.display = "none";
+    }
+</script>
+{% endblock %}
