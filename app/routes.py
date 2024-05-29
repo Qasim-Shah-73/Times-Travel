@@ -6,6 +6,7 @@ from app.forms import LoginForm, RegistrationForm, HotelForm, RoomForm, UpdateHo
 from datetime import datetime
 from sqlalchemy import func
 
+
 bp = Blueprint('main', __name__)
 
 def is_logged_in_admin():
@@ -146,40 +147,62 @@ def update_hotel(hotel_id):
         return redirect(url_for('main.view_hotels'))
     return render_template('update_hotel.html', form=form, hotel=hotel)
 
+
 @bp.route('/hotels/<int:hotel_id>/rooms/create', methods=['GET', 'POST'])
 @login_required
 def create_room(hotel_id):
     if not is_logged_in_admin():
         flash('You need to be logged in as an admin to access this page.', 'warning')
         return redirect(url_for('main.index'))
-    
-    form = RoomForm(hotel_id=hotel_id)  # Pass hotel_id to the form
+
+    form = RoomForm()
+    form.hotel_id.data = hotel_id  # Set the hotel_id field with the provided value
+
+    def set_days(form_field, days):
+        while len(form_field.rates) < days:
+            form_field.rates.append_entry()
+        while len(form_field.rates) > days:
+            form_field.rates.pop_entry()
+
+    set_days(form.january_rates, 31)
+    set_days(form.february_rates, 28)
+    set_days(form.march_rates, 31)
+    set_days(form.april_rates, 30)
+    set_days(form.may_rates, 31)
+    set_days(form.june_rates, 30)
+    set_days(form.july_rates, 31)
+    set_days(form.august_rates, 31)
+    set_days(form.september_rates, 30)
+    set_days(form.october_rates, 31)
+    set_days(form.november_rates, 30)
+    set_days(form.december_rates, 31)
+
     if form.validate_on_submit():
-        weekend_rates_addition = {
-            'January': form.weekend_rates_addition.January.data or 0,
-            'February': form.weekend_rates_addition.February.data or 0,
-            'March': form.weekend_rates_addition.March.data or 0,
-            'April': form.weekend_rates_addition.April.data or 0,
-            'May': form.weekend_rates_addition.May.data or 0,
-            'June': form.weekend_rates_addition.June.data or 0,
-            'July': form.weekend_rates_addition.July.data or 0,
-            'August': form.weekend_rates_addition.August.data or 0,
-            'September': form.weekend_rates_addition.September.data or 0,
-            'October': form.weekend_rates_addition.October.data or 0,
-            'November': form.weekend_rates_addition.November.data or 0,
-            'December': form.weekend_rates_addition.December.data or 0
-        }
+        # Create Room object with rate dictionaries
         new_room = Room(
-            hotel_id=hotel_id,
+            hotel_id=form.hotel_id.data,
             type=form.type.data,
             availability=form.availability.data,
             rooms_available=form.rooms_available.data,
-            rates=form.rates.data,
-            weekend_rates_addition=weekend_rates_addition
+            inclusion=form.inclusion.data,
+            january_rates={f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.january_rates.rates.data)},
+            february_rates={f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.february_rates.rates.data)},
+            march_rates={f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.march_rates.rates.data)},
+            april_rates={f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.april_rates.rates.data)},
+            may_rates={f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.may_rates.rates.data)},
+            june_rates={f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.june_rates.rates.data)},
+            july_rates={f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.july_rates.rates.data)},
+            august_rates={f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.august_rates.rates.data)},
+            september_rates={f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.september_rates.rates.data)},
+            october_rates={f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.october_rates.rates.data)},
+            november_rates={f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.november_rates.rates.data)},
+            december_rates={f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.december_rates.rates.data)}
         )
         db.session.add(new_room)
         db.session.commit()
+        flash('Room created successfully', 'success')
         return redirect(url_for('main.view_hotels', hotel_id=hotel_id))
+
     return render_template('create_room.html', form=form)
 
 @bp.route('/hotels/<int:hotel_id>/rooms/<int:room_id>/update', methods=['GET', 'POST'])
@@ -188,48 +211,50 @@ def update_room(hotel_id, room_id):
     if not is_logged_in_admin():
         flash('You need to be logged in as an admin to access this page.', 'warning')
         return redirect(url_for('main.index'))
-    
+
     room = Room.query.get_or_404(room_id)
     form = RoomForm(obj=room)
+
+    def set_days(form_field, days):
+        while len(form_field.rates) < days:
+            form_field.rates.append_entry()
+        while len(form_field.rates) > days:
+            form_field.rates.pop_entry()
+
+    set_days(form.january_rates, 31)
+    set_days(form.february_rates, 28)
+    set_days(form.march_rates, 31)
+    set_days(form.april_rates, 30)
+    set_days(form.may_rates, 31)
+    set_days(form.june_rates, 30)
+    set_days(form.july_rates, 31)
+    set_days(form.august_rates, 31)
+    set_days(form.september_rates, 30)
+    set_days(form.october_rates, 31)
+    set_days(form.november_rates, 30)
+    set_days(form.december_rates, 31)
+
     if form.validate_on_submit():
-        # Update weekend_rates_addition
-        room.weekend_rates_addition = {
-            'January': form.weekend_rates_addition.January.data or room.weekend_rates_addition.get('January', 0),
-            'February': form.weekend_rates_addition.February.data or room.weekend_rates_addition.get('February', 0),
-            'March': form.weekend_rates_addition.March.data or room.weekend_rates_addition.get('March', 0),
-            'April': form.weekend_rates_addition.April.data or room.weekend_rates_addition.get('April', 0),
-            'May': form.weekend_rates_addition.May.data or room.weekend_rates_addition.get('May', 0),
-            'June': form.weekend_rates_addition.June.data or room.weekend_rates_addition.get('June', 0),
-            'July': form.weekend_rates_addition.July.data or room.weekend_rates_addition.get('July', 0),
-            'August': form.weekend_rates_addition.August.data or room.weekend_rates_addition.get('August', 0),
-            'September': form.weekend_rates_addition.September.data or room.weekend_rates_addition.get('September', 0),
-            'October': form.weekend_rates_addition.October.data or room.weekend_rates_addition.get('October', 0),
-            'November': form.weekend_rates_addition.November.data or room.weekend_rates_addition.get('November', 0),
-            'December': form.weekend_rates_addition.December.data or room.weekend_rates_addition.get('December', 0)
-        }
-
-        # Update rates
-        room.rates = {
-            'January': form.rates.January.data or room.rates.get('January', 0),
-            'February': form.rates.February.data or room.rates.get('February', 0),
-            'March': form.rates.March.data or room.rates.get('March', 0),
-            'April': form.rates.April.data or room.rates.get('April', 0),
-            'May': form.rates.May.data or room.rates.get('May', 0),
-            'June': form.rates.June.data or room.rates.get('June', 0),
-            'July': form.rates.July.data or room.rates.get('July', 0),
-            'August': form.rates.August.data or room.rates.get('August', 0),
-            'September': form.rates.September.data or room.rates.get('September', 0),
-            'October': form.rates.October.data or room.rates.get('October', 0),
-            'November': form.rates.November.data or room.rates.get('November', 0),
-            'December': form.rates.December.data or room.rates.get('December', 0)
-        }
-
         room.type = form.type.data
         room.availability = form.availability.data
         room.rooms_available = form.rooms_available.data
+        room.january_rates = {f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.january_rates.rates.data)}
+        room.february_rates = {f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.february_rates.rates.data)}
+        room.march_rates = {f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.march_rates.rates.data)}
+        room.april_rates = {f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.april_rates.rates.data)}
+        room.may_rates = {f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.may_rates.rates.data)}
+        room.june_rates = {f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.june_rates.rates.data)}
+        room.july_rates = {f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.july_rates.rates.data)}
+        room.august_rates = {f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.august_rates.rates.data)}
+        room.september_rates = {f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.september_rates.rates.data)}
+        room.october_rates = {f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.october_rates.rates.data)}
+        room.november_rates = {f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.november_rates.rates.data)}
+        room.december_rates = {f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.december_rates.rates.data)}
+        room.inclusion = form.inclusion.data
         db.session.commit()
         flash('Room updated successfully', 'success')
         return redirect(url_for('main.view_hotels', hotel_id=hotel_id))
+
     return render_template('update_room.html', form=form, room=room)
 
 @bp.route('/hotel/<int:hotel_id>/room/<int:room_id>/delete', methods=['POST'])
@@ -264,6 +289,10 @@ def search_hotels():
     check_out_date = datetime.strptime(check_out_date_str, '%Y-%m-%d')  # Convert to datetime object
     check_in_month = check_in_date.strftime('%B')  # Get the month name
 
+    # Format dates to 'd m y'
+    check_in_date = check_in_date.strftime('%d-%m-%Y')
+    check_out_date = check_out_date.strftime('%d-%m-%Y')
+
     # Query database for hotels available at the specified location
     hotels = Hotel.query.filter_by(location=location).all()
 
@@ -276,8 +305,7 @@ def search_hotels():
                            check_in = check_in_date,
                            check_out = check_out_date,
                            location = location,
-                           adults = request.args.get('adults'),
-                           infants = request.args.get('infants'))
+                           nights = request.args.get('total_nights'))
 
 def is_month_available(hotel, check_in_month):
     """
@@ -285,7 +313,6 @@ def is_month_available(hotel, check_in_month):
     """
     availability = hotel.availability.get(check_in_month)
     return availability is not None and availability > 0
-
 
 @bp.route('/booking/<int:hotel_id>/<int:room_id>', methods=['GET'])
 @login_required
@@ -295,10 +322,23 @@ def booking_form(hotel_id, room_id):
     location = request.args.get('location')
     check_in = request.args.get('check_in')
     check_out = request.args.get('check_out')
-    adults = request.args.get('adults')
-    infants = request.args.get('infants')
+    nights = request.args.get('nights')
+    # Assigning default value as 1
+    persons = 1
 
-    return render_template('booking_form.html', hotel=hotel, room=room, location=location, check_in=check_in, check_out=check_out, adults=adults, infants=infants)
+    # Checking room type for keywords
+    if 'Single' in room.type:
+        persons = 1
+    elif 'Double' in room.type:
+        persons = 2
+    elif 'Triple' in room.type:
+        persons = 3
+    elif 'Quad' in room.type:
+        persons = 4
+
+    return render_template('booking_form.html', hotel=hotel, room=room, location=location,
+                            check_in=check_in, check_out=check_out, nights=nights, persons = persons,
+                            name = hotel.name, type = room.type)
 
 @bp.route('/book/<int:hotel_id>/<int:room_id>', methods=['GET', 'POST'])
 @login_required
@@ -310,11 +350,10 @@ def book(hotel_id, room_id):
     location = request.form.get('location')
     check_in = request.form.get('check_in')
     check_out = request.form.get('check_out')
-    adults = request.form.get('adults')
-    infants = request.form.get('infants')
+    nights = request.form.get('nights')
 
     # Save booking data to Google Sheet
-    row = [hotel.name, room.type, first_name, last_name, location, check_in, check_out, adults, infants]
+    row = [hotel.name, room.type, first_name, last_name, location, check_in, check_out, nights]
     # sheet.append_row(row)
 
     return redirect(url_for('main.index'))

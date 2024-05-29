@@ -2,6 +2,7 @@
 
 {% block content %}
 <style>
+    /* General Styles */
     .container {
         max-width: 800px;
         margin: 0 auto;
@@ -12,38 +13,53 @@
         color: #007bff;
         font-size: 2rem;
         margin-bottom: 30px;
-        font-family: fangsong;
+        font-family: Arial, sans-serif;
         font-weight: bold;
+        text-align: center;
     }
 
-    .search-form {
-        width: 100%;
+    /* Form Styles */
+    .form-container {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .form-section {
+        width: 48%;
+        margin-bottom: 20px;
+    }
+
+    .form-section h2 {
+        color: #007bff;
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        font-weight: bold;
     }
 
     .form-group {
-        display: flex;
-        align-items: center;
-        margin-bottom: 20px;
+        margin-bottom: 15px;
     }
 
-    .form-group label {
-        flex: 1;
+    label {
         color: #333;
-        display: block;
-        text-align: left;
-        margin-bottom: 5px;
         font-weight: bold;
+        margin-bottom: 5px;
+        display: block;
     }
 
-    .form-group input {
-        flex: 2;
-        width: 100%;
-        margin-bottom: 20px;
+    input[type="text"] {
+        width: calc(100% - 42px); /* Adjusting for icon width */
         padding: 10px;
         border: 1px solid #ccc;
         border-radius: 5px;
         font-size: 1rem;
         color: #333;
+    }
+
+    .form-group .fas {
+        margin-right: 10px;
+        color: #007bff;
     }
 
     button {
@@ -56,7 +72,7 @@
         border-radius: 5px;
         font-size: 1.2rem;
         font-weight: bold;
-        font-family: fangsong;
+        font-family: Arial, sans-serif;
         width: 100%;
     }
 
@@ -66,20 +82,20 @@
 
     /* Modal Styles */
     .modal {
-        display: none; 
-        position: fixed; 
-        z-index: 1; 
+        display: none;
+        position: fixed;
+        z-index: 1;
         left: 0;
         top: 0;
         width: 100%;
         height: 100%;
-        overflow: auto; 
-        background-color: rgba(0, 0, 0, 0.4); 
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
     }
 
     .modal-content {
         background-color: #fefefe;
-        margin: 15% auto; 
+        margin: 15% auto;
         padding: 20px;
         border: 1px solid #888;
         width: 80%;
@@ -102,36 +118,98 @@
         text-decoration: none;
         cursor: pointer;
     }
+
+    /* Styling for Booking Summary */
+    .booking-summary {
+        margin-top: 30px;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .summary-item {
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+    }
+
+    .summary-label {
+        font-weight: bold;
+        color: #333;
+        margin-right: 10px;
+    }
+
+    .summary-value {
+        color: #666;
+    }
+
+    /* Divider Styles */
+    .divider {
+        width: 100%;
+        height: 1px;
+        background-color: #ccc;
+        margin: 20px 0;
+    }
 </style>
 
-<div class="container mx-auto">
-    <h1 class="text-4xl font-bold text-center text-blue-700 my-8">Booking Form</h1>
-    <form id="bookingForm" action="{{ url_for('main.book', hotel_id=hotel.id, room_id=room.id) }}" method="POST" class="search-form">
-        <input type="hidden" name="location" value="{{ location }}">
-        <input type="hidden" name="check_in" value="{{ check_in }}">
-        <input type="hidden" name="check_out" value="{{ check_out }}">
-        <input type="hidden" name="adults" value="{{ adults }}">
-        <input type="hidden" name="infants" value="{{ infants }}">
-
-        <div class="form-group">
-            <label for="first_name" class="block text-gray-700 font-bold mb-2">First Name</label>
-            <input type="text" id="first_name" name="first_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+<div class="">
+    <h1>Booking Form</h1>
+    <div class="form-container">
+        <div class="form-section bg-white">
+            {% for i in range(persons) %}
+            <h2>Pax {{ i + 1 }}</h2>
+            <div class="person-info flex">
+                <div class="form-group mx-12">
+                    <label for="first_name{{ i }}"><i class="fas fa-user"></i> First Name:</label>
+                    <input type="text" id="first_name{{ i }}" name="first_name{{ i }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="last_name{{ i }}"><i class="fas fa-user"></i> Last Name:</label>
+                    <input type="text" id="last_name{{ i }}" name="last_name{{ i }}" required>
+                </div>
+            </div>
+            {% if i != persons-1 %}
+            <div class="divider"></div>
+            {% endif %}
+            {% endfor %}
+            <div class="form-group">
+                <label for="referred_by"><i class="fas fa-building"></i> Agency Ref:</label>
+                <input type="text" id="referred_by" name="referred_by">
+            </div>
         </div>
-
-        <div class="form-group">
-            <label for="last_name" class="block text-gray-700 font-bold mb-2">Last Name</label>
-            <input type="text" id="last_name" name="last_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+        <div class="w-full md:w-2/5 mt-8 md:mt-0">
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden p-6">
+                <h2 class="text-2xl font-semibold text-blue-700 my-4">Booking Summary</h2>
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-map-marker-alt mx-2 text-blue-700"></i>
+                    <h3 class="text-gray-600 mr-2 text-blue-700">Hotel Name:</h3>
+                    <p class="text-gray-600">{{ name }}</p>
+                </div>
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-bed mx-2 text-blue-700"></i>
+                    <h3 class="text-gray-600 mr-2 text-blue-700">Room Type:</h3>
+                    <p class="text-gray-600">{{ type }}</p>
+                </div>
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-calendar-alt mx-2 text-blue-700"></i>
+                    <h3 class="text-gray-600 mr-2 text-blue-700">Check-in:</h3>
+                    <p class="text-gray-600">{{ check_in }}</p>
+                </div>
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-calendar-alt mx-2 text-blue-700"></i>
+                    <h3 class="text-gray-600 mr-2 text-blue-700">Check-out:</h3>
+                    <p class="text-gray-600">{{ check_out }}</p>
+                </div>
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-moon mx-2 text-blue-700"></i>
+                    <h3 class="text-gray-600 mr-2 text-blue-700">Nights:</h3>
+                    <p class="text-gray-600">{{ nights }} nights</p>
+                </div>
+            </div>
         </div>
-
-        <div class="form-group">
-            <label for="referred_by" class="block text-gray-700 font-bold mb-2">Referred by</label>
-            <input type="text" id="referred_by" name="referred_by" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-        </div>
-
-        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-            Book Now
-        </button>
-    </form>
+    </div>
+    <button class="my-8" type="submit" id="book_now">Book Now</button>
 </div>
 
 <!-- The Modal -->
@@ -143,16 +221,15 @@
 </div>
 
 <script>
-    document.getElementById('bookingForm').addEventListener('submit', function(event) {
+    document.getElementById('book_now').addEventListener('click', function(event) {
         event.preventDefault(); // Prevent the default form submission
 
         // Show the modal
         document.getElementById('bookingModal').style.display = "block";
 
-        // Close the modal after 2 seconds and submit the form
+        // Close the modal after 2 seconds
         setTimeout(function() {
             document.getElementById('bookingModal').style.display = "none";
-            document.getElementById('bookingForm').submit();
         }, 2000);
     });
 

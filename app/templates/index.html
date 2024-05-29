@@ -157,17 +157,11 @@
                 </div>
 
                 <div class="form-group">
-                    <i class="fas fa-user"></i>
-                    <label for="adults">Number of Adults</label>
-                    <input type="number" name="adults" id="adults" placeholder="Number of Adults" required>
+                    <i class="fas fa-moon"></i>
+                    <label for="total_nights">Total Nights</label>
+                    <input type="text" name="total_nights" id="total_nights" placeholder="Total Nights" readonly>
                 </div>
-
-                <div class="form-group">
-                    <i class="fas fa-child"></i>
-                    <label for="infants">Number of Infants</label>
-                    <input type="number" name="infants" id="infants" placeholder="Number of Infants">
-                </div>
-
+                
                 <button type="submit"><i class="fas fa-search mx-2"></i>Search</button>
             </form>
         </div>
@@ -177,8 +171,32 @@
             <img src="{{ url_for('static', filename='images/hotel.png') }}" alt="Hotel Icon" class="mr-4">
             <h2 class="text-lg font-bold">Experience luxury, receive more! Book now for added value.</h2>
         </div>        
-        <p>This May, we're giving away 5x £200 vouchers towards your holiday wardrobe. All you have to do for your chance to win is book a Stuba island hotel between now and 31 May '24.</p>
+        <p>This May, we're giving away 5x £200 vouchers towards your holiday wardrobe. All you have to do for your chance to win is book with Times Travel between now and 31 May '24.</p>
         <button>Know more</button>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const checkInInput = document.getElementById('check_in');
+        const checkOutInput = document.getElementById('check_out');
+        const totalNightsInput = document.getElementById('total_nights');
+
+        checkInInput.addEventListener('input', updateTotalNights);
+        checkOutInput.addEventListener('input', updateTotalNights);
+
+        function updateTotalNights() {
+            const checkInDate = new Date(checkInInput.value);
+            const checkOutDate = new Date(checkOutInput.value);
+
+            if (isNaN(checkInDate.getTime()) || isNaN(checkOutDate.getTime())) {
+                totalNightsInput.value = '';
+            } else {
+                const diffTime = Math.abs(checkOutDate - checkInDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                totalNightsInput.value = diffDays + ' nights';
+            }
+        }
+    });
+</script>
 {% endblock %}

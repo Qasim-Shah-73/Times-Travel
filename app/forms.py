@@ -1,6 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import (StringField,TextAreaField,FloatField,BooleanField,DateTimeField,SubmitField,IntegerField,FormField,PasswordField,HiddenField)
-from wtforms.validators import (DataRequired,Length,NumberRange,Email,EqualTo,ValidationError)
+from wtforms import FormField,StringField, TextAreaField, FieldList, BooleanField, SubmitField, IntegerField, PasswordField
+from wtforms.validators import DataRequired, Length, NumberRange, Email, EqualTo, ValidationError,Optional
+from wtforms.fields import FormField as WTFormField
+from calendar import monthrange
 from app.models import User, Room, Hotel
 
 class LoginForm(FlaskForm):
@@ -41,53 +43,39 @@ class MonthAvailabilityForm(FlaskForm):
     November = BooleanField('November')
     December = BooleanField('December')
 
-class MonthRatesForm(FlaskForm):
-    January = FloatField('January', validators=[NumberRange(min=0)])
-    February = FloatField('February', validators=[NumberRange(min=0)])
-    March = FloatField('March', validators=[NumberRange(min=0)])
-    April = FloatField('April', validators=[NumberRange(min=0)])
-    May = FloatField('May', validators=[NumberRange(min=0)])
-    June = FloatField('June', validators=[NumberRange(min=0)])
-    July = FloatField('July', validators=[NumberRange(min=0)])
-    August = FloatField('August', validators=[NumberRange(min=0)])
-    September = FloatField('September', validators=[NumberRange(min=0)])
-    October = FloatField('October', validators=[NumberRange(min=0)])
-    November = FloatField('November', validators=[NumberRange(min=0)])
-    December = FloatField('December', validators=[NumberRange(min=0)])
-
-class MonthWeekendRatesForm(FlaskForm):
-    January = FloatField('January', validators=[NumberRange(min=0)], default=0)
-    February = FloatField('February', validators=[NumberRange(min=0)], default=0)
-    March = FloatField('March', validators=[NumberRange(min=0)], default=0)
-    April = FloatField('April', validators=[NumberRange(min=0)], default=0)
-    May = FloatField('May', validators=[NumberRange(min=0)], default=0)
-    June = FloatField('June', validators=[NumberRange(min=0)], default=0)
-    July = FloatField('July', validators=[NumberRange(min=0)], default=0)
-    August = FloatField('August', validators=[NumberRange(min=0)], default=0)
-    September = FloatField('September', validators=[NumberRange(min=0)], default=0)
-    October = FloatField('October', validators=[NumberRange(min=0)], default=0)
-    November = FloatField('November', validators=[NumberRange(min=0)], default=0)
-    December = FloatField('December', validators=[NumberRange(min=0)], default=0)
-
 class HotelForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired(), Length(max=100)])
     description = TextAreaField('Description', validators=[DataRequired(), Length(max=255)])
     location = StringField('Location', validators=[DataRequired(), Length(max=100)])
-    availability = FormField(MonthAvailabilityForm)
+    availability = WTFormField(MonthAvailabilityForm)
     submit = SubmitField('Submit')
 
 class UpdateHotelForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     description = TextAreaField('Description', validators=[DataRequired()])
     location = StringField('Location', validators=[DataRequired()])
-    availability = FormField(MonthAvailabilityForm)
+    availability = WTFormField(MonthAvailabilityForm)
     submit = SubmitField('Update')
 
+class RatesForm(FlaskForm):
+    rates = FieldList(IntegerField('Rate', validators=[Optional(), NumberRange(min=0)]))
+
 class RoomForm(FlaskForm):
-    hotel_id = HiddenField('Hotel ID', validators=[DataRequired()])
-    type = StringField('Type', validators=[DataRequired(), Length(max=100)])
+    hotel_id = IntegerField('Hotel ID', validators=[DataRequired()])
+    type = StringField('Room Type', validators=[DataRequired()])
     availability = BooleanField('Availability')
-    rooms_available = IntegerField('Rooms Available', validators=[DataRequired(), NumberRange(min=1)])
-    rates = FormField(MonthRatesForm)
-    weekend_rates_addition = FormField(MonthWeekendRatesForm)
-    submit = SubmitField('Submit')
+    rooms_available = IntegerField('Rooms Available', validators=[DataRequired()])
+    inclusion = StringField('Inclusion')
+    january_rates = FormField(RatesForm)
+    february_rates = FormField(RatesForm)
+    march_rates = FormField(RatesForm)
+    april_rates = FormField(RatesForm)
+    may_rates = FormField(RatesForm)
+    june_rates = FormField(RatesForm)
+    july_rates = FormField(RatesForm)
+    august_rates = FormField(RatesForm)
+    september_rates = FormField(RatesForm)
+    october_rates = FormField(RatesForm)
+    november_rates = FormField(RatesForm)
+    december_rates = FormField(RatesForm)
+    submit = SubmitField('Create Room')
