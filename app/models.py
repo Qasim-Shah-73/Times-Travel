@@ -2,6 +2,7 @@ from datetime import datetime
 from app import db, login
 from flask_login import UserMixin
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.sqlite import JSON
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
@@ -47,18 +48,19 @@ class Room(db.Model):
     availability = db.Column(db.Boolean, nullable=False)
     rooms_available = db.Column(db.Integer, nullable=False)
     inclusion = db.Column(db.String(100))
-    january_rates = db.Column(JSONB)
-    february_rates = db.Column(JSONB)
-    march_rates = db.Column(JSONB)
-    april_rates = db.Column(JSONB)
-    may_rates = db.Column(JSONB)
-    june_rates = db.Column(JSONB)
-    july_rates = db.Column(JSONB)
-    august_rates = db.Column(JSONB)
-    september_rates = db.Column(JSONB)
-    october_rates = db.Column(JSONB)
-    november_rates = db.Column(JSONB)
-    december_rates = db.Column(JSONB)
+    january_rates = db.Column(JSON, nullable=True)  # Change JSONB to TEXT
+    february_rates = db.Column(JSON, nullable=True)  # Change JSONB to TEXT
+    march_rates = db.Column(JSON, nullable=True)  # Change JSONB to TEXT
+    april_rates = db.Column(JSON, nullable=True)  # Change JSONB to TEXT
+    may_rates = db.Column(JSON, nullable=True)  # Change JSONB to TEXT
+    june_rates = db.Column(JSON, nullable=True)  # Change JSONB to TEXT
+    july_rates = db.Column(JSON, nullable=True)  # Change JSONB to TEXT
+    august_rates = db.Column(JSON, nullable=True)  # Change JSONB to TEXT
+    september_rates = db.Column(JSON, nullable=True)  # Change JSONB to TEXT
+    october_rates = db.Column(JSON, nullable=True)  # Change JSONB to TEXT
+    november_rates = db.Column(JSON, nullable=True)  # Change JSONB to TEXT
+    december_rates = db.Column(JSON, nullable=True)  # Change JSONB to TEXT
+    total_price = db.Column(db.Float, default=0)
 
     def __init__(self, **kwargs):
         super(Room, self).__init__(**kwargs)
@@ -100,5 +102,6 @@ class Room(db.Model):
             'october_rates': self.october_rates,
             'november_rates': self.november_rates,
             'december_rates': self.december_rates,
-            'inclusion': self.inclusion
+            'inclusion': self.inclusion,
+            'total_price': self.total_price 
         }

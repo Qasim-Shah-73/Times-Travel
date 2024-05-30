@@ -1,10 +1,9 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
+from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import current_user, login_user, logout_user, login_required
 from app import db
 from app.models import User, Hotel, Room
 from app.forms import LoginForm, RegistrationForm, HotelForm, RoomForm, UpdateHotelForm
-from datetime import datetime
-from sqlalchemy import func
+from datetime import datetime, timedelta
 
 
 bp = Blueprint('main', __name__)
@@ -282,30 +281,72 @@ def view_rooms(hotel_id):
 @bp.route('/search_hotels', methods=['GET'])
 @login_required
 def search_hotels():
+    # Get user inputs
     location = request.args.get('location')
     check_in_date_str = request.args.get('check_in')
     check_out_date_str = request.args.get('check_out')
-    check_in_date = datetime.strptime(check_in_date_str, '%Y-%m-%d')  # Convert to datetime object
-    check_out_date = datetime.strptime(check_out_date_str, '%Y-%m-%d')  # Convert to datetime object
-    check_in_month = check_in_date.strftime('%B')  # Get the month name
+    check_in_month = datetime.strptime(check_in_date_str, '%Y-%m-%d').strftime('%B')  # Get the month name
 
     # Format dates to 'd m y'
-    check_in_date = check_in_date.strftime('%d-%m-%Y')
-    check_out_date = check_out_date.strftime('%d-%m-%Y')
+    check_in_date = datetime.strptime(check_in_date_str, '%Y-%m-%d').strftime('%d-%m-%Y')
+    check_out_date = datetime.strptime(check_out_date_str, '%Y-%m-%d').strftime('%d-%m-%Y')
+
+    # Determine the location type based on the presence of "Makkah" or "Madinah" in the location string
+    location_type = None
+    if 'Makkah' in location:
+        location_type = 'Makkah'
+    elif 'Madinah' in location:
+        location_type = 'Madinah'
 
     # Query database for hotels available at the specified location
-    hotels = Hotel.query.filter_by(location=location).all()
+    hotels = Hotel.query.filter_by(location=location_type).all()
 
     # Filter available hotels based on availability for the check-in month
     available_hotels = [hotel for hotel in hotels if is_month_available(hotel, check_in_month)]
 
+    # Calculate price for each room in available hotels
+    for hotel in available_hotels:
+        for room in hotel.rooms:
+            # Determine number of persons based on room type
+            persons = 1
+            if 'Single' in room.type:
+                persons = 1
+            elif 'Double' in room.type:
+                persons = 2
+            elif 'Triple' in room.type:
+                persons = 3
+            elif 'Quad' in room.type:
+                persons = 4
+            
+            # Calculate price based on check-in and check-out dates
+            check_in_date = datetime.strptime(check_in_date_str, '%Y-%m-%d')
+            check_out_date = datetime.strptime(check_out_date_str, '%Y-%m-%d')
+
+            total_price = 0
+
+            # Loop through each day and add the corresponding rate for that day
+            current_date = check_in_date
+            while current_date < check_out_date:
+                # Get the rates for the current month
+                current_month_rates = getattr(room, current_date.strftime('%B').lower() + '_rates', {})
+                # Add the rate for the current day to the total price
+                total_price += current_month_rates.get('Day{}'.format(current_date.day), 0)
+                # Move to the next day
+                current_date += timedelta(days=1)
+
+            # Multiply total price by number of persons
+            total_price *= persons
+
+            # Store the calculated total price in the room object
+            room.total_price = total_price
+
     return render_template('search_hotels.html', 
                            hotels=available_hotels, 
-                           month= check_in_month, 
-                           check_in = check_in_date,
-                           check_out = check_out_date,
-                           location = location,
-                           nights = request.args.get('total_nights'))
+                           month=check_in_month, 
+                           check_in=check_in_date,
+                           check_out=check_out_date,
+                           location=location,
+                           nights=request.args.get('total_nights'))
 
 def is_month_available(hotel, check_in_month):
     """
@@ -323,10 +364,10 @@ def booking_form(hotel_id, room_id):
     check_in = request.args.get('check_in')
     check_out = request.args.get('check_out')
     nights = request.args.get('nights')
-    # Assigning default value as 1
-    persons = 1
+    price = request.args.get('price')
+    persons = 1  # Default value
 
-    # Checking room type for keywords
+    # Determine number of persons based on room type
     if 'Single' in room.type:
         persons = 1
     elif 'Double' in room.type:
@@ -336,9 +377,11 @@ def booking_form(hotel_id, room_id):
     elif 'Quad' in room.type:
         persons = 4
 
+
+
     return render_template('booking_form.html', hotel=hotel, room=room, location=location,
-                            check_in=check_in, check_out=check_out, nights=nights, persons = persons,
-                            name = hotel.name, type = room.type)
+                           check_in=check_in, check_out=check_out, nights=nights, persons=persons,
+                           name=hotel.name, type=room.type, price=price)
 
 @bp.route('/book/<int:hotel_id>/<int:room_id>', methods=['GET', 'POST'])
 @login_required

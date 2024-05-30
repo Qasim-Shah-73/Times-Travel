@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import FormField,StringField, TextAreaField, FieldList, BooleanField, SubmitField, IntegerField, PasswordField
-from wtforms.validators import DataRequired, Length, NumberRange, Email, EqualTo, ValidationError,Optional
+from wtforms import FormField,StringField, TextAreaField, FieldList, BooleanField, SubmitField, IntegerField, PasswordField, SelectField
+from wtforms.validators import DataRequired, Length, NumberRange, Email, EqualTo, ValidationError,Optional, InputRequired
 from wtforms.fields import FormField as WTFormField
 from calendar import monthrange
 from app.models import User, Room, Hotel
@@ -46,14 +46,14 @@ class MonthAvailabilityForm(FlaskForm):
 class HotelForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired(), Length(max=100)])
     description = TextAreaField('Description', validators=[DataRequired(), Length(max=255)])
-    location = StringField('Location', validators=[DataRequired(), Length(max=100)])
+    location = SelectField('Location', choices=[('Makkah', 'Makkah, Saudi Arabia'), ('Madinah', 'Madinah, Saudi Arabia')], validators=[InputRequired()])
     availability = WTFormField(MonthAvailabilityForm)
     submit = SubmitField('Submit')
 
 class UpdateHotelForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     description = TextAreaField('Description', validators=[DataRequired()])
-    location = StringField('Location', validators=[DataRequired()])
+    location = SelectField('Location', choices=[('Makkah', 'Makkah, Saudi Arabia'), ('Madinah', 'Madinah, Saudi Arabia')], validators=[InputRequired()], render_kw={"size": 1})
     availability = WTFormField(MonthAvailabilityForm)
     submit = SubmitField('Update')
 
