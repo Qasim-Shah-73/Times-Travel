@@ -214,24 +214,19 @@ def update_room(hotel_id, room_id):
     room = Room.query.get_or_404(room_id)
     form = RoomForm(obj=room)
 
-    def set_days(form_field, days):
-        while len(form_field.rates) < days:
-            form_field.rates.append_entry()
-        while len(form_field.rates) > days:
-            form_field.rates.pop_entry()
-
-    set_days(form.january_rates, 31)
-    set_days(form.february_rates, 28)
-    set_days(form.march_rates, 31)
-    set_days(form.april_rates, 30)
-    set_days(form.may_rates, 31)
-    set_days(form.june_rates, 30)
-    set_days(form.july_rates, 31)
-    set_days(form.august_rates, 31)
-    set_days(form.september_rates, 30)
-    set_days(form.october_rates, 31)
-    set_days(form.november_rates, 30)
-    set_days(form.december_rates, 31)
+    # Populate RatesForm fields with existing data
+    form.january_rates.populate_rates(room.january_rates)
+    form.february_rates.populate_rates(room.february_rates)
+    form.march_rates.populate_rates(room.march_rates)
+    form.april_rates.populate_rates(room.april_rates)
+    form.may_rates.populate_rates(room.may_rates)
+    form.june_rates.populate_rates(room.june_rates)
+    form.july_rates.populate_rates(room.july_rates)
+    form.august_rates.populate_rates(room.august_rates)
+    form.september_rates.populate_rates(room.september_rates)
+    form.october_rates.populate_rates(room.october_rates)
+    form.november_rates.populate_rates(room.november_rates)
+    form.december_rates.populate_rates(room.december_rates)
 
     if form.validate_on_submit():
         room.type = form.type.data

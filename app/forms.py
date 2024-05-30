@@ -60,6 +60,10 @@ class UpdateHotelForm(FlaskForm):
 class RatesForm(FlaskForm):
     rates = FieldList(IntegerField('Rate', validators=[Optional(), NumberRange(min=0)]))
 
+    def populate_rates(self, rate_dict):
+        for i, rate in rate_dict.items():
+            self.rates.append_entry(rate)
+
 class RoomForm(FlaskForm):
     hotel_id = IntegerField('Hotel ID', validators=[DataRequired()])
     type = StringField('Room Type', validators=[DataRequired()])
