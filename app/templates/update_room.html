@@ -25,6 +25,7 @@
     <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Update Room</h2>
     <form method="post">
         {{ form.hidden_tag() }}
+        
         <div class="mb-4">
             {{ form.type.label(class="block text-gray-700 font-bold mb-2") }}
             {{ form.type(size=32, class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
@@ -32,6 +33,7 @@
             <span class="text-red-500">{{ error }}</span>
             {% endfor %}
         </div>
+
         <div class="mb-4 flex items-center">
             <label for="availability" class="block text-gray-700 font-bold mr-4">Availability</label>
             <div class="relative inline-block w-10 align-middle select-none">
@@ -43,6 +45,7 @@
                 </div>
             </div>
         </div>
+
         <div class="mb-4">
             {{ form.rooms_available.label(class="block text-gray-700 font-bold mb-2") }}
             {{ form.rooms_available(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
@@ -50,6 +53,25 @@
             <span class="text-red-500">{{ error }}</span>
             {% endfor %}
         </div>
+
+        <!-- Added inclusion field -->
+        <div class="mb-4">
+            {{ form.inclusion.label(class="block text-gray-700 font-bold mb-2") }}
+            {{ form.inclusion(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+            {% for error in form.inclusion.errors %}
+            <span class="text-red-500">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <!-- Added notes field -->
+        <div class="mb-4">
+            {{ form.notes.label(class="block text-gray-700 font-bold mb-2") }}
+            {{ form.notes(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+            {% for error in form.notes.errors %}
+            <span class="text-red-500">{{ error }}</span>
+            {% endfor %}
+        </div>
+
         <div class="mb-6">
             {% for month_form in [form.january_rates, form.february_rates, form.march_rates, form.april_rates, form.may_rates, form.june_rates, form.july_rates, form.august_rates, form.september_rates, form.october_rates, form.november_rates, form.december_rates] %}
             <div class="mb-4">
@@ -68,6 +90,7 @@
             </div>
             {% endfor %}
         </div>
+
         <div class="text-center">
             {{ form.submit(class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline") }}
         </div>

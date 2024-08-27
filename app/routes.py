@@ -184,6 +184,7 @@ def create_room(hotel_id):
             availability=form.availability.data,
             rooms_available=form.rooms_available.data,
             inclusion=form.inclusion.data,
+            notes=form.notes.data,
             january_rates={f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.january_rates.rates.data)},
             february_rates={f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.february_rates.rates.data)},
             march_rates={f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.march_rates.rates.data)},
@@ -232,6 +233,8 @@ def update_room(hotel_id, room_id):
         room.type = form.type.data
         room.availability = form.availability.data
         room.rooms_available = form.rooms_available.data
+        room.inclusion = form.inclusion.data
+        room.notes = form.notes.data
         room.january_rates = {f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.january_rates.rates.data)}
         room.february_rates = {f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.february_rates.rates.data)}
         room.march_rates = {f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.march_rates.rates.data)}

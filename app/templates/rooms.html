@@ -19,12 +19,13 @@
                             <p><span class="font-bold">Type:</span> <span class="ml-2 text-right">{{ room.type }}</span></p>
                             <p><span class="font-bold">Availability:</span> <span class="ml-2 text-right">{{ 'Available' if room.availability else 'Not Available' }}</span></p>
                             <p><span class="font-bold">Rooms Available:</span> <span class="ml-2 text-right">{{ room.rooms_available }}</span></p>
+                            <p><span class="font-bold">Inclusion:</span> <span class="ml-2 text-right">{{ room.inclusion }}</span></p>
                         </div>
                     </div>
                     <div class="divide-y divide-gray-300">
                         <div class="mb-4">
-                            <h3 class="text-lg font-bold mb-2">Inclusion:</h3>
-                            <p>{{ room.inclusion }}</p>
+                            <h3 class="text-lg font-bold mb-2">Notes:</h3>
+                            <p>{{ room.notes }}</p>
                         </div>
                         <div>
                             <h3 class="text-lg font-bold mb-2">Rates:</h3>

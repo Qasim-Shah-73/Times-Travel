@@ -70,6 +70,7 @@ class RoomForm(FlaskForm):
     availability = BooleanField('Availability')
     rooms_available = IntegerField('Rooms Available', validators=[DataRequired()])
     inclusion = StringField('Inclusion')
+    notes = StringField('Notes')
     january_rates = FormField(RatesForm)
     february_rates = FormField(RatesForm)
     march_rates = FormField(RatesForm)

@@ -39,6 +39,10 @@
             {{ form.inclusion.label(class="block text-gray-700 text-sm font-bold mb-2") }}
             {{ form.inclusion(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
         </div>
+        <div class="mb-4">
+            {{ form.notes.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+            {{ form.notes(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+        </div>
 
         {% for month_form in [form.january_rates, form.february_rates, form.march_rates, form.april_rates, form.may_rates, form.june_rates, form.july_rates, form.august_rates, form.september_rates, form.october_rates, form.november_rates, form.december_rates] %}
         <div class="mb-4">

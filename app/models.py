@@ -48,6 +48,7 @@ class Room(db.Model):
     availability = db.Column(db.Boolean, nullable=False)
     rooms_available = db.Column(db.Integer, nullable=False)
     inclusion = db.Column(db.String(100))
+    notes = db.Column(db.String(100))
     january_rates = db.Column(JSON, nullable=True)
     february_rates = db.Column(JSON, nullable=True)
     march_rates = db.Column(JSON, nullable=True)
