@@ -1,4 +1,8 @@
-{% extends "base.html" %} {% block title %}Hotels{% endblock %} {% block content %}
+{% extends "base.html" %}
+
+{% block title %}Hotels{% endblock %}
+
+{% block content %}
 <div class="bg-gray-100 min-h-screen py-6">
   <div class="container mx-auto bg-white rounded-lg shadow-md overflow-hidden">
     <!-- Header section -->
@@ -18,8 +22,8 @@
         <li class="bg-white rounded-lg shadow-md overflow-hidden">
           <div class="relative">
             <img
-              src="https://via.placeholder.com/400x200"
-              alt="Hotel Image"
+              src="{{ url_for('static', filename='images/' ~ hotel.image) if hotel.image else url_for('static', filename='images/hotel.png') }}"
+              alt="{{ hotel.name }} Image"
               class="w-full h-48 object-cover"
             />
             <div

@@ -4,6 +4,9 @@ from app import db
 from app.models import User, Hotel, Room
 from app.forms import LoginForm, RegistrationForm, HotelForm, RoomForm, UpdateHotelForm, UpdateRoomForm
 from datetime import datetime, timedelta
+from werkzeug.utils import secure_filename
+import os
+from flask import current_app
 
 
 bp = Blueprint('main', __name__)
@@ -64,6 +67,11 @@ def create_hotel():
     
     form = HotelForm()
     if form.validate_on_submit():
+        # Handle image upload
+        image_file = None
+        if form.image.data:
+            image_file = save_image(form.image.data)
+
         availability = {
             'January': form.availability.January.data,
             'February': form.availability.February.data,
@@ -78,16 +86,74 @@ def create_hotel():
             'November': form.availability.November.data,
             'December': form.availability.December.data
         }
+
         new_hotel = Hotel(
             name=form.name.data,
             description=form.description.data,
             location=form.location.data,
-            availability=availability
+            availability=availability,
+            image=image_file  # Save image filename in the database
         )
         db.session.add(new_hotel)
         db.session.commit()
+        flash('Hotel created successfully', 'success')
         return redirect(url_for('main.view_hotels'))
+    
     return render_template('create_hotel.html', form=form)
+
+def save_image(image):
+    filename = secure_filename(image.filename)
+    filepath = os.path.join(current_app.root_path, 'static/images', filename)
+    image.save(filepath)
+    return filename
+
+
+@bp.route('/hotels/<int:hotel_id>/update', methods=['GET', 'POST'])
+@login_required
+def update_hotel(hotel_id):
+    if not is_logged_in_admin():
+        flash('You need to be logged in as an admin to access this page.', 'warning')
+        return redirect(url_for('main.index'))
+    
+    hotel = Hotel.query.get_or_404(hotel_id)
+    form = UpdateHotelForm(obj=hotel)
+    
+    if form.validate_on_submit():
+        # Handle image update
+        if form.image.data:
+            if hotel.image:  # Optionally delete the old image
+                delete_image(hotel.image)
+            hotel.image = save_image(form.image.data)
+
+        hotel.name = form.name.data
+        hotel.description = form.description.data
+        hotel.location = form.location.data
+        hotel.availability = {
+            'January': form.availability.January.data,
+            'February': form.availability.February.data,
+            'March': form.availability.March.data,
+            'April': form.availability.April.data,
+            'May': form.availability.May.data,
+            'June': form.availability.June.data,
+            'July': form.availability.July.data,
+            'August': form.availability.August.data,
+            'September': form.availability.September.data,
+            'October': form.availability.October.data,
+            'November': form.availability.November.data,
+            'December': form.availability.December.data
+        }
+        
+        db.session.commit()
+        flash('Hotel updated successfully', 'success')
+        return redirect(url_for('main.view_hotels'))
+    
+    return render_template('update_hotel.html', form=form, hotel=hotel)
+
+def delete_image(filename):
+    filepath = os.path.join(current_app.root_path, 'static/images', filename)
+    if os.path.exists(filepath):
+        os.remove(filepath)
+
 
 @bp.route('/hotels', methods=['GET'])
 @login_required
@@ -114,37 +180,6 @@ def delete_hotel(hotel_id):
     db.session.commit()
     return redirect(url_for('main.view_hotels'))
 
-@bp.route('/hotels/<int:hotel_id>/update', methods=['GET', 'POST'])
-@login_required
-def update_hotel(hotel_id):
-    if not is_logged_in_admin():
-        flash('You need to be logged in as an admin to access this page.', 'warning')
-        return redirect(url_for('main.index'))
-    
-    hotel = Hotel.query.get_or_404(hotel_id)
-    form = UpdateHotelForm(obj=hotel)
-    if form.validate_on_submit():
-        hotel.name = form.name.data
-        hotel.description = form.description.data
-        hotel.location = form.location.data
-        hotel.availability = {
-            'January': form.availability.January.data,
-            'February': form.availability.February.data,
-            'March': form.availability.March.data,
-            'April': form.availability.April.data,
-            'May': form.availability.May.data,
-            'June': form.availability.June.data,
-            'July': form.availability.July.data,
-            'August': form.availability.August.data,
-            'September': form.availability.September.data,
-            'October': form.availability.October.data,
-            'November': form.availability.November.data,
-            'December': form.availability.December.data
-        }
-        db.session.commit()
-        flash('Hotel updated successfully', 'success')
-        return redirect(url_for('main.view_hotels'))
-    return render_template('update_hotel.html', form=form, hotel=hotel)
 
 @bp.route('/hotels/<int:hotel_id>/rooms/create', methods=['GET', 'POST'])
 @login_required

@@ -29,6 +29,7 @@ class Hotel(db.Model):
     description = db.Column(db.String(255), nullable=False)
     location = db.Column(db.String(100), nullable=False)
     availability = db.Column(db.JSON, nullable=False)  # Dictionary to hold availability for each month
+    image = db.Column(db.String(255), nullable=True)  # New field to store image filename or URL
     rooms = db.relationship('Room', backref='hotel', cascade='all, delete-orphan', lazy=True)
 
     def to_dict(self):
@@ -37,8 +38,10 @@ class Hotel(db.Model):
             'name': self.name,
             'description': self.description,
             'location': self.location,
-            'availability': self.availability
+            'availability': self.availability,
+            'image': self.image  # Include image in the dict
         }
+
 
 class Room(db.Model):
     __tablename__ = 'room'

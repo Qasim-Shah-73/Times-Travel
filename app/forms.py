@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import FormField,StringField, TextAreaField, FieldList, BooleanField, SubmitField, IntegerField, PasswordField, SelectField
 from wtforms.validators import DataRequired, Length, NumberRange, Email, EqualTo, ValidationError,Optional, InputRequired
 from wtforms.fields import FormField as WTFormField
+from flask_wtf.file import FileField, FileAllowed
 from calendar import monthrange
 from app.models import User, Room, Hotel
 
@@ -48,6 +49,7 @@ class HotelForm(FlaskForm):
     description = TextAreaField('Description', validators=[DataRequired(), Length(max=255)])
     location = SelectField('Location', choices=[('Makkah', 'Makkah, Saudi Arabia'), ('Madinah', 'Madinah, Saudi Arabia')], validators=[InputRequired()])
     availability = WTFormField(MonthAvailabilityForm)
+    image = FileField('Hotel Image', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])  # Image upload field
     submit = SubmitField('Submit')
 
 class UpdateHotelForm(FlaskForm):
@@ -55,6 +57,7 @@ class UpdateHotelForm(FlaskForm):
     description = TextAreaField('Description', validators=[DataRequired()])
     location = SelectField('Location', choices=[('Makkah', 'Makkah, Saudi Arabia'), ('Madinah', 'Madinah, Saudi Arabia')], validators=[InputRequired()], render_kw={"size": 1})
     availability = WTFormField(MonthAvailabilityForm)
+    image = FileField('Update Hotel Image', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])  # Image upload field
     submit = SubmitField('Update')
 
 class RatesForm(FlaskForm):
