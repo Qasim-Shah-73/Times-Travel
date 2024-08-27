@@ -48,18 +48,18 @@ class Room(db.Model):
     availability = db.Column(db.Boolean, nullable=False)
     rooms_available = db.Column(db.Integer, nullable=False)
     inclusion = db.Column(db.String(100))
-    january_rates = db.Column(JSON, nullable=True)  # Change JSONB to TEXT
-    february_rates = db.Column(JSON, nullable=True)  # Change JSONB to TEXT
-    march_rates = db.Column(JSON, nullable=True)  # Change JSONB to TEXT
-    april_rates = db.Column(JSON, nullable=True)  # Change JSONB to TEXT
-    may_rates = db.Column(JSON, nullable=True)  # Change JSONB to TEXT
-    june_rates = db.Column(JSON, nullable=True)  # Change JSONB to TEXT
-    july_rates = db.Column(JSON, nullable=True)  # Change JSONB to TEXT
-    august_rates = db.Column(JSON, nullable=True)  # Change JSONB to TEXT
-    september_rates = db.Column(JSON, nullable=True)  # Change JSONB to TEXT
-    october_rates = db.Column(JSON, nullable=True)  # Change JSONB to TEXT
-    november_rates = db.Column(JSON, nullable=True)  # Change JSONB to TEXT
-    december_rates = db.Column(JSON, nullable=True)  # Change JSONB to TEXT
+    january_rates = db.Column(JSON, nullable=True)
+    february_rates = db.Column(JSON, nullable=True)
+    march_rates = db.Column(JSON, nullable=True)
+    april_rates = db.Column(JSON, nullable=True)
+    may_rates = db.Column(JSON, nullable=True)
+    june_rates = db.Column(JSON, nullable=True)
+    july_rates = db.Column(JSON, nullable=True)
+    august_rates = db.Column(JSON, nullable=True)
+    september_rates = db.Column(JSON, nullable=True)
+    october_rates = db.Column(JSON, nullable=True)
+    november_rates = db.Column(JSON, nullable=True)
+    december_rates = db.Column(JSON, nullable=True)
     total_price = db.Column(db.Float, default=0)
 
     def __init__(self, **kwargs):
