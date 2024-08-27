@@ -76,9 +76,8 @@
             {% for month_form in [form.january_rates, form.february_rates, form.march_rates, form.april_rates, form.may_rates, form.june_rates, form.july_rates, form.august_rates, form.september_rates, form.october_rates, form.november_rates, form.december_rates] %}
             <div class="mb-4">
                 <h3 class="text-lg font-semibold mb-2">{{ month_form.label.text }}</h3>
-                {{ month_form.hidden_tag() }}
                 <div class="flex flex-wrap -mx-2">
-                    {% for rate_field in month_form.rates %}
+                    {% for rate_field in month_form %}
                     <div class="w-1/3 px-2">
                         <div class="mb-4">
                             <label class="block text-gray-700 font-bold mb-1">Day {{ loop.index }}</label>

@@ -84,3 +84,27 @@ class RoomForm(FlaskForm):
     november_rates = FormField(RatesForm)
     december_rates = FormField(RatesForm)
     submit = SubmitField('Create Room')
+    
+class UpdateRoomForm(FlaskForm):
+    hotel_id = IntegerField('Hotel ID', validators=[DataRequired()])
+    type = StringField('Room Type', validators=[DataRequired()])
+    availability = BooleanField('Availability')
+    rooms_available = IntegerField('Rooms Available', validators=[DataRequired()])
+    inclusion = StringField('Inclusion')
+    notes = StringField('Notes')
+    
+    # Instead of using FormField, we'll use FieldList directly
+    january_rates = FieldList(IntegerField('Rate', validators=[Optional(), NumberRange(min=0)]), min_entries=31, max_entries=31)
+    february_rates = FieldList(IntegerField('Rate', validators=[Optional(), NumberRange(min=0)]), min_entries=28, max_entries=28)
+    march_rates = FieldList(IntegerField('Rate', validators=[Optional(), NumberRange(min=0)]), min_entries=31, max_entries=31)
+    april_rates = FieldList(IntegerField('Rate', validators=[Optional(), NumberRange(min=0)]), min_entries=30, max_entries=30)
+    may_rates = FieldList(IntegerField('Rate', validators=[Optional(), NumberRange(min=0)]), min_entries=31, max_entries=31)
+    june_rates = FieldList(IntegerField('Rate', validators=[Optional(), NumberRange(min=0)]), min_entries=30, max_entries=30)
+    july_rates = FieldList(IntegerField('Rate', validators=[Optional(), NumberRange(min=0)]), min_entries=31, max_entries=31)
+    august_rates = FieldList(IntegerField('Rate', validators=[Optional(), NumberRange(min=0)]), min_entries=31, max_entries=31)
+    september_rates = FieldList(IntegerField('Rate', validators=[Optional(), NumberRange(min=0)]), min_entries=30, max_entries=30)
+    october_rates = FieldList(IntegerField('Rate', validators=[Optional(), NumberRange(min=0)]), min_entries=31, max_entries=31)
+    november_rates = FieldList(IntegerField('Rate', validators=[Optional(), NumberRange(min=0)]), min_entries=30, max_entries=30)
+    december_rates = FieldList(IntegerField('Rate', validators=[Optional(), NumberRange(min=0)]), min_entries=31, max_entries=31)
+    
+    submit = SubmitField('Update Room')

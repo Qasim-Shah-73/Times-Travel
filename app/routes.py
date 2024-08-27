@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import current_user, login_user, logout_user, login_required
 from app import db
 from app.models import User, Hotel, Room
-from app.forms import LoginForm, RegistrationForm, HotelForm, RoomForm, UpdateHotelForm
+from app.forms import LoginForm, RegistrationForm, HotelForm, RoomForm, UpdateHotelForm, UpdateRoomForm
 from datetime import datetime, timedelta
 
 
@@ -146,7 +146,6 @@ def update_hotel(hotel_id):
         return redirect(url_for('main.view_hotels'))
     return render_template('update_hotel.html', form=form, hotel=hotel)
 
-
 @bp.route('/hotels/<int:hotel_id>/rooms/create', methods=['GET', 'POST'])
 @login_required
 def create_room(hotel_id):
@@ -213,41 +212,36 @@ def update_room(hotel_id, room_id):
         return redirect(url_for('main.index'))
 
     room = Room.query.get_or_404(room_id)
-    form = RoomForm(obj=room)
+    form = UpdateRoomForm(obj=room)
 
-    # Populate RatesForm fields with existing data
-    form.january_rates.populate_rates(room.january_rates)
-    form.february_rates.populate_rates(room.february_rates)
-    form.march_rates.populate_rates(room.march_rates)
-    form.april_rates.populate_rates(room.april_rates)
-    form.may_rates.populate_rates(room.may_rates)
-    form.june_rates.populate_rates(room.june_rates)
-    form.july_rates.populate_rates(room.july_rates)
-    form.august_rates.populate_rates(room.august_rates)
-    form.september_rates.populate_rates(room.september_rates)
-    form.october_rates.populate_rates(room.october_rates)
-    form.november_rates.populate_rates(room.november_rates)
-    form.december_rates.populate_rates(room.december_rates)
+    if request.method == 'GET':
+        # Populate form with existing data
+        form.hotel_id.data = room.hotel_id
+        form.type.data = room.type
+        form.availability.data = room.availability
+        form.rooms_available.data = room.rooms_available
+        form.inclusion.data = room.inclusion
+        form.notes.data = room.notes
 
-    if form.validate_on_submit():
+        # Populate rate fields
+        for month in ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december']:
+            rates = getattr(room, f'{month}_rates')
+            form_field = getattr(form, f'{month}_rates')
+            for i, rate in enumerate(form_field):
+                rate.process_data(rates.get(f'Day{i+1}', 0))
+
+    if request.method == 'POST':
         room.type = form.type.data
         room.availability = form.availability.data
         room.rooms_available = form.rooms_available.data
         room.inclusion = form.inclusion.data
         room.notes = form.notes.data
-        room.january_rates = {f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.january_rates.rates.data)}
-        room.february_rates = {f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.february_rates.rates.data)}
-        room.march_rates = {f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.march_rates.rates.data)}
-        room.april_rates = {f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.april_rates.rates.data)}
-        room.may_rates = {f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.may_rates.rates.data)}
-        room.june_rates = {f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.june_rates.rates.data)}
-        room.july_rates = {f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.july_rates.rates.data)}
-        room.august_rates = {f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.august_rates.rates.data)}
-        room.september_rates = {f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.september_rates.rates.data)}
-        room.october_rates = {f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.october_rates.rates.data)}
-        room.november_rates = {f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.november_rates.rates.data)}
-        room.december_rates = {f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.december_rates.rates.data)}
-        room.inclusion = form.inclusion.data
+
+        for month in ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december']:
+            form_field = getattr(form, f'{month}_rates')
+            rates = {f'Day{i+1}': rate.data if rate.data is not None else 0 for i, rate in enumerate(form_field)}
+            setattr(room, f'{month}_rates', rates)
+
         db.session.commit()
         flash('Room updated successfully', 'success')
         return redirect(url_for('main.view_hotels', hotel_id=hotel_id))
