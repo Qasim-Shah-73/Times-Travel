@@ -44,6 +44,7 @@
                             {% if current_user.is_authenticated %}
                                 {% if current_user.is_admin %}
                                     <a href="{{ url_for('main.view_hotels') }}" class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">View Hotels</a>
+                                    <a href="{{ url_for('main.view_agencies') }}" class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">View Agencies</a>
                                 {% endif %}
                                 <a href="{{ url_for('main.logout') }}" class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">Logout</a>
                             {% else %}

@@ -1,10 +1,10 @@
 from flask_wtf import FlaskForm
-from wtforms import FormField,StringField, TextAreaField, FieldList, BooleanField, SubmitField, IntegerField, PasswordField, SelectField
+from wtforms import FormField, EmailField, StringField, TextAreaField, FieldList, BooleanField, HiddenField, SubmitField, IntegerField, PasswordField, SelectField
 from wtforms.validators import DataRequired, Length, NumberRange, Email, EqualTo, ValidationError,Optional, InputRequired
 from wtforms.fields import FormField as WTFormField
 from flask_wtf.file import FileField, FileAllowed
 from calendar import monthrange
-from app.models import User, Room, Hotel
+from app.models import User, Room, Hotel, Agency
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -29,6 +29,49 @@ class RegistrationForm(FlaskForm):
         user = User.query.filter_by(email=email.data).first()
         if user is not None:
             raise ValidationError('Please use a different email address.')
+
+class UserUpdateForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(min=4, max=64)])
+    email = EmailField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('New Password', validators=[Optional(), Length(min=6)])
+    is_agency_admin = BooleanField('Agency Admin')
+    submit = SubmitField('Update')
+    
+class UserCreateForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(min=4, max=64)])
+    email = EmailField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
+    is_agency_admin = BooleanField('Agency Admin')
+    agency_id = HiddenField('Agency ID', validators=[DataRequired()])
+    submit = SubmitField('Create')
+
+class AgencyForm(FlaskForm):
+    # Fields for Agency
+    name = StringField('Agency Name', validators=[DataRequired()])
+    email = StringField('Agency Email', validators=[DataRequired(), Email()])
+    designation = StringField('Designation', validators=[DataRequired()])
+    telephone = IntegerField('Telephone', validators=[DataRequired()])
+
+    # Fields for Admin User
+    admin_username = StringField('Admin Username', validators=[DataRequired()])
+    admin_email = StringField('Admin Email', validators=[DataRequired(), Email()])
+    admin_password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
+    admin_password2 = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('admin_password')])
+
+    submit = SubmitField('Register')
+
+    # Custom validation to ensure the admin email does not exist
+    def validate_admin_email(self, admin_email):
+        user = User.query.filter_by(email=admin_email.data).first()
+        if user is not None:
+            raise ValidationError('Please use a different email address for the admin.')
+
+class UpdateAgencyForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired(), Length(max=128)])
+    email = EmailField('Email', validators=[DataRequired(), Email()])
+    designation = StringField('Designation', validators=[Optional(), Length(max=128)])
+    telephone = IntegerField('Telephone', validators=[Optional()])
+    submit = SubmitField('Update')
 
 class MonthAvailabilityForm(FlaskForm):
     January = BooleanField('January')

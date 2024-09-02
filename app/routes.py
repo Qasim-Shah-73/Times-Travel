@@ -1,23 +1,32 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import current_user, login_user, logout_user, login_required
 from app import db
-from app.models import User, Hotel, Room
-from app.forms import LoginForm, RegistrationForm, HotelForm, RoomForm, UpdateHotelForm, UpdateRoomForm
+from app.models import User, Hotel, Room, Agency
+from app.forms import LoginForm, RegistrationForm, HotelForm, RoomForm, UpdateHotelForm, UpdateRoomForm, AgencyForm, UserUpdateForm, UpdateAgencyForm, UserCreateForm
 from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
 import os
 from flask import current_app
 
-
 bp = Blueprint('main', __name__)
 
-def is_logged_in_admin():
+def is_super_admin():
     """
     Check if the user is logged in and is an admin.
     """
     if current_user.is_authenticated and current_user.is_admin:
         return True
     return False
+
+def is_agency_admin():
+    """
+    Check if the user is logged in and is an agency admin.
+    """
+    if current_user.is_authenticated and current_user.is_agency_admin:
+        return True
+    return False
+
+# Basic Index Routes and Login Signup
 
 @bp.route('/')
 @bp.route('/login', methods=['GET', 'POST'])
@@ -58,10 +67,157 @@ def logout():
 def index():
     return render_template('index.html')
 
+# User routes
+@bp.route('/create_user', methods=['GET', 'POST'])
+def create_user():
+    # Retrieve agency_id from query parameters
+    agency_id = request.args.get('agency_id', type=int)
+    
+    form = UserCreateForm()
+
+    # If agency_id is passed, set it in the form
+    if agency_id:
+        form.agency_id.data = agency_id
+
+    if form.validate_on_submit():
+        user = User(
+            username=form.username.data,
+            email=form.email.data,
+            is_agency_admin=form.is_agency_admin.data
+        )
+        if form.password.data:
+            user.set_password(form.password.data)
+
+        # Assign the user to the specified agency
+        if agency_id:
+            agency = Agency.query.get_or_404(agency_id)
+            user.agency_id = agency.id  # Ensure User model has an agency_id field
+
+        db.session.add(user)
+        db.session.commit()
+
+        flash('User created successfully and assigned to the agency!', 'success')
+        return redirect(url_for('main.view_all_users', agency_id=agency_id))
+
+    return render_template('create_user.html', title='Create User', form=form, agency_id=agency_id)
+
+@bp.route('/users/<int:agency_id>', methods=['GET'])
+def view_all_users(agency_id):
+    agency = Agency.query.get_or_404(agency_id)
+    users = User.query.filter_by(agency_id=agency_id).all()
+    return render_template('users.html', users=users, agency=agency)
+
+
+@bp.route('/update_user/<int:user_id>', methods=['GET', 'POST'])
+def update_user(user_id):
+    user = User.query.get_or_404(user_id)
+    
+    form = UserUpdateForm(obj=user)
+    
+    if form.validate_on_submit():
+        user.username = form.username.data
+        user.email = form.email.data
+        if form.password.data:
+            user.set_password(form.password.data)
+        user.is_agency_admin = form.is_agency_admin.data
+        user.is_admin = False  # Ensure this is always false
+
+        db.session.commit()
+        flash('User updated successfully!', 'success')
+        return redirect(url_for('main.view_agencies'))
+
+    return render_template('update_user.html', title='Update User', form=form, user=user)
+
+@bp.route('/delete_user/<int:user_id>', methods=['POST'])
+def delete_user(user_id):
+    user = User.query.get_or_404(user_id)
+    
+    db.session.delete(user)
+    db.session.commit()
+    flash('User deleted successfully!', 'success')
+    return redirect(url_for('main.view_agencies'))
+
+# Agency Routes
+
+@bp.route('/create_agency', methods=['GET', 'POST'])
+def create_agency():
+    if not is_super_admin():
+        flash('You need to be logged in as a Super admin to access this page.', 'warning')
+        return redirect(url_for('main.index'))
+
+    form = AgencyForm()
+
+    if form.validate_on_submit():
+        # Create the agency
+        agency = Agency(
+            name=form.name.data,
+            email=form.email.data,
+            designation=form.designation.data,
+            telephone=form.telephone.data
+        )
+
+        # Create the admin user for the agency
+        admin_user = User(
+            username=form.admin_username.data,
+            email=form.admin_email.data,
+            is_agency_admin=True,  # Mark this user as an agency admin
+            agency=agency  # Link the new admin user to this agency
+        )
+        admin_user.set_password(form.admin_password.data)
+
+        # Add both the new user and agency to the session
+        db.session.add(agency)
+        db.session.add(admin_user)
+        db.session.commit()
+
+        flash('Agency and admin user created successfully!', 'success')
+        return redirect(url_for('main.view_agencies'))
+
+    return render_template('create_agency.html', title='Create Agency', form=form)
+
+@bp.route('/agencies', methods=['GET'])
+@login_required
+def view_agencies():
+    if not is_super_admin():
+        flash('You need to be logged in as an admin to access this page.', 'warning')
+        return redirect(url_for('main.index'))
+    
+    agencies = Agency.query.all()
+    return render_template('agencies.html', agencies=agencies)
+
+@bp.route('/update_agency/<int:agency_id>', methods=['GET', 'POST'])
+def update_agency(agency_id):
+    agency = Agency.query.get_or_404(agency_id)
+    form = UpdateAgencyForm(obj=agency)
+    
+    if form.validate_on_submit():
+        agency.name = form.name.data
+        agency.email = form.email.data
+        agency.designation = form.designation.data
+        agency.telephone = form.telephone.data
+
+        db.session.commit()
+        flash('Agency updated successfully!', 'success')
+        return redirect(url_for('main.view_agencies'))
+
+    return render_template('update_agency.html', title='Update Agency', form=form, agency=agency)
+
+@bp.route('/delete_agency/<int:agency_id>', methods=['POST'])
+def delete_agency(agency_id):
+    agency = Agency.query.get_or_404(agency_id)
+    
+    db.session.delete(agency)
+    db.session.commit()
+    
+    flash('Agency deleted successfully!', 'success')
+    return redirect(url_for('main.view_agencies'))
+
+# Hotel Routes
+
 @bp.route('/create_hotels', methods=['GET', 'POST'])
 @login_required
 def create_hotel():
-    if not is_logged_in_admin():
+    if not is_super_admin():
         flash('You need to be logged in as an admin to access this page.', 'warning')
         return redirect(url_for('main.index'))
     
@@ -107,11 +263,10 @@ def save_image(image):
     image.save(filepath)
     return filename
 
-
 @bp.route('/hotels/<int:hotel_id>/update', methods=['GET', 'POST'])
 @login_required
 def update_hotel(hotel_id):
-    if not is_logged_in_admin():
+    if not is_super_admin():
         flash('You need to be logged in as an admin to access this page.', 'warning')
         return redirect(url_for('main.index'))
     
@@ -154,11 +309,10 @@ def delete_image(filename):
     if os.path.exists(filepath):
         os.remove(filepath)
 
-
 @bp.route('/hotels', methods=['GET'])
 @login_required
 def view_hotels():
-    if not is_logged_in_admin():
+    if not is_super_admin():
         flash('You need to be logged in as an admin to access this page.', 'warning')
         return redirect(url_for('main.index'))
     
@@ -168,7 +322,7 @@ def view_hotels():
 @bp.route('/hotels/<int:hotel_id>/delete', methods=['POST'])
 @login_required
 def delete_hotel(hotel_id):
-    if not is_logged_in_admin():
+    if not is_super_admin():
         flash('You need to be logged in as an admin to access this page.', 'warning')
         return redirect(url_for('main.index'))
 
@@ -180,11 +334,12 @@ def delete_hotel(hotel_id):
     db.session.commit()
     return redirect(url_for('main.view_hotels'))
 
+# Room Routes
 
 @bp.route('/hotels/<int:hotel_id>/rooms/create', methods=['GET', 'POST'])
 @login_required
 def create_room(hotel_id):
-    if not is_logged_in_admin():
+    if not is_super_admin():
         flash('You need to be logged in as an admin to access this page.', 'warning')
         return redirect(url_for('main.index'))
 
@@ -242,7 +397,7 @@ def create_room(hotel_id):
 @bp.route('/hotels/<int:hotel_id>/rooms/<int:room_id>/update', methods=['GET', 'POST'])
 @login_required
 def update_room(hotel_id, room_id):
-    if not is_logged_in_admin():
+    if not is_super_admin():
         flash('You need to be logged in as an admin to access this page.', 'warning')
         return redirect(url_for('main.index'))
 
@@ -286,7 +441,7 @@ def update_room(hotel_id, room_id):
 @bp.route('/hotel/<int:hotel_id>/room/<int:room_id>/delete', methods=['POST'])
 @login_required
 def delete_room(hotel_id, room_id):
-    if not is_logged_in_admin():
+    if not is_super_admin():
         flash('You need to be logged in as an admin to access this page.', 'warning')
         return redirect(url_for('main.index'))
     room = Room.query.get_or_404(room_id)
@@ -297,7 +452,7 @@ def delete_room(hotel_id, room_id):
 @bp.route('/hotels/<int:hotel_id>/rooms', methods=['GET'])
 @login_required
 def view_rooms(hotel_id):
-    if not is_logged_in_admin():
+    if not is_super_admin():
         flash('You need to be logged in as an admin to access this page.', 'warning')
         return redirect(url_for('main.index'))
     

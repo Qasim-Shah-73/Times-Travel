@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Update User{% endblock %}
+
+{% block content %}
+<div class="bg-gray-100 min-h-screen py-6">
+  <div class="container mx-auto bg-white rounded-lg shadow-md overflow-hidden p-8">
+    <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">Update User</h1>
+    <form method="post">
+      {{ form.hidden_tag() }}
+      <div class="mb-4">
+        {{ form.username.label(class="block text-gray-700 font-bold mb-2") }}
+        {{ form.username(class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+        {% for error in form.username.errors %}
+        <span class="text-red-500">{{ error }}</span>
+        {% endfor %}
+      </div>
+      <div class="mb-4">
+        {{ form.email.label(class="block text-gray-700 font-bold mb-2") }}
+        {{ form.email(class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+        {% for error in form.email.errors %}
+        <span class="text-red-500">{{ error }}</span>
+        {% endfor %}
+      </div>
+      <div class="mb-4">
+        {{ form.password.label(class="block text-gray-700 font-bold mb-2") }}
+        {{ form.password(class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+        {% for error in form.password.errors %}
+        <span class="text-red-500">{{ error }}</span>
+        {% endfor %}
+      </div>
+      <div class="mb-4">
+        {{ form.is_agency_admin.label(class="inline-block text-gray-700 font-bold mr-2") }}
+        {{ form.is_agency_admin() }}
+        {% for error in form.is_agency_admin.errors %}
+        <span class="text-red-500">{{ error }}</span>
+        {% endfor %}
+      </div>
+      <div class="text-center mt-6">
+        {{ form.submit(class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-200") }}
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
