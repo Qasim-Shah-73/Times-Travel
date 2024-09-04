@@ -19,6 +19,7 @@ class Agency(db.Model):
     credit_limit = Column(Numeric(precision=12, scale=2), default=0.00)
     used_credit = Column(Numeric(precision=12, scale=2), default=0.00)
     paid_back = Column(Numeric(precision=12, scale=2), default=0.00)
+    account_limit = Column(Numeric(precision=5, scale=0), default=0)
 
     # Relationship to User model
     users = relationship(
@@ -80,10 +81,9 @@ class Booking(db.Model):
     check_out = Column(DateTime, nullable=False)
     hotel_name = Column(String(128), nullable=False)
     room_type = Column(String(128), nullable=True)
-    guest_details = Column(Text, nullable=True)
     agent_id = Column(Integer, ForeignKey('users.id'), nullable=True)  # Agent associated with booking
     agency_id = Column(Integer, ForeignKey('agencies.id'), nullable=True)  # Agency associated with booking
-    confirmation_number = Column(String(64), unique=True, nullable=False)
+    confirmation_number = Column(String(64), unique=True, nullable=True)
     booking_confirmed = Column(Boolean, default=False)
     invoice_paid = Column(Boolean, default=False)
     selling_price = Column(Numeric(precision=12, scale=2), nullable=True)
@@ -93,22 +93,42 @@ class Booking(db.Model):
     # Relationships
     agent = relationship('User', back_populates='bookings', foreign_keys=[agent_id])
     agency = relationship('Agency', back_populates='bookings', foreign_keys=[agency_id])
+    guests = relationship('Guest', back_populates='booking', cascade="all, delete-orphan")
 
     def __repr__(self):
         return f'<Booking {self.confirmation_number}>'
+    
+# Define the Guest model
+class Guest(db.Model):
+    __tablename__ = 'guests'
+
+    id = Column(Integer, primary_key=True)
+    first_name = Column(String(64), nullable=False)
+    last_name = Column(String(64), nullable=False)
+    booking_id = Column(Integer, ForeignKey('bookings.id'), nullable=False)  # Link to Booking model
+
+    # Relationship to Booking model
+    booking = relationship('Booking', back_populates='guests')
+
+    def __repr__(self):
+        return f'<Guest {self.first_name} {self.last_name}>'
     
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
 
+# Define the Hotel model
 class Hotel(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.String(255), nullable=False)
-    location = db.Column(db.String(100), nullable=False)
-    availability = db.Column(db.JSON, nullable=False)  # Dictionary to hold availability for each month
-    image = db.Column(db.String(255), nullable=True)  # New field to store image filename or URL
-    rooms = db.relationship('Room', backref='hotel', cascade='all, delete-orphan', lazy=True)
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100), nullable=False)
+    description = Column(String(255), nullable=False)
+    location = Column(String(100), nullable=False)
+    availability = Column(db.JSON, nullable=False)  # Dictionary to hold availability for each month
+    image = Column(String(255), nullable=True)  # New field to store image filename or URL
+    vendor_id = Column(Integer, ForeignKey('vendors.id'), nullable=True)  # Foreign key for Vendor
+    rooms = relationship('Room', backref='hotel', cascade='all, delete-orphan', lazy=True)
+
+    vendor = relationship('Vendor', backref='hotels', foreign_keys=[vendor_id])
 
     def to_dict(self):
         return {
@@ -117,10 +137,10 @@ class Hotel(db.Model):
             'description': self.description,
             'location': self.location,
             'availability': self.availability,
-            'image': self.image  # Include image in the dict
+            'image': self.image
         }
 
-
+# Define the Room model
 class Room(db.Model):
     __tablename__ = 'room'
     id = db.Column(db.Integer, primary_key=True)
@@ -187,3 +207,24 @@ class Room(db.Model):
             'inclusion': self.inclusion,
             'total_price': self.total_price 
         }
+              
+# Define the Vendor model
+class Vendor(db.Model):
+    __tablename__ = 'vendors'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100), nullable=False)
+    email = Column(String(120), unique=True, nullable=False)
+    contact_person = Column(String(100), nullable=False)
+    phone_number = Column(BigInteger, nullable=True)  # Phone number field
+    bank_details = Column(String(255), nullable=True)
+
+    # Relationship to Hotel model
+    hotels = relationship(
+        'Hotel',
+        backref='vendor',
+        lazy=True
+    )
+
+    def __repr__(self):
+        return f'<Vendor {self.name}>'

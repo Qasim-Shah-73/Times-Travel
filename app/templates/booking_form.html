@@ -151,66 +151,110 @@
         background-color: #ccc;
         margin: 20px 0;
     }
+
+    .button-container {
+        display: flex;
+        justify-content: space-between; /* Distribute space between buttons */
+        gap: 10px; /* Space between buttons */
+    }
+    
+    /* General Button Styles */
+    button {
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        font-family: Arial, sans-serif;
+        width: 48%; /* Adjusted width for side-by-side layout */
+    }
+    
+    /* Book Now Button Styles */
+    .btn-book {
+        background-color: #007bff;
+        color: white;
+    }
+    
+    .btn-book:hover {
+        background-color: #0056b3;
+    }
+    
+    /* Cancel Button Styles */
+    .btn-cancel {
+        background-color: #dc3545; /* Red background color */
+        color: white;
+    }
+    
+    .btn-cancel:hover {
+        background-color: #c82333; /* Darker red on hover */
+    }
 </style>
 
 <div class="">
     <h1>Booking Form</h1>
-    <div class="form-container">
-        <div class="form-section bg-white">
-            {% for i in range(persons) %}
-            <h2>Pax {{ i + 1 }}</h2>
-            <div class="person-info flex">
-                <div class="form-group mx-12">
-                    <label for="first_name{{ i }}"><i class="fas fa-user"></i> First Name:</label>
-                    <input type="text" id="first_name{{ i }}" name="first_name{{ i }}" required>
+    <form method="post" action="{{ url_for('main.book', hotel_id=hotel.id, room_id=room.id, booking_id=booking.id) }}">
+        <div class="form-container">
+            <div class="form-section bg-white">
+                {% for i in range(persons) %}
+                <h2>Pax {{ i + 1 }}</h2>
+                <div class="person-info flex">
+                    <div class="form-group mx-12">
+                        <label for="first_name{{ i }}"><i class="fas fa-user"></i> First Name:</label>
+                        <input type="text" id="first_name{{ i }}" name="first_name{{ i }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="last_name{{ i }}"><i class="fas fa-user"></i> Last Name:</label>
+                        <input type="text" id="last_name{{ i }}" name="last_name{{ i }}" required>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="last_name{{ i }}"><i class="fas fa-user"></i> Last Name:</label>
-                    <input type="text" id="last_name{{ i }}" name="last_name{{ i }}" required>
+                {% if i != persons-1 %}
+                <div class="divider"></div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            <div class="w-full md:w-2/5 mt-8 md:mt-0">
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden p-6">
+                    <h2 class="text-2xl font-semibold text-blue-700 my-4">Booking Summary</h2>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-map-marker-alt mx-2 text-blue-700"></i>
+                        <h3 class="text-gray-600 mr-2 text-blue-700">Hotel Name:</h3>
+                        <p class="text-gray-600">{{ hotel_name }}</p>
+                    </div>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-bed mx-2 text-blue-700"></i>
+                        <h3 class="text-gray-600 mr-2 text-blue-700">Room Type:</h3>
+                        <p class="text-gray-600">{{ room.type }}</p>
+                    </div>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-calendar-alt mx-2 text-blue-700"></i>
+                        <h3 class="text-gray-600 mr-2 text-blue-700">Check-in:</h3>
+                        <p class="text-gray-600">{{ booking.check_in }}</p>
+                    </div>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-calendar-alt mx-2 text-blue-700"></i>
+                        <h3 class="text-gray-600 mr-2 text-blue-700">Check-out:</h3>
+                        <p class="text-gray-600">{{ booking.check_out }}</p>
+                    </div>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-moon mx-2 text-blue-700"></i>
+                        <h3 class="text-gray-600 mr-2 text-blue-700">Nights:</h3>
+                        <p class="text-gray-600">{{ nights }}</p>
+                    </div>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-money-bill-alt mx-2 text-blue-700"></i>
+                        <h3 class="text-gray-600 mr-2 text-blue-700">Price:</h3>
+                        <p class="text-gray-600">{{ booking.selling_price }}</p>
+                    </div>
                 </div>
             </div>
-            {% if i != persons-1 %}
-            <div class="divider"></div>
-            {% endif %}
-            {% endfor %}
         </div>
-        <div class="w-full md:w-2/5 mt-8 md:mt-0">
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden p-6">
-                <h2 class="text-2xl font-semibold text-blue-700 my-4">Booking Summary</h2>
-                <div class="flex items-center mb-4">
-                    <i class="fas fa-map-marker-alt mx-2 text-blue-700"></i>
-                    <h3 class="text-gray-600 mr-2 text-blue-700">Hotel Name:</h3>
-                    <p class="text-gray-600">{{ name }}</p>
-                </div>
-                <div class="flex items-center mb-4">
-                    <i class="fas fa-bed mx-2 text-blue-700"></i>
-                    <h3 class="text-gray-600 mr-2 text-blue-700">Room Type:</h3>
-                    <p class="text-gray-600">{{ type }}</p>
-                </div>
-                <div class="flex items-center mb-4">
-                    <i class="fas fa-calendar-alt mx-2 text-blue-700"></i>
-                    <h3 class="text-gray-600 mr-2 text-blue-700">Check-in:</h3>
-                    <p class="text-gray-600">{{ check_in }}</p>
-                </div>
-                <div class="flex items-center mb-4">
-                    <i class="fas fa-calendar-alt mx-2 text-blue-700"></i>
-                    <h3 class="text-gray-600 mr-2 text-blue-700">Check-out:</h3>
-                    <p class="text-gray-600">{{ check_out }}</p>
-                </div>
-                <div class="flex items-center mb-4">
-                    <i class="fas fa-moon mx-2 text-blue-700"></i>
-                    <h3 class="text-gray-600 mr-2 text-blue-700">Nights:</h3>
-                    <p class="text-gray-600">{{ nights }}</p>
-                </div>
-                <div class="flex items-center mb-4">
-                    <i class="fas fa-money-bill-alt mx-2 text-blue-700"></i>
-                    <h3 class="text-gray-600 mr-2 text-blue-700">Price:</h3>
-                    <p class="text-gray-600">{{ price }}</p>
-                </div>
-            </div>
+        <div class="button-container">
+            <button class="my-8 btn-book" type="submit" id="book_now">Book Now</button>
+            <button class="my-8 btn-cancel" type="submit" name="cancel" value="true">Cancel</button>
         </div>
-    </div>
-    <button class="my-8" type="submit" id="book_now">Book Now</button>
+    </form>
 </div>
 
 <!-- The Modal -->
@@ -231,6 +275,7 @@
         // Close the modal after 2 seconds
         setTimeout(function() {
             document.getElementById('bookingModal').style.display = "none";
+            document.querySelector('form').submit(); // Submit the form after showing the modal
         }, 2000);
     });
 

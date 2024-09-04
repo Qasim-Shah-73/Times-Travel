@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import current_user, login_user, logout_user, login_required
 from app import db
-from app.models import User, Hotel, Room, Agency
+from app.models import User, Hotel, Room, Agency, Booking, Guest
 from app.forms import LoginForm, RegistrationForm, HotelForm, RoomForm, UpdateHotelForm, UpdateRoomForm, AgencyForm, UserUpdateForm, UpdateAgencyForm, UserCreateForm
 from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
@@ -583,12 +583,52 @@ def is_month_available(hotel, check_in_month):
 def booking_form(hotel_id, room_id):
     hotel = Hotel.query.get_or_404(hotel_id)
     room = Room.query.get_or_404(room_id)
-    location = request.args.get('location')
-    check_in = request.args.get('check_in')
-    check_out = request.args.get('check_out')
+    
+    # Extract query parameters
+    check_in_str = request.args.get('check_in')
+    check_out_str = request.args.get('check_out')
     nights = request.args.get('nights')
     price = request.args.get('price')
-    persons = 1  # Default value
+
+    # Assuming the current user is the agent making the booking
+    agent = current_user
+
+    # Example agency fetch based on the agent's info
+    agency = agent.agency if agent.agency else None
+    # Convert check_in and check_out to datetime objects if they are strings
+    try:
+        if check_in_str and check_out_str:
+            check_in = datetime.strptime(check_in_str, '%Y-%m-%d %H:%M:%S')
+            check_out = datetime.strptime(check_out_str, '%Y-%m-%d %H:%M:%S')
+            print(f"Parsed check_in: {check_in}")
+            print(f"Parsed check_out: {check_out}")
+        else:
+            flash("Check-in and check-out dates are required.", "danger")
+            return redirect(url_for('some_error_handling_view'))  # Redirect to an error handling view or the booking form
+    except ValueError as e:
+        print(f"Error parsing dates. Check-in: {check_in_str}, Check-out: {check_out_str}. Error: {e}")
+        flash("Invalid date format. Please use YYYY-MM-DD HH:MM:SS.", "danger")
+
+    # Create the booking object
+    new_booking = Booking(
+        check_in=check_in,
+        check_out=check_out,
+        hotel_name=hotel.name,
+        room_type=room.type,  # Updated to use `room.room_type` for consistency
+        agent_id=agent.id if agent else None,
+        agency_id=agency.id if agency else None,
+        booking_confirmed=False,  # Default as not confirmed
+        invoice_paid=False,  # Default as not paid
+        selling_price=price,  # Selling price from request
+        buying_price=None,  # Set if you have a buying price (could be calculated separately)
+        remarks=f"Booking created by {agent.username}."
+    )
+
+    # Add the new booking to the session and commit
+    db.session.add(new_booking)
+    db.session.commit()
+    
+    flash('Booking created successfully', 'success')
 
     # Determine number of persons based on room type
     if 'Single' in room.type:
@@ -602,24 +642,58 @@ def booking_form(hotel_id, room_id):
 
 
 
-    return render_template('booking_form.html', hotel=hotel, room=room, location=location,
-                           check_in=check_in, check_out=check_out, nights=nights, persons=persons,
-                           name=hotel.name, type=room.type, price=price)
+    return render_template('booking_form.html', hotel=hotel, room=room, booking=new_booking,
+                           nights=nights, persons=persons, hotel_name=hotel.name)
 
-@bp.route('/book/<int:hotel_id>/<int:room_id>', methods=['GET', 'POST'])
+#booking is created here
+@bp.route('/book/<int:hotel_id>/<int:room_id>/<int:booking_id>', methods=['GET', 'POST'])
 @login_required
-def book(hotel_id, room_id):
-    hotel = Hotel.query.get_or_404(hotel_id)
+def book(hotel_id, room_id, booking_id):
     room = Room.query.get_or_404(room_id)
-    first_name = request.form.get('first_name')
-    last_name = request.form.get('last_name')
-    location = request.form.get('location')
-    check_in = request.form.get('check_in')
-    check_out = request.form.get('check_out')
-    nights = request.form.get('nights')
-    print(request.form)
-    # Save booking data to Google Sheet
-    row = [hotel.name, room.type, first_name, last_name, location, check_in, check_out, nights]
-    # sheet.append_row(row)
+    booking = Room.query.get_or_404(booking_id)
+    
+    
+    if request.method == 'POST':
+        if 'cancel' in request.form:
+            # Handle cancellation logic here
+            db.session.delete(booking)
+            db.session.commit()
+            flash("Booking cancelled", "info")
+            return redirect(url_for('main.index'))
+        
+        # Determine number of persons based on room type
+        if 'Single' in room.type:
+            persons = 1
+        elif 'Double' in room.type:
+            persons = 2
+        elif 'Triple' in room.type:
+            persons = 3
+        elif 'Quad' in room.type:
+            persons = 4
 
+
+        # Handle guests
+        for i in range(persons):
+            first_name = request.form.get(f'first_name{i}')
+            last_name = request.form.get(f'last_name{i}')
+            if first_name and last_name:
+                guest = Guest(
+                    first_name=first_name,
+                    last_name=last_name,
+                    booking_id=booking.id
+                )
+                db.session.add(guest)
+
+        db.session.commit()
+        
+        flash('Booking created successfully', 'success')
+        return redirect(url_for('main.index'))
+
+    # If GET request, render the booking form
+    return redirect(url_for('main.index'))
+
+@bp.route('/bookings', methods=['GET', 'POST'])
+@login_required
+
+def view_bookings():
     return redirect(url_for('main.index'))
