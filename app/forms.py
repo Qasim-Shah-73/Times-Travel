@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import FormField, EmailField, StringField, TextAreaField, FieldList, BooleanField, HiddenField, SubmitField, IntegerField, PasswordField, SelectField
+from wtforms import FormField, EmailField, StringField, TextAreaField, FieldList, BooleanField, HiddenField, SubmitField, IntegerField, PasswordField, SelectField, DecimalField
 from wtforms.validators import DataRequired, Length, NumberRange, Email, EqualTo, ValidationError,Optional, InputRequired
 from wtforms.fields import FormField as WTFormField
 from flask_wtf.file import FileField, FileAllowed
@@ -7,7 +7,7 @@ from calendar import monthrange
 from app.models import User, Room, Hotel, Agency
 
 class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
+    email = StringField('Email Address', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Remember Me')
     submit = SubmitField('Sign In')
@@ -34,14 +34,14 @@ class UserUpdateForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=4, max=64)])
     email = EmailField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('New Password', validators=[Optional(), Length(min=6)])
-    is_agency_admin = BooleanField('Agency Admin')
+    role = SelectField('Role', choices=[], coerce=str)
     submit = SubmitField('Update')
     
 class UserCreateForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=4, max=64)])
     email = EmailField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
-    is_agency_admin = BooleanField('Agency Admin')
+    role = SelectField('Role', choices=[], coerce=str)
     agency_id = HiddenField('Agency ID', validators=[DataRequired()])
     submit = SubmitField('Create')
 
@@ -51,6 +51,9 @@ class AgencyForm(FlaskForm):
     email = StringField('Agency Email', validators=[DataRequired(), Email()])
     designation = StringField('Designation', validators=[DataRequired()])
     telephone = IntegerField('Telephone', validators=[DataRequired()])
+    credit_limit = DecimalField('Credit Limit', validators=[DataRequired(), NumberRange(min=0)], default=0.00)
+    used_credit = DecimalField('Used Credit', validators=[Optional(), NumberRange(min=0)], default=0.00)
+    paid_back = DecimalField('Paid Back', validators=[Optional(), NumberRange(min=0)], default=0.00)
 
     # Fields for Admin User
     admin_username = StringField('Admin Username', validators=[DataRequired()])
@@ -71,6 +74,9 @@ class UpdateAgencyForm(FlaskForm):
     email = EmailField('Email', validators=[DataRequired(), Email()])
     designation = StringField('Designation', validators=[Optional(), Length(max=128)])
     telephone = IntegerField('Telephone', validators=[Optional()])
+    credit_limit = DecimalField('Credit Limit', validators=[Optional(), NumberRange(min=0)], default=0.00)
+    used_credit = DecimalField('Used Credit', validators=[Optional(), NumberRange(min=0)], default=0.00)
+    paid_back = DecimalField('Paid Back', validators=[Optional(), NumberRange(min=0)], default=0.00)
     submit = SubmitField('Update')
 
 class MonthAvailabilityForm(FlaskForm):

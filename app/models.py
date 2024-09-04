@@ -1,7 +1,7 @@
 from datetime import datetime
 from app import db, login
 from flask_login import UserMixin
-from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, BigInteger
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, BigInteger, Numeric, DateTime, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.dialects.sqlite import JSON
@@ -16,14 +16,22 @@ class Agency(db.Model):
     email = Column(String(120), index=True, unique=True, nullable=False)
     designation = Column(String(128), nullable=True)
     telephone = Column(BigInteger, nullable=True)
-    # Removed user_id as it is not needed for this relationship
-    # user_id = Column(Integer, ForeignKey('users.id'), unique=True, nullable=True)
+    credit_limit = Column(Numeric(precision=12, scale=2), default=0.00)
+    used_credit = Column(Numeric(precision=12, scale=2), default=0.00)
+    paid_back = Column(Numeric(precision=12, scale=2), default=0.00)
 
-    # Establish a relationship back to the User model
+    # Relationship to User model
     users = relationship(
         'User',
         back_populates='agency',
-        foreign_keys='User.agency_id'  # Explicitly specify the foreign key column
+        foreign_keys='User.agency_id'
+    )
+
+    # Relationship to Booking model
+    bookings = relationship(
+        'Booking',
+        back_populates='agency',
+        foreign_keys='Booking.agency_id'
     )
 
     def __repr__(self):
@@ -37,15 +45,21 @@ class User(UserMixin, db.Model):
     username = Column(String(64), unique=True, nullable=False)
     email = Column(String(120), unique=True, nullable=False)
     hashed_password = Column(String(128), nullable=False)
-    is_agency_admin = Column(Boolean, default=False)
-    is_admin = Column(Boolean, default=False)
+    role = Column(String(64), nullable=False, default='user')
     agency_id = Column(Integer, ForeignKey('agencies.id'), nullable=True)
 
-    # Establish a relationship with the Agency model
+    # Relationship with the Agency model
     agency = relationship(
         'Agency',
         back_populates='users',
-        foreign_keys=[agency_id]  # Explicitly specify the foreign key column
+        foreign_keys=[agency_id]
+    )
+
+    # Relationship to Booking model
+    bookings = relationship(
+        'Booking',
+        back_populates='agent',
+        foreign_keys='Booking.agent_id'
     )
 
     def set_password(self, password):
@@ -56,6 +70,32 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return f'<User {self.username}>'
+
+# Define the Booking model
+class Booking(db.Model):
+    __tablename__ = 'bookings'
+
+    id = Column(Integer, primary_key=True)
+    check_in = Column(DateTime, nullable=False)
+    check_out = Column(DateTime, nullable=False)
+    hotel_name = Column(String(128), nullable=False)
+    room_type = Column(String(128), nullable=True)
+    guest_details = Column(Text, nullable=True)
+    agent_id = Column(Integer, ForeignKey('users.id'), nullable=True)  # Agent associated with booking
+    agency_id = Column(Integer, ForeignKey('agencies.id'), nullable=True)  # Agency associated with booking
+    confirmation_number = Column(String(64), unique=True, nullable=False)
+    booking_confirmed = Column(Boolean, default=False)
+    invoice_paid = Column(Boolean, default=False)
+    selling_price = Column(Numeric(precision=12, scale=2), nullable=True)
+    buying_price = Column(Numeric(precision=12, scale=2), nullable=True)
+    remarks = Column(Text, nullable=True)
+
+    # Relationships
+    agent = relationship('User', back_populates='bookings', foreign_keys=[agent_id])
+    agency = relationship('Agency', back_populates='bookings', foreign_keys=[agency_id])
+
+    def __repr__(self):
+        return f'<Booking {self.confirmation_number}>'
     
 @login.user_loader
 def load_user(id):

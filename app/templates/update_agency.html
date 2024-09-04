@@ -8,6 +8,8 @@
     <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">Update Agency</h1>
     <form method="post">
       {{ form.hidden_tag() }}
+
+      <!-- Name Field -->
       <div class="mb-4">
         {{ form.name.label(class="block text-gray-700 font-bold mb-2") }}
         {{ form.name(class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
@@ -15,6 +17,8 @@
         <span class="text-red-500">{{ error }}</span>
         {% endfor %}
       </div>
+
+      <!-- Email Field -->
       <div class="mb-4">
         {{ form.email.label(class="block text-gray-700 font-bold mb-2") }}
         {{ form.email(class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
@@ -22,6 +26,8 @@
         <span class="text-red-500">{{ error }}</span>
         {% endfor %}
       </div>
+
+      <!-- Designation Field -->
       <div class="mb-4">
         {{ form.designation.label(class="block text-gray-700 font-bold mb-2") }}
         {{ form.designation(class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
@@ -29,6 +35,8 @@
         <span class="text-red-500">{{ error }}</span>
         {% endfor %}
       </div>
+
+      <!-- Telephone Field -->
       <div class="mb-4">
         {{ form.telephone.label(class="block text-gray-700 font-bold mb-2") }}
         {{ form.telephone(class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
@@ -36,6 +44,35 @@
         <span class="text-red-500">{{ error }}</span>
         {% endfor %}
       </div>
+
+      <!-- Credit Limit Field -->
+      <div class="mb-4">
+        {{ form.credit_limit.label(class="block text-gray-700 font-bold mb-2") }}
+        {{ form.credit_limit(class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+        {% for error in form.credit_limit.errors %}
+        <span class="text-red-500">{{ error }}</span>
+        {% endfor %}
+      </div>
+
+      <!-- Used Credit Field -->
+      <div class="mb-4">
+        {{ form.used_credit.label(class="block text-gray-700 font-bold mb-2") }}
+        {{ form.used_credit(class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+        {% for error in form.used_credit.errors %}
+        <span class="text-red-500">{{ error }}</span>
+        {% endfor %}
+      </div>
+
+      <!-- Paid Back Field -->
+      <div class="mb-4">
+        {{ form.paid_back.label(class="block text-gray-700 font-bold mb-2") }}
+        {{ form.paid_back(class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+        {% for error in form.paid_back.errors %}
+        <span class="text-red-500">{{ error }}</span>
+        {% endfor %}
+      </div>
+
+      <!-- Submit Button -->
       <div class="text-center mt-6">
         {{ form.submit(class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-200") }}
       </div>
