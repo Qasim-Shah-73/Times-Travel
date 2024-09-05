@@ -12,6 +12,16 @@ user_bp = Blueprint('user', __name__)
 @roles_required('super_admin', 'agency_admin')
 def create_user():
     agency_id = request.args.get('agency_id', type=int)
+
+    if current_user.role == 'agency_admin':
+        agency = Agency.query.get_or_404(agency_id)
+        limit = agency.account_limit
+        num_users = User.query.filter_by(agency_id=agency_id).count()
+        
+        if num_users >= limit and limit > 0:
+            flash('User creation limit reached for this agency. Please contact the admin.', 'danger')
+            return redirect(url_for('user.view_all_users', agency_id=agency_id))
+ 
     form = UserCreateForm()
 
     if current_user.role == 'super_admin':

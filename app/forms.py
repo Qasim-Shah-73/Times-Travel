@@ -51,9 +51,11 @@ class AgencyForm(FlaskForm):
     email = StringField('Agency Email', validators=[DataRequired(), Email()])
     designation = StringField('Designation', validators=[DataRequired()])
     telephone = IntegerField('Telephone', validators=[DataRequired()])
-    credit_limit = DecimalField('Credit Limit', validators=[DataRequired(), NumberRange(min=0)], default=0.00)
+    credit_limit = DecimalField('Credit Limit', validators=[Optional(), NumberRange(min=0)], default=0.00)
     used_credit = DecimalField('Used Credit', validators=[Optional(), NumberRange(min=0)], default=0.00)
     paid_back = DecimalField('Paid Back', validators=[Optional(), NumberRange(min=0)], default=0.00)
+    allowed_accounts = IntegerField('Allowed Accounts', validators=[DataRequired(), NumberRange(min=0)], default=0)
+
 
     # Fields for Admin User
     admin_username = StringField('Admin Username', validators=[DataRequired()])
@@ -77,6 +79,7 @@ class UpdateAgencyForm(FlaskForm):
     credit_limit = DecimalField('Credit Limit', validators=[Optional(), NumberRange(min=0)], default=0.00)
     used_credit = DecimalField('Used Credit', validators=[Optional(), NumberRange(min=0)], default=0.00)
     paid_back = DecimalField('Paid Back', validators=[Optional(), NumberRange(min=0)], default=0.00)
+    allowed_accounts = IntegerField('Allowed Accounts', validators=[Optional(), NumberRange(min=0)], default=0)
     submit = SubmitField('Update')
 
 class MonthAvailabilityForm(FlaskForm):
@@ -98,7 +101,8 @@ class HotelForm(FlaskForm):
     description = TextAreaField('Description', validators=[DataRequired(), Length(max=255)])
     location = SelectField('Location', choices=[('Makkah', 'Makkah, Saudi Arabia'), ('Madinah', 'Madinah, Saudi Arabia')], validators=[InputRequired()])
     availability = WTFormField(MonthAvailabilityForm)
-    image = FileField('Hotel Image', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])  # Image upload field
+    image = FileField('Hotel Image', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
+    vendor_id = SelectField('Vendor', choices=[], coerce=int, validators=[InputRequired()])
     submit = SubmitField('Submit')
 
 class UpdateHotelForm(FlaskForm):
@@ -106,7 +110,8 @@ class UpdateHotelForm(FlaskForm):
     description = TextAreaField('Description', validators=[DataRequired()])
     location = SelectField('Location', choices=[('Makkah', 'Makkah, Saudi Arabia'), ('Madinah', 'Madinah, Saudi Arabia')], validators=[InputRequired()], render_kw={"size": 1})
     availability = WTFormField(MonthAvailabilityForm)
-    image = FileField('Update Hotel Image', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])  # Image upload field
+    image = FileField('Update Hotel Image', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
+    vendor_id = SelectField('Vendor', choices=[], coerce=int, validators=[InputRequired()])
     submit = SubmitField('Update')
 
 class RatesForm(FlaskForm):
@@ -160,3 +165,19 @@ class UpdateRoomForm(FlaskForm):
     december_rates = FieldList(IntegerField('Rate', validators=[Optional(), NumberRange(min=0)]), min_entries=31, max_entries=31)
     
     submit = SubmitField('Update Room')
+       
+class VendorCreateForm(FlaskForm):
+    name = StringField('Vendor Name', validators=[DataRequired(), Length(max=100)])
+    email = StringField('Vendor Email', validators=[DataRequired(), Email(), Length(max=120)])
+    contact_person = StringField('Contact Person', validators=[Optional(), Length(max=100)])
+    phone_number = IntegerField('Phone Number', validators=[Optional()])
+    bank_details = StringField('Bank Details', validators=[Optional(), Length(max=255)])
+    submit = SubmitField('Create Vendor')
+
+class VendorUpdateForm(FlaskForm):
+    name = StringField('Vendor Name', validators=[DataRequired(), Length(max=100)])
+    email = StringField('Vendor Email', validators=[DataRequired(), Email(), Length(max=120)])
+    contact_person = StringField('Contact Person', validators=[Optional(), Length(max=100)])
+    phone_number = IntegerField('Phone Number', validators=[Optional()])
+    bank_details = StringField('Bank Details', validators=[Optional(), Length(max=255)])
+    submit = SubmitField('Update Vendor')

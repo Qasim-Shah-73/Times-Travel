@@ -33,6 +33,13 @@
             <span class="text-red-500">{{ error }}</span>
             {% endfor %}
         </div>
+        <div class="mb-4">
+            {{ form.vendor_id.label(class="block text-gray-700 font-bold mb-2") }}  <!-- Vendor label -->
+            {{ form.vendor_id(class_="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}  <!-- Vendor dropdown -->
+            {% for error in form.vendor_id.errors %}
+            <span class="text-red-500">{{ error }}</span>
+            {% endfor %}
+        </div>
         <div class="mb-6">
             <h3 class="text-xl font-bold mb-2">Availability:</h3>
             <div class="grid grid-cols-2 gap-4">

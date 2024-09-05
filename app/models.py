@@ -20,6 +20,7 @@ class Agency(db.Model):
     used_credit = Column(Numeric(precision=12, scale=2), default=0.00)
     paid_back = Column(Numeric(precision=12, scale=2), default=0.00)
     account_limit = Column(Numeric(precision=5, scale=0), default=0)
+    allowed_accounts = Column(Integer, default=0)
 
     # Relationship to User model
     users = relationship(

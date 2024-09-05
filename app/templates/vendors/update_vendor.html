@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Vendor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="max-w-lg w-full bg-white rounded-lg shadow-lg overflow-hidden p-6">
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <h1 class="text-3xl font-bold text-gray-800">Update Vendor</h1>
+        </div>
+        <form method="post">
+            {{ form.hidden_tag() }}
+
+            <!-- Vendor Name -->
+            <div class="mb-4">
+                {{ form.name.label(class="block text-gray-700 font-bold mb-2") }}
+                {{ form.name(class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+                {% for error in form.name.errors %}
+                <span class="text-red-500">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <!-- Vendor Email -->
+            <div class="mb-4">
+                {{ form.email.label(class="block text-gray-700 font-bold mb-2") }}
+                {{ form.email(class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+                {% for error in form.email.errors %}
+                <span class="text-red-500">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <!-- Contact Person -->
+            <div class="mb-4">
+                {{ form.contact_person.label(class="block text-gray-700 font-bold mb-2") }}
+                {{ form.contact_person(class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+                {% for error in form.contact_person.errors %}
+                <span class="text-red-500">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <!-- Phone Number -->
+            <div class="mb-4">
+                {{ form.phone_number.label(class="block text-gray-700 font-bold mb-2") }}
+                {{ form.phone_number(class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+                {% for error in form.phone_number.errors %}
+                <span class="text-red-500">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <!-- Bank Details -->
+            <div class="mb-4">
+                {{ form.bank_details.label(class="block text-gray-700 font-bold mb-2") }}
+                {{ form.bank_details(class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+                {% for error in form.bank_details.errors %}
+                <span class="text-red-500">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center mt-6">
+                {{ form.submit(class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-200") }}
+            </div>
+        </form>
+    </div>
+</body>
+</html>

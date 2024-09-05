@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required
 from app import db
-from app.models import Hotel, Room
+from app.models import Hotel, Room, Vendor
 from app.forms import HotelForm, UpdateHotelForm
 from app.decorators import roles_required
 from .utils import is_super_admin, is_agency_admin, save_image, delete_image
@@ -17,6 +17,7 @@ def create_hotel():
         return redirect(url_for('auth.index'))
     
     form = HotelForm()
+    form.vendor_id.choices = [(v.id, v.name) for v in Vendor.query.all()]
     if form.validate_on_submit():
         image_file = None
         if form.image.data:
@@ -29,7 +30,8 @@ def create_hotel():
             description=form.description.data,
             location=form.location.data,
             availability=availability,
-            image=image_file
+            image=image_file,
+            vendor_id=form.vendor_id.data
         )
         db.session.add(new_hotel)
         db.session.commit()
@@ -48,6 +50,7 @@ def update_hotel(hotel_id):
     
     hotel = Hotel.query.get_or_404(hotel_id)
     form = UpdateHotelForm(obj=hotel)
+    form.vendor_id.choices = [(v.id, v.name) for v in Vendor.query.all()] 
     
     if form.validate_on_submit():
         if form.image.data:
@@ -59,6 +62,7 @@ def update_hotel(hotel_id):
         hotel.description = form.description.data
         hotel.location = form.location.data
         hotel.availability = {month: getattr(form.availability, month).data for month in ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']}
+        hotel.vendor_id = form.vendor_id.data
         
         db.session.commit()
         flash('Hotel updated successfully', 'success')

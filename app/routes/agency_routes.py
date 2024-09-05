@@ -26,7 +26,8 @@ def create_agency():
             telephone=form.telephone.data,
             credit_limit=form.credit_limit.data,
             used_credit=form.used_credit.data,
-            paid_back=form.paid_back.data
+            paid_back=form.paid_back.data,
+            allowed_accounts=form.allowed_accounts.data
         )
 
         admin_user = User(
@@ -68,6 +69,7 @@ def update_agency(agency_id):
         agency.credit_limit = form.credit_limit.data
         agency.used_credit = form.used_credit.data
         agency.paid_back = form.paid_back.data
+        agency.allowed_accounts = form.allowed_accounts.data
 
         db.session.commit()
         flash('Agency updated successfully!', 'success')
@@ -91,7 +93,8 @@ def view_agencies():
 @roles_required('super_admin', 'agency_admin')
 def delete_agency(agency_id):
     agency = Agency.query.get_or_404(agency_id)
-    if not (current_user.agency_id == agency_id):
+    if not (current_user.role == 'super_admin' or 
+        (current_user.role == 'agency_admin' and current_user.agency_id == agency_id)):
         flash('You are not allowed to delete this agency.', 'danger')
         return redirect(url_for('agency.view_agencies'))
 
