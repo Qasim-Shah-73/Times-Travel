@@ -119,16 +119,19 @@ def load_user(id):
 
 # Define the Hotel model
 class Hotel(db.Model):
+    __tablename__ = 'hotel'
+
     id = Column(Integer, primary_key=True)
     name = Column(String(100), nullable=False)
     description = Column(String(255), nullable=False)
     location = Column(String(100), nullable=False)
     availability = Column(db.JSON, nullable=False)  # Dictionary to hold availability for each month
-    image = Column(String(255), nullable=True)  # New field to store image filename or URL
+    image = Column(String(255), nullable=True)  # Field to store image filename or URL
     vendor_id = Column(Integer, ForeignKey('vendors.id'), nullable=True)  # Foreign key for Vendor
     rooms = relationship('Room', backref='hotel', cascade='all, delete-orphan', lazy=True)
 
-    vendor = relationship('Vendor', backref='hotels', foreign_keys=[vendor_id])
+    # Explicit relationship to Vendor with back_populates
+    vendor = relationship('Vendor', back_populates='hotels', foreign_keys=[vendor_id])
 
     def to_dict(self):
         return {
@@ -219,12 +222,8 @@ class Vendor(db.Model):
     phone_number = Column(BigInteger, nullable=True)  # Phone number field
     bank_details = Column(String(255), nullable=True)
 
-    # Relationship to Hotel model
-    hotels = relationship(
-        'Hotel',
-        backref='vendor',
-        lazy=True
-    )
+    # Explicit relationship to Hotel with back_populates
+    hotels = relationship('Hotel', back_populates='vendor', lazy=True)
 
     def __repr__(self):
         return f'<Vendor {self.name}>'

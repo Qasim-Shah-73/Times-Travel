@@ -1,0 +1,121 @@
+<style>
+    .hotel-container {
+        display: flex;
+        margin-bottom: 20px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    .hotel-image {
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+    }
+    .hotel-info {
+        padding: 20px;
+        flex-grow: 1;
+        text-align: left;
+    }
+    .hotel-name {
+        font-size: 24px;
+        font-weight: bold;
+        color: #203C60;
+        margin-bottom: 10px;
+        text-align: left;
+    }
+    .hotel-location {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    .hotel-description {
+        margin-bottom: 10px;
+        text-align: left;
+    }
+    .view-rooms-btn {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        border-radius: 4px;
+        text-align: left;
+    }
+    .room-details {
+        margin-top: 10px;
+        border-top: 1px solid #eee;
+        padding-top: 10px;
+        text-align: left;
+    }
+    .room-info {
+        margin-bottom: 10px;
+        text-align: left;
+    }
+    .book-now-btn {
+        background-color: #203C60;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+    book-now-btn:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+{% extends "index.html" %}
+{% block title %}Hotel Results{% endblock %}
+{% block content %}
+<div class="container mx-auto">
+    <h1 class="text-4xl font-bold text-left text-blue-700 my-8">{{ hotels|length }} Available Hotels in {{ location }}</h1>
+    {% if hotels %}
+        {% for hotel in hotels %}
+        <div class="hotel-container">
+            <img class="hotel-image" src="{{ url_for('static', filename='images/' ~ hotel.image) if hotel.image else url_for('static', filename='images/hotel_2.jpg') }}" alt="{{ hotel.name }}">
+            <div class="hotel-info">
+                <h2 class="hotel-name">{{ hotel.name }}</h2>
+                <div class="hotel-location">
+                    <i class="fas fa-map-marker-alt mr-2 text-blue-700"></i>
+                    <span>{{ hotel.description }}</span>
+                </div>
+
+                {% if hotel.rooms %}
+                    <button onclick="toggleRoomDetails({{ hotel.id }})" class="view-rooms-btn">View Rooms</button>
+                    <div id="room-details-{{ hotel.id }}" class="room-details" style="display: none;">
+                        {% for room in hotel.rooms %}
+                        <div class="room-info">
+                            <h3 style="text-align: left;"><strong>{{ room.type }}</strong></h3>
+                            <p style="text-align: left;"><strong>Price:</strong> {{ room.total_price }} (SAR)</p>
+                            <p style="text-align: left;"><strong>Inclusion:</strong> {{ room.inclusion }}</p>
+                            <p style="text-align: left;"><strong>Notes:</strong> {{ room.notes }}</p>
+                            <form action="{{ url_for('booking.booking_form', hotel_id=hotel.id, room_id=room.id) }}" method="GET" style="text-align: left;">
+                                <input type="hidden" name="hotel_id" value="{{ hotel.id }}">
+                                <input type="hidden" name="room_id" value="{{ room.id }}">
+                                <input type="hidden" name="location" value="{{ location }}">
+                                <input type="hidden" name="check_in" value="{{ check_in }}">
+                                <input type="hidden" name="check_out" value="{{ check_out }}">
+                                <input type="hidden" name="nights" value="{{ nights }}">
+                                <input type="hidden" name="price" value="{{ room.total_price }}">
+                                <button type="submit" class="book-now-btn">Book Now</button>
+                            </form>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p class="text-left text-gray-600 mt-8">No hotels available for the selected location and dates.</p>
+    {% endif %}
+</div>
+
+<script>
+    function toggleRoomDetails(hotelId) {
+        var roomDetails = document.getElementById("room-details-" + hotelId);
+        roomDetails.style.display = roomDetails.style.display === "none" ? "block" : "none";
+    }
+</script>
+{% endblock %}

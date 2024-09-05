@@ -24,7 +24,7 @@
     <div class="flex justify-center items-center h-screen bg-gray-100">
         <div class="bg-white rounded-lg shadow-md p-8 max-w-md w-full">
             <h1 class="text-2xl font-bold mb-6 text-center text-primary">Sign Up</h1>
-            <form method="POST" action="{{ url_for('main.signup') }}">
+            <form method="POST" action="{{ url_for('auth.signup') }}">
                 {{ form.hidden_tag() }}
                 <div class="mb-4">
                     {{ form.username.label(class="block text-gray-700 font-bold mb-2") }}

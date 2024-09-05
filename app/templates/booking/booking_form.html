@@ -194,7 +194,7 @@
 
 <div class="">
     <h1>Booking Form</h1>
-    <form method="post" action="{{ url_for('main.book', hotel_id=hotel.id, room_id=room.id, booking_id=booking.id) }}">
+    <form method="post" action="{{ url_for('booking.book', hotel_id=hotel.id, room_id=room.id, booking_id=booking.id) }}">
         <div class="form-container">
             <div class="form-section bg-white">
                 {% for i in range(persons) %}
