@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Travel Website - Booking Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#3490dc',
+                        'yellow': '#fcd34d'
+                    }
+                }
+            }
+        }
+        function openConfirmationModal(bookingId, confirmationNumber, buyingPrice) {
+            document.getElementById('confirmationBookingId' + bookingId).value = bookingId;
+            document.getElementById('confirmationNumber' + bookingId).value = confirmationNumber || '';
+            document.getElementById('buyingPrice' + bookingId).value = buyingPrice || '';
+            document.getElementById('confirmationModal' + bookingId).classList.remove('hidden');
+        }
+        
+        function openInvoiceModal(bookingId) {
+            document.getElementById('invoiceBookingId' + bookingId).value = bookingId;
+            document.getElementById('invoiceModal' + bookingId).classList.remove('hidden');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+        
+        function updateInvoiceStatus(bookingId) {
+            $.ajax({
+                type: 'POST',
+                url: "{{ url_for('booking.update_invoice') }}",
+                data: { booking_id: bookingId },
+                success: function (response) {
+                    location.reload(); // Reload page after successful update
+                },
+                error: function (error) {
+                    alert('Failed to update invoice status');
+                }
+            });
+        }
+        
+        $(document).ready(function () {
+            {% for booking in bookings %}
+            $('#confirmationForm{{ booking.id }}').on('submit', function (event) {
+                event.preventDefault();
+                const bookingId = $('#confirmationBookingId{{ booking.id }}').val();
+                const confirmationNumber = $('#confirmationNumber{{ booking.id }}').val();
+                const buyingPrice = $('#buyingPrice{{ booking.id }}').val();
+                
+                $.ajax({
+                    type: 'POST',
+                    url: "{{ url_for('booking.update_confirmation') }}",
+                    data: {
+                        booking_id: bookingId,
+                        confirmation_number: confirmationNumber,
+                        buying_price: buyingPrice
+                    },
+                    success: function (response) {
+                        location.reload(); // Reload page after successful update
+                    },
+                    error: function (error) {
+                        alert('Failed to update booking confirmation');
+                    }
+                });
+            });
+        
+            $('#invoiceForm{{ booking.id }}').on('submit', function (event) {
+                event.preventDefault();
+                updateInvoiceStatus({{ booking.id }});
+            });
+            {% endfor %}
+        });          
+    </script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f8ff;
+        }
+        .nowrap {
+            white-space: nowrap;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 8px;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.open-modal').forEach(button => {
+                button.addEventListener('click', function() {
+                    const modalId = this.dataset.modalId;
+                    document.getElementById(modalId).style.display = 'block';
+                });
+            });
+
+            document.querySelectorAll('.close-modal').forEach(button => {
+                button.addEventListener('click', function() {
+                    this.closest('.modal').style.display = 'none';
+                });
+            });
+
+            window.addEventListener('click', function(event) {
+                if (event.target.classList.contains('modal')) {
+                    event.target.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</head>
+<body class="bg-primary-100">
+    <!-- Navigation Bar -->
+    <nav class="bg-yellow-400 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <a href="{{ url_for('auth.index') }}">
+                            <img src="{{ url_for('static', filename='images/Times_logo-high.png') }}" alt="Times Travel Logo"
+                                class="h-12 w-auto mr-2">
+                        </a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <div class="hidden md:block">
+                        <div class="ml-4 flex items-center md:ml-6">
+                            {% if current_user.is_authenticated %}
+                            {% if current_user.role == 'super_admin' or current_user.role == 'admin' %}
+                            <a href="{{ url_for('booking.view_bookings') }}"
+                                class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">Bookings
+                                Dashboard</a>
+                            <a href="{{ url_for('hotel.view_hotels') }}"
+                                class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">View
+                                Hotels</a>
+                            <a href="{{ url_for('agency.view_agencies') }}"
+                                class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">View
+                                Agencies</a>
+                            <a href="{{ url_for('vendor.view_vendors') }}"
+                                class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">View
+                                Vendors</a>
+                            {% elif current_user.role == 'super_admin' or current_user.role == 'agency_admin' %}
+                            <a href="{{ url_for('agency.view_agencies') }}"
+                                class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">View
+                                Agencies</a>
+                            {% endif %}
+                            <a href="{{ url_for('auth.logout') }}"
+                                class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">Logout</a>
+                            {% else %}
+                            <a href="{{ url_for('auth.login') }}"
+                                class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">Login</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="mt-6 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <h1 class="text-4xl font-extrabold text-gray-800 mb-8 text-center">Booking Dashboard</h1>
+
+        <!-- Filter Form -->
+        <div class="mb-6">
+            <form method="get" action="{{ url_for('booking.view_bookings') }}" class="flex items-center space-x-4">
+                <input type="text" name="filter_value" placeholder="Search..." class="border rounded-md px-4 py-2">
+                <select name="filter_column" class="border rounded-md px-4 py-2">
+                    <option value="">Select Filter</option>
+                    <option value="hotel_name">Hotel Name</option>
+                    <option value="room_type">Room Type</option>
+                    <option value="agent_name">Agent Name</option>
+                    <option value="check_in">Check-In Date</option>
+                    <option value="check_out">Check-Out Date</option>
+                    <option value="agency_name">Agency Name</option>
+                    <option value="confirmation_number">Confirmation Number</option>
+                </select>
+                <!-- Date range filters -->
+                <div class="flex items-center space-x-4">
+                    <input type="date" name="start_date" placeholder="Start Date" class="border rounded-md px-4 py-2">
+                    <input type="date" name="end_date" placeholder="End Date" class="border rounded-md px-4 py-2">
+                </div>
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Filter</button>
+            </form>
+        </div>
+
+        <!-- Booking Table -->
+        <div class="overflow-x-auto bg-white shadow-md rounded-lg">
+            <table class="min-w-full border border-gray-300 divide-y divide-gray-200">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                            <a href="{{ url_for('booking.view_bookings', sort_by='id', sort_order='asc' if sort_order == 'desc' else 'desc', filter_column=filter_column, filter_value=filter_value) }}">ID</a>
+                        </th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                            <a href="{{ url_for('booking.view_bookings', sort_by='hotel_name', sort_order='asc' if sort_order == 'desc' else 'desc', filter_column=filter_column, filter_value=filter_value) }}">Hotel Name</a>
+                        </th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                            <a href="{{ url_for('booking.view_bookings', sort_by='room_type', sort_order='asc' if sort_order == 'desc' else 'desc', filter_column=filter_column, filter_value=filter_value) }}">Room Type</a>
+                        </th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                            <a href="{{ url_for('booking.view_bookings', sort_by='check_in', sort_order='asc' if sort_order == 'desc' else 'desc', filter_column=filter_column, filter_value=filter_value) }}">Check-In</a>
+                        </th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                            <a href="{{ url_for('booking.view_bookings', sort_by='check_out', sort_order='asc' if sort_order == 'desc' else 'desc', filter_column=filter_column, filter_value=filter_value) }}">Check-Out</a>
+                        </th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                            <a href="{{ url_for('booking.view_bookings', sort_by='agent_name', sort_order='asc' if sort_order == 'desc' else 'desc', filter_column=filter_column, filter_value=filter_value) }}">Agent Name</a>
+                        </th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                            <a href="{{ url_for('booking.view_bookings', sort_by='agency_name', sort_order='asc' if sort_order == 'desc' else 'desc', filter_column=filter_column, filter_value=filter_value) }}">Agency Name</a>
+                        </th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                            <a href="{{ url_for('booking.view_bookings', sort_by='guests', sort_order='asc' if sort_order == 'desc' else 'desc', filter_column=filter_column, filter_value=filter_value) }}">Guests</a>
+                        </th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                            <a href="{{ url_for('booking.view_bookings', sort_by='confirmation_number', sort_order='asc' if sort_order == 'desc' else 'desc', filter_column=filter_column, filter_value=filter_value) }}">Confirmation Number</a>
+                        </th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                            <a href="{{ url_for('booking.view_bookings', sort_by='booking_confirmed', sort_order='asc' if sort_order == 'desc' else 'desc', filter_column=filter_column, filter_value=filter_value) }}">
+                                Booking Confirmed
+                            </a>
+                        </th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                            <a href="{{ url_for('booking.view_bookings', sort_by='invoice_paid', sort_order='asc' if sort_order == 'desc' else 'desc', filter_column=filter_column, filter_value=filter_value) }}">
+                                Invoice Paid
+                            </a>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for booking in bookings %}
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 text-gray-700">{{ booking.id }}</td>
+                        <td class="px-6 py-4 text-gray-700">{{ booking.hotel_name }}</td>
+                        <td class="px-6 py-4 text-gray-700 nowrap">{{ booking.room_type or 'N/A' }}</td>
+                        <td class="px-6 py-4 text-gray-700 nowrap">{{ booking.check_in.strftime('%d-%m-%Y') }}</td>
+                        <td class="px-6 py-4 text-gray-700 nowrap">{{ booking.check_out.strftime('%d-%m-%Y') }}</td>
+                        <td class="px-6 py-4 text-gray-700">
+                            {% if booking.agent %}
+                            {{ booking.agent.username }}
+                            {% else %}
+                            N/A
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-gray-700">
+                            {% if booking.agency %}
+                            {{ booking.agency.name }}
+                            {% else %}
+                            N/A
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-gray-700">
+                            {% if booking.guests %}
+                                {{ booking.guests[0].first_name }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-gray-700">{{ booking.confirmation_number or 'N/A' }}</td>
+                        <td class="px-6 py-4 text-center">
+                            <span
+                                class="inline-block px-2 py-1 text-xs font-medium text-white rounded-full {{ 'bg-green-500' if booking.booking_confirmed else 'bg-red-500' }}">
+                                {{ 'Yes' if booking.booking_confirmed else 'No' }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span
+                                class="inline-block px-2 py-1 text-xs font-medium text-white rounded-full {{ 'bg-green-500' if booking.invoice_paid else 'bg-red-500' }}">
+                                {{ 'Yes' if booking.invoice_paid else 'No' }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="inline-block px-2 py-1 text-xs font-medium text-white rounded-full {{ 'bg-green-500' if booking.booking_confirmed else 'bg-red-500' }}">
+                                {{ 'Yes' if booking.booking_confirmed else 'No' }}
+                            </span>
+                            <!-- Button for updating booking confirmation -->
+                            <button onclick="openConfirmationModal({{ booking.id }}, '{{ booking.confirmation_number }}', '{{ booking.buying_price }}')" class="bg-blue-500 text-white px-2 py-1 rounded mt-2">Update Confirmation</button>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="inline-block px-2 py-1 text-xs font-medium text-white rounded-full {{ 'bg-green-500' if booking.invoice_paid else 'bg-red-500' }}">
+                                {{ 'Yes' if booking.invoice_paid else 'No' }}
+                            </span>
+                            <!-- Button for marking invoice as paid -->
+                            <button onclick="openInvoiceModal({{ booking.id }})" class="bg-green-500 text-white px-2 py-1 rounded mt-2">Mark as Paid</button>
+                        </td>                        
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Confirmation Modals -->
+    {% for booking in bookings %}
+    <div id="confirmationModal{{ booking.id }}" class="modal hidden">
+        <div class="modal-content">
+            <h2 class="text-xl font-bold mb-4">Update Booking Confirmation</h2>
+            <form id="confirmationForm{{ booking.id }}">
+                <input type="hidden" id="confirmationBookingId{{ booking.id }}" name="booking_id">
+                <div class="mb-4">
+                    <label for="confirmationNumber{{ booking.id }}" class="block text-gray-700">Confirmation Number</label>
+                    <input type="text" id="confirmationNumber{{ booking.id }}" name="confirmation_number" class="border rounded-md px-4 py-2 w-full">
+                </div>
+                <div class="mb-4">
+                    <label for="buyingPrice{{ booking.id }}" class="block text-gray-700">Buying Price</label>
+                    <input type="text" id="buyingPrice{{ booking.id }}" name="buying_price" class="border rounded-md px-4 py-2 w-full">
+                </div>
+                <div class="flex justify-between">
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Update</button>
+                    <button type="button" onclick="closeModal('confirmationModal{{ booking.id }}')" class="bg-gray-500 text-white px-4 py-2 rounded">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="invoiceModal{{ booking.id }}" class="modal hidden">
+        <div class="modal-content">
+            <h2 class="text-xl font-bold mb-4">Mark Invoice as Paid</h2>
+            <form id="invoiceForm{{ booking.id }}">
+                <input type="hidden" id="invoiceBookingId{{ booking.id }}" name="booking_id">
+                <div class="flex justify-between">
+                    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Mark as Paid</button>
+                    <button type="button" onclick="closeModal('invoiceModal{{ booking.id }}')" class="bg-gray-500 text-white px-4 py-2 rounded">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</body>
+</html>

@@ -1,7 +1,7 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required
 from app import db
-from app.models import User, Hotel, Room, Agency, Booking, Guest
+from app.models import User, Hotel, Room, Agency, Booking, Guest, User
 from app.decorators import roles_required
 from datetime import datetime, timedelta
 from flask_login import current_user
@@ -201,6 +201,95 @@ def book(hotel_id, room_id, booking_id):
 
 @booking_bp.route('/bookings', methods=['GET', 'POST'])
 @login_required
-
 def view_bookings():
-    return redirect(url_for('auth.index'))
+    sort_by = request.args.get('sort_by', 'id')
+    sort_order = request.args.get('sort_order', 'asc')
+    filter_column = request.args.get('filter_column')
+    filter_value = request.args.get('filter_value')
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+
+    query = Booking.query
+
+    # Apply filtering if specified
+    if filter_column and filter_value:
+        if filter_column == 'hotel_name':
+            query = query.filter(Booking.hotel_name.ilike(f'%{filter_value}%'))
+        elif filter_column == 'room_type':
+            query = query.filter(Booking.room_type.ilike(f'%{filter_value}%'))
+        elif filter_column == 'agent_name':
+            query = query.join(User).filter(User.username.ilike(f'%{filter_value}%'))
+        elif filter_column == 'agency_name':
+            query = query.join(Agency).filter(Agency.name.ilike(f'%{filter_value}%'))
+        elif filter_column == 'confirmation_number':
+            query = query.filter(Booking.confirmation_number.ilike(f'%{filter_value}%'))
+            
+    # Apply date range filtering if specified
+    if start_date and end_date:
+        start_date = datetime.strptime(start_date, '%Y-%m-%d')
+        end_date = datetime.strptime(end_date, '%Y-%m-%d')
+        query = query.filter(Booking.check_in.between(start_date, end_date) | Booking.check_out.between(start_date, end_date))
+
+    # Apply sorting
+    if sort_by == 'hotel_name':
+        query = query.order_by(Booking.hotel_name.asc() if sort_order == 'asc' else Booking.hotel_name.desc())
+    elif sort_by == 'room_type':
+        query = query.order_by(Booking.room_type.asc() if sort_order == 'asc' else Booking.room_type.desc())
+    elif sort_by == 'check_in':
+        query = query.order_by(Booking.check_in.asc() if sort_order == 'asc' else Booking.check_in.desc())
+    elif sort_by == 'check_out':
+        query = query.order_by(Booking.check_out.asc() if sort_order == 'asc' else Booking.check_out.desc())
+    elif sort_by == 'agent_name':
+        query = query.join(User).order_by(User.username.asc() if sort_order == 'asc' else User.username.desc())
+    elif sort_by == 'agency_name':
+        query = query.join(Agency).order_by(Agency.name.asc() if sort_order == 'asc' else Agency.name.desc())
+    elif sort_by == 'confirmation_number':
+        query = query.order_by(Booking.confirmation_number.asc() if sort_order == 'asc' else Booking.confirmation_number.desc())
+    elif sort_by == 'booking_confirmed':
+        query = query.order_by(Booking.booking_confirmed.asc() if sort_order == 'asc' else Booking.booking_confirmed.desc())
+    elif sort_by == 'invoice_paid':
+        query = query.order_by(Booking.invoice_paid.asc() if sort_order == 'asc' else Booking.invoice_paid.desc())
+
+
+    # Apply role-based filtering
+    if current_user.role == 'super_admin':
+        # Super admins see all bookings
+        bookings = query.all()
+    elif current_user.role == 'agency_admin':
+        # Agency admins see only bookings of their agency
+        bookings = query.filter_by(agency_id=current_user.agency_id).all()
+    elif current_user.role == 'admin':
+        # Admins see only bookings where invoice_paid is False
+        bookings = query.filter_by(invoice_paid=False).all()
+
+    return render_template('booking/booking_dashboard.html', bookings=bookings, sort_by=sort_by, sort_order=sort_order, filter_column=filter_column, filter_value=filter_value)
+
+@booking_bp.route('/update_confirmation', methods=['POST'])
+@login_required
+@roles_required('super_admin', 'admin', 'agency_admin')
+def update_confirmation():
+    booking_id = request.form.get('booking_id')
+    confirmation_number = request.form.get('confirmation_number')
+    buying_price = request.form.get('buying_price')
+
+    booking = Booking.query.get(booking_id)
+    if booking:
+        booking.confirmation_number = confirmation_number
+        booking.buying_price = buying_price
+        booking.booking_confirmed = True
+        db.session.commit()
+        return jsonify({'status': 'success'}), 200
+    return jsonify({'status': 'error', 'message': 'Booking not found'}), 404
+
+@booking_bp.route('/update_invoice', methods=['POST'])
+@login_required
+@roles_required('super_admin', 'admin', 'agency_admin')
+def update_invoice():
+    booking_id = request.form.get('booking_id')
+
+    booking = Booking.query.get(booking_id)
+    if booking:
+        booking.invoice_paid = True
+        db.session.commit()
+        return jsonify({'status': 'success'}), 200
+    return jsonify({'status': 'error', 'message': 'Booking not found'}), 404
