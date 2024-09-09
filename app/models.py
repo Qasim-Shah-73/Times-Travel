@@ -80,10 +80,11 @@ class Booking(db.Model):
     id = Column(Integer, primary_key=True)
     check_in = Column(DateTime, nullable=False)
     check_out = Column(DateTime, nullable=False)
+    hotel_id = Column(Integer, ForeignKey('hotel.id'), nullable=False)  # Link to Hotel
     hotel_name = Column(String(128), nullable=False)
     room_type = Column(String(128), nullable=True)
-    agent_id = Column(Integer, ForeignKey('users.id'), nullable=True)  # Agent associated with booking
-    agency_id = Column(Integer, ForeignKey('agencies.id'), nullable=True)  # Agency associated with booking
+    agent_id = Column(Integer, ForeignKey('users.id'), nullable=True)
+    agency_id = Column(Integer, ForeignKey('agencies.id'), nullable=True)
     confirmation_number = Column(String(64), unique=True, nullable=True)
     booking_confirmed = Column(Boolean, default=False)
     invoice_paid = Column(Boolean, default=False)
@@ -95,9 +96,12 @@ class Booking(db.Model):
     agent = relationship('User', back_populates='bookings', foreign_keys=[agent_id])
     agency = relationship('Agency', back_populates='bookings', foreign_keys=[agency_id])
     guests = relationship('Guest', back_populates='booking', cascade="all, delete-orphan")
+    hotel = relationship('Hotel', back_populates='bookings')  # New relationship to Hotel
+    invoice = relationship('Invoice', back_populates='booking', uselist=False, cascade="all, delete-orphan")
 
     def __repr__(self):
         return f'<Booking {self.confirmation_number}>'
+
     
 # Define the Guest model
 class Guest(db.Model):
@@ -126,13 +130,14 @@ class Hotel(db.Model):
     name = Column(String(100), nullable=False)
     description = Column(String(255), nullable=False)
     location = Column(String(100), nullable=False)
-    availability = Column(db.JSON, nullable=False)  # Dictionary to hold availability for each month
-    image = Column(String(255), nullable=True)  # Field to store image filename or URL
-    vendor_id = Column(Integer, ForeignKey('vendors.id'), nullable=True)  # Foreign key for Vendor
-    rooms = relationship('Room', backref='hotel', cascade='all, delete-orphan', lazy=True)
+    availability = Column(db.JSON, nullable=False)
+    image = Column(String(255), nullable=True)
+    vendor_id = Column(Integer, ForeignKey('vendors.id'), nullable=True)
 
-    # Explicit relationship to Vendor with back_populates
+    # Relationships
+    rooms = relationship('Room', backref='hotel', cascade='all, delete-orphan', lazy=True)
     vendor = relationship('Vendor', back_populates='hotels', foreign_keys=[vendor_id])
+    bookings = relationship('Booking', back_populates='hotel')  # New relationship to Booking
 
     def to_dict(self):
         return {
@@ -143,6 +148,22 @@ class Hotel(db.Model):
             'availability': self.availability,
             'image': self.image
         }
+
+# Define the Invoice model
+class Invoice(db.Model):
+    __tablename__ = 'invoices'
+
+    id = Column(Integer, primary_key=True)
+    booking_id = Column(Integer, ForeignKey('bookings.id'), nullable=False)  # Link to Booking
+    time = Column(DateTime, default=datetime.utcnow, nullable=False)
+    payment_method = Column(String(50), nullable=False)  # Use String for flexible payment methods
+    remarks = Column(Text, nullable=True)
+
+    # Relationship to Booking
+    booking = relationship('Booking', back_populates='invoice')
+
+    def __repr__(self):
+        return f'<Invoice {self.id} for Booking {self.booking_id}>'
 
 # Define the Room model
 class Room(db.Model):
@@ -228,3 +249,4 @@ class Vendor(db.Model):
 
     def __repr__(self):
         return f'<Vendor {self.name}>'
+    

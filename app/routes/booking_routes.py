@@ -1,10 +1,11 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required
 from app import db
-from app.models import User, Hotel, Room, Agency, Booking, Guest, User
+from app.models import User, Hotel, Room, Agency, Booking, Guest, User, Invoice
 from app.decorators import roles_required
 from datetime import datetime, timedelta
 from flask_login import current_user
+from sqlalchemy import func
 
 booking_bp = Blueprint('booking', __name__)
 
@@ -124,6 +125,7 @@ def booking_form(hotel_id, room_id):
         room_type=room.type,  # Updated to use `room.room_type` for consistency
         agent_id=agent.id if agent else None,
         agency_id=agency.id if agency else None,
+        hotel_id=hotel.id, #link hotel with booking
         booking_confirmed=False,  # Default as not confirmed
         invoice_paid=False,  # Default as not paid
         selling_price=price,  # Selling price from request
@@ -225,20 +227,25 @@ def view_bookings():
             query = query.filter(Booking.confirmation_number.ilike(f'%{filter_value}%'))
             
     # Apply date range filtering if specified
-    if start_date and end_date:
+    if start_date:
         start_date = datetime.strptime(start_date, '%Y-%m-%d')
+        query = query.filter(Booking.check_in >= start_date)
+    
+    if end_date:
         end_date = datetime.strptime(end_date, '%Y-%m-%d')
-        query = query.filter(Booking.check_in.between(start_date, end_date) | Booking.check_out.between(start_date, end_date))
+        query = query.filter(Booking.check_out <= end_date)
 
     # Apply sorting
     if sort_by == 'hotel_name':
         query = query.order_by(Booking.hotel_name.asc() if sort_order == 'asc' else Booking.hotel_name.desc())
     elif sort_by == 'room_type':
         query = query.order_by(Booking.room_type.asc() if sort_order == 'asc' else Booking.room_type.desc())
+    elif sort_by == 'selling_price':
+        query = query.order_by(Booking.selling_price.asc() if sort_order == 'asc' else Booking.selling_price.desc())
     elif sort_by == 'check_in':
-        query = query.order_by(Booking.check_in.asc() if sort_order == 'asc' else Booking.check_in.desc())
+        query = query.order_by(func.date(Booking.check_in).asc() if sort_order == 'asc' else func.date(Booking.check_in).desc())
     elif sort_by == 'check_out':
-        query = query.order_by(Booking.check_out.asc() if sort_order == 'asc' else Booking.check_out.desc())
+        query = query.order_by(func.date(Booking.check_out).asc() if sort_order == 'asc' else func.date(Booking.check_out).desc())
     elif sort_by == 'agent_name':
         query = query.join(User).order_by(User.username.asc() if sort_order == 'asc' else User.username.desc())
     elif sort_by == 'agency_name':
@@ -249,7 +256,8 @@ def view_bookings():
         query = query.order_by(Booking.booking_confirmed.asc() if sort_order == 'asc' else Booking.booking_confirmed.desc())
     elif sort_by == 'invoice_paid':
         query = query.order_by(Booking.invoice_paid.asc() if sort_order == 'asc' else Booking.invoice_paid.desc())
-
+    else:
+        query = query.order_by(Booking.id.asc() if sort_order == 'asc' else Booking.id.desc())
 
     # Apply role-based filtering
     if current_user.role == 'super_admin':
@@ -262,7 +270,14 @@ def view_bookings():
         # Admins see only bookings where invoice_paid is False
         bookings = query.filter_by(invoice_paid=False).all()
 
-    return render_template('booking/booking_dashboard.html', bookings=bookings, sort_by=sort_by, sort_order=sort_order, filter_column=filter_column, filter_value=filter_value)
+    return render_template('booking/booking_dashboard.html', 
+                           bookings=bookings, 
+                           sort_by=sort_by, 
+                           sort_order=sort_order, 
+                           filter_column=filter_column, 
+                           filter_value=filter_value,
+                           start_date=start_date,
+                           end_date=end_date)
 
 @booking_bp.route('/update_confirmation', methods=['POST'])
 @login_required
@@ -271,6 +286,9 @@ def update_confirmation():
     booking_id = request.form.get('booking_id')
     confirmation_number = request.form.get('confirmation_number')
     buying_price = request.form.get('buying_price')
+
+    if not booking_id or not confirmation_number or not buying_price:
+        return jsonify({'status': 'error', 'message': 'Invalid data'}), 400
 
     booking = Booking.query.get(booking_id)
     if booking:
@@ -281,15 +299,45 @@ def update_confirmation():
         return jsonify({'status': 'success'}), 200
     return jsonify({'status': 'error', 'message': 'Booking not found'}), 404
 
+
 @booking_bp.route('/update_invoice', methods=['POST'])
 @login_required
 @roles_required('super_admin', 'admin', 'agency_admin')
 def update_invoice():
     booking_id = request.form.get('booking_id')
+    payment_date_str = request.form.get('payment_date')
+    payment_method = request.form.get('payment_method')
+    remarks = request.form.get('remarks')
+
+    # Validate the received data
+    if not booking_id or not payment_date_str or not payment_method:
+        return jsonify({'status': 'error', 'message': 'Invalid data'}), 400
 
     booking = Booking.query.get(booking_id)
+
+    # Parse the payment date
+    try:
+        payment_date = datetime.strptime(payment_date_str, '%Y-%m-%dT%H:%M')
+    except ValueError as e:
+        print(f"Error parsing date: {payment_date_str}. Error: {e}")
+        return jsonify({'status': 'error', 'message': 'Invalid date format.'}), 400
+
     if booking:
+        # Mark the booking's invoice as paid
         booking.invoice_paid = True
+        
+        # Create a new Invoice object and link it to the booking
+        new_invoice = Invoice(
+            booking_id=booking.id,
+            time=payment_date,
+            payment_method=payment_method,
+            remarks=remarks
+        )
+
+        # Add the new invoice to the session
+        db.session.add(new_invoice)
         db.session.commit()
+
         return jsonify({'status': 'success'}), 200
+    
     return jsonify({'status': 'error', 'message': 'Booking not found'}), 404
