@@ -103,7 +103,7 @@
         <h1 class="text-4xl font-extrabold text-gray-800 mb-8 text-center">Booking Dashboard</h1>
 
         <!-- Filter Form -->
-        <div class="mb-6">
+        <div class="mb-6 flex">
             <form method="get" action="{{ url_for('booking.view_bookings') }}" class="flex items-center space-x-4">
                 <select name="filter_column" class="border rounded-md px-4 py-2">
                     <option value="">Select Filter</option>
@@ -124,6 +124,11 @@
                 </div>
                 <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Filter</button>
             </form>
+            <div class="flex items-center space-x-4 ml-12">
+                <button onclick="downloadBookingsAsCSV()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-3 rounded">
+                    Download Bookings
+                </button>
+            </div>
         </div>
 
         <!-- Booking Table -->
@@ -176,7 +181,7 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                     {% for booking in bookings %}
                     <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 text-gray-700">{{ booking.id }}</td>
+                        <td class="px-6 py-4 text-gray-700" onclick="openBookingDetailsModal({{ booking.id }})">{{ booking.id }}</td>
                         <td class="px-6 py-4 text-gray-700">
                             {% if booking.agency %}
                             {{ booking.agency.name }}
@@ -293,8 +298,21 @@
         </div>
     </div>
 
-
-    
+    <!-- Booking Details Modal -->
+    <div id="bookingDetailsModal" class="modal">
+        <div class="modal-content max-w-4xl">
+            <h2 class="text-2xl font-bold mb-4">Booking Details</h2>
+            <div id="bookingDetailsContent"></div>
+            <div class="flex justify-end mt-4">
+                <button onclick="downloadBookingDetails($('#bookingDetailsModal').attr('data-booking-id'))" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mr-2">
+                    Download Details
+                </button>
+                <button onclick="closeBookingDetailsModal()" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script>
         function openUpdateModal(bookingId) {
@@ -411,6 +429,58 @@
             });
         });
 
+        function openBookingDetailsModal(bookingId) {
+            console.log("Opening modal for booking ID:", bookingId);
+            $('#bookingDetailsModal').attr('data-booking-id', bookingId);
+            var url = "{{ url_for('booking.get_booking_details', booking_id=0) }}".replace('0', bookingId);
+            console.log("Request URL:", url);
+            
+            $.ajax({
+                url: url,
+                method: "GET",
+                success: function(response) {
+                    if (response.status === 'success') {
+                        $('#bookingDetailsContent').html(response.html);
+                        $('#bookingDetailsModal').show();
+                    } else {
+                        alert('Failed to fetch booking details.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("AJAX Error:", status, error);
+                    alert('Failed to fetch booking details. Check console for details.');
+                }
+            });
+        } 
+        
+        function closeBookingDetailsModal() {
+            $('#bookingDetailsModal').hide();
+        }
+        
+        function downloadBookingDetails(bookingId) {
+            console.log("Downloading details for booking ID:", bookingId);
+            window.location.href = "{{ url_for('booking.download_booking_details', booking_id=0) }}".replace('0', bookingId);
+        }
+
+        function downloadBookingsAsCSV() {
+            // Create a new URL object based on the current URL
+            const url = new URL(window.location.href);
+
+            // Extract current search parameters from the URL
+            const params = new URLSearchParams(url.search);
+
+            // Create a new URL object for the export request
+            const exportUrl = new URL('/export_bookings', window.location.origin);
+            
+            // Add all parameters to the export URL
+            for (const [key, value] of params.entries()) {
+                exportUrl.searchParams.append(key, value);
+            }
+
+            // Redirect to the export URL to download the CSV
+            window.location.href = exportUrl;
+        }
+        
     </script>
 </body>
 </html>

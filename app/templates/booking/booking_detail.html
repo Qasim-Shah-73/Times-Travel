@@ -1,0 +1,74 @@
+<div class="bg-white shadow-sm rounded-md p-4" data-booking-id="{{ booking.id }}">
+    <h2 class="text-lg font-semibold text-gray-800 mb-3">Booking Details</h2>
+    <table class="w-full text-sm divide-y divide-gray-200">
+        <tbody class="bg-white divide-y divide-gray-200">
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-2 font-medium text-gray-600">Booking ID</td>
+                <td class="px-4 py-2 text-gray-800">{{ booking.id }}</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-2 font-medium text-gray-600">Agency</td>
+                <td class="px-4 py-2 text-gray-800">{{ booking.agency.name if booking.agency else 'N/A' }}</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-2 font-medium text-gray-600">Hotel Name</td>
+                <td class="px-4 py-2 text-gray-800">{{ booking.hotel_name }}</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-2 font-medium text-gray-600">Check-In</td>
+                <td class="px-4 py-2 text-gray-800">{{ booking.check_in.strftime('%d-%m-%Y') }}</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-2 font-medium text-gray-600">Check-Out</td>
+                <td class="px-4 py-2 text-gray-800">{{ booking.check_out.strftime('%d-%m-%Y') }}</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-2 font-medium text-gray-600">Room Type</td>
+                <td class="px-4 py-2 text-gray-800">{{ booking.room_type or 'N/A' }}</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-2 font-medium text-gray-600">Selling Price</td>
+                <td class="px-4 py-2 text-gray-800">{{ booking.selling_price }}</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-2 font-medium text-gray-600">Buying Price</td>
+                <td class="px-4 py-2 text-gray-800">{{ booking.buying_price }}</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-2 font-medium text-gray-600">Vendor</td>
+                <td class="px-4 py-2 text-gray-800">{{ booking.hotel.vendor.name if booking.hotel.vendor else 'N/A' }}</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-2 font-medium text-gray-600">Agent</td>
+                <td class="px-4 py-2 text-gray-800">{{ booking.agent.username if booking.agent else 'N/A' }}</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-2 font-medium text-gray-600">Confirmation Number</td>
+                <td class="px-4 py-2 text-gray-800">{{ booking.confirmation_number or 'N/A' }}</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-2 font-medium text-gray-600">Booking Confirmed</td>
+                <td class="px-4 py-2">
+                    <span class="px-2 py-1 text-xs font-medium rounded {{ 'bg-green-100 text-green-700' if booking.booking_confirmed else 'bg-red-100 text-red-700' }}">
+                        {{ 'Yes' if booking.booking_confirmed else 'No' }}
+                    </span>
+                </td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-2 font-medium text-gray-600">Invoice Paid</td>
+                <td class="px-4 py-2">
+                    <span class="px-2 py-1 text-xs font-medium rounded {{ 'bg-green-100 text-green-700' if booking.invoice_paid else 'bg-red-100 text-red-700' }}">
+                        {{ 'Yes' if booking.invoice_paid else 'No' }}
+                    </span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3 class="text-md font-semibold text-gray-800 mt-4 mb-2">Guests</h3>
+    <ul class="list-disc pl-5 text-sm text-gray-700">
+        {% for guest in booking.guests %}
+            <li class="py-1">{{ guest.first_name }} {{ guest.last_name }}</li>
+        {% endfor %}
+    </ul>
+</div>

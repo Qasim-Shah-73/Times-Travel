@@ -1,4 +1,7 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
+import json
+from flask import Blueprint, Response, render_template, redirect, url_for, flash, request, jsonify, send_file
+from io import StringIO, BytesIO
+import csv
 from flask_login import login_required
 from app import db
 from app.models import User, Hotel, Room, Agency, Booking, Guest, User, Invoice
@@ -341,3 +344,149 @@ def update_invoice():
         return jsonify({'status': 'success'}), 200
     
     return jsonify({'status': 'error', 'message': 'Booking not found'}), 404
+
+@booking_bp.route('/get_booking_details/<int:booking_id>', methods=['GET'])
+def get_booking_details(booking_id):
+    print(f"Received request for booking ID: {booking_id}")  # Debugging line
+    try:
+        booking = Booking.query.get_or_404(booking_id)
+        print(f"Booking found: {booking}")  # Debugging line
+        html = render_template('booking/booking_detail.html', booking=booking)
+        return jsonify({'status': 'success', 'html': html})
+    except Exception as e:
+        print(f"Error: {e}")  # For debugging purposes
+        return jsonify({'status': 'error', 'message': 'Failed to fetch booking details.'}), 500
+
+@booking_bp.route('/download_booking_details/<int:booking_id>', methods=['GET'])
+def download_booking_details(booking_id):
+    booking = Booking.query.get_or_404(booking_id)
+
+    # Create a CSV file in memory using StringIO
+    output = StringIO()
+    writer = csv.writer(output)
+
+    # Write the headers
+    writer.writerow(['Field', 'Value'])
+
+    # Write the booking details
+    writer.writerow(['Booking ID', booking.id])
+    writer.writerow(['Agency', booking.agency.name if booking.agency else 'N/A'])
+    writer.writerow(['Hotel Name', booking.hotel_name])
+    writer.writerow(['Check-In', booking.check_in.strftime('%d-%m-%Y')])
+    writer.writerow(['Check-Out', booking.check_out.strftime('%d-%m-%Y')])
+    writer.writerow(['Room Type', booking.room_type or 'N/A'])
+    writer.writerow(['Selling Price', booking.selling_price])
+    writer.writerow(['Buying Price', booking.buying_price])
+    writer.writerow(['Vendor', booking.hotel.vendor.name or 'N/A'])
+    writer.writerow(['Agent', booking.agent.username if booking.agent else 'N/A'])
+    writer.writerow(['Confirmation Number', booking.confirmation_number or 'N/A'])
+    writer.writerow(['Booking Confirmed', 'Yes' if booking.booking_confirmed else 'No'])
+    writer.writerow(['Invoice Paid', 'Yes' if booking.invoice_paid else 'No'])
+
+    # Add guest information
+    for i, guest in enumerate(booking.guests, 1):
+        writer.writerow([f'Guest {i} Name', f'{guest.first_name} {guest.last_name}'])
+
+    # Get CSV content as a string
+    csv_content = output.getvalue()
+    output.close()
+
+    # Convert the CSV string to bytes using BytesIO
+    byte_stream = BytesIO(csv_content.encode('utf-8'))
+
+    # Send the file using send_file with BytesIO
+    return send_file(
+        byte_stream,
+        mimetype='text/csv',
+        as_attachment=True,
+        download_name=f'booking_details_{booking_id}.csv'
+    )
+   
+   
+@booking_bp.route('/export_bookings', methods=['GET'])
+@login_required
+def export_bookings():
+    sort_by = request.args.get('sort_by', 'id')
+    sort_order = request.args.get('sort_order', 'asc')
+    filter_column = request.args.get('filter_column')
+    filter_value = request.args.get('filter_value')
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+
+    query = Booking.query
+
+    # Apply filtering if specified
+    if filter_column and filter_value:
+        if filter_column == 'hotel_name':
+            query = query.filter(Booking.hotel_name.ilike(f'%{filter_value}%'))
+        elif filter_column == 'room_type':
+            query = query.filter(Booking.room_type.ilike(f'%{filter_value}%'))
+        elif filter_column == 'agent_name':
+            query = query.join(User).filter(User.username.ilike(f'%{filter_value}%'))
+        elif filter_column == 'agency_name':
+            query = query.join(Agency).filter(Agency.name.ilike(f'%{filter_value}%'))
+        elif filter_column == 'confirmation_number':
+            query = query.filter(Booking.confirmation_number.ilike(f'%{filter_value}%'))
+            
+    # Apply date range filtering if specified
+    if start_date:
+        start_date = datetime.strptime(start_date, '%Y-%m-%d')
+        query = query.filter(Booking.check_in >= start_date)
+    
+    if end_date:
+        end_date = datetime.strptime(end_date, '%Y-%m-%d')
+        query = query.filter(Booking.check_out <= end_date)
+
+    # Apply sorting
+    if sort_by == 'hotel_name':
+        query = query.order_by(Booking.hotel_name.asc() if sort_order == 'asc' else Booking.hotel_name.desc())
+    elif sort_by == 'room_type':
+        query = query.order_by(Booking.room_type.asc() if sort_order == 'asc' else Booking.room_type.desc())
+    elif sort_by == 'selling_price':
+        query = query.order_by(Booking.selling_price.asc() if sort_order == 'asc' else Booking.selling_price.desc())
+    elif sort_by == 'check_in':
+        query = query.order_by(func.date(Booking.check_in).asc() if sort_order == 'asc' else func.date(Booking.check_in).desc())
+    elif sort_by == 'check_out':
+        query = query.order_by(func.date(Booking.check_out).asc() if sort_order == 'asc' else func.date(Booking.check_out).desc())
+    elif sort_by == 'agent_name':
+        query = query.join(User).order_by(User.username.asc() if sort_order == 'asc' else User.username.desc())
+    elif sort_by == 'agency_name':
+        query = query.join(Agency).order_by(Agency.name.asc() if sort_order == 'asc' else Agency.name.desc())
+    elif sort_by == 'confirmation_number':
+        query = query.order_by(Booking.confirmation_number.asc() if sort_order == 'asc' else Booking.confirmation_number.desc())
+    elif sort_by == 'booking_confirmed':
+        query = query.order_by(Booking.booking_confirmed.asc() if sort_order == 'asc' else Booking.booking_confirmed.desc())
+    elif sort_by == 'invoice_paid':
+        query = query.order_by(Booking.invoice_paid.asc() if sort_order == 'asc' else Booking.invoice_paid.desc())
+    else:
+        query = query.order_by(Booking.id.asc() if sort_order == 'asc' else Booking.id.desc())
+
+    # Apply role-based filtering
+    if current_user.role == 'super_admin':
+        bookings = query.all()
+    elif current_user.role == 'agency_admin':
+        bookings = query.filter_by(agency_id=current_user.agency_id).all()
+    elif current_user.role == 'admin':
+        bookings = query.filter_by(invoice_paid=False).all()
+
+    # Generate CSV
+    output = StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['ID', 'Hotel Name', 'Room Type', 'Check-In Date', 'Check-Out Date', 'Selling Price', 'Agent Name', 'Confirmation Number', 'Booking Confirmed', 'Invoice Paid'])
+
+    for booking in bookings:
+        writer.writerow([
+            booking.id,
+            booking.hotel_name,
+            booking.room_type or 'N/A',
+            booking.check_in.strftime('%d-%m-%Y'),
+            booking.check_out.strftime('%d-%m-%Y'),
+            booking.selling_price,
+            booking.agent.username if booking.agent else 'N/A',
+            booking.confirmation_number or 'N/A',
+            'Yes' if booking.booking_confirmed else 'No',
+            'Yes' if booking.invoice_paid else 'No'
+        ])
+
+    output.seek(0)
+    return Response(output, mimetype='text/csv', headers={"Content-Disposition": "attachment;filename=bookings.csv"})
