@@ -102,7 +102,6 @@ class Booking(db.Model):
     def __repr__(self):
         return f'<Booking {self.confirmation_number}>'
 
-    
 # Define the Guest model
 class Guest(db.Model):
     __tablename__ = 'guests'
@@ -158,6 +157,7 @@ class Invoice(db.Model):
     time = Column(DateTime, default=datetime.utcnow, nullable=False)
     payment_method = Column(String(50), nullable=False)  # Use String for flexible payment methods
     remarks = Column(Text, nullable=True)
+    tram_num = Column(String(10), nullable=True)
 
     # Relationship to Booking
     booking = relationship('Booking', back_populates='invoice')

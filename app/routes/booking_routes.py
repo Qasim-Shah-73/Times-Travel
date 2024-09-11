@@ -1,4 +1,3 @@
-import json
 from flask import Blueprint, Response, render_template, redirect, url_for, flash, request, jsonify, send_file
 from io import StringIO, BytesIO
 import csv
@@ -9,6 +8,7 @@ from app.decorators import roles_required
 from datetime import datetime, timedelta
 from flask_login import current_user
 from sqlalchemy import func
+from app.email import send_tentative_email, send_confirmation_email, send_invoice_paid_email
 
 booking_bp = Blueprint('booking', __name__)
 
@@ -158,31 +158,25 @@ def booking_form(hotel_id, room_id):
                            nights=nights, persons=persons, hotel_name=hotel.name)
 
 #booking is created here
-@booking_bp.route('/book/<int:hotel_id>/<int:room_id>/<int:booking_id>', methods=['GET', 'POST'])
+@booking_bp.route('/book/<int:room_id>/<int:booking_id>', methods=['GET', 'POST'])
 @login_required
-def book(hotel_id, room_id, booking_id):
+def book(room_id, booking_id):
     room = Room.query.get_or_404(room_id)
-    booking = Room.query.get_or_404(booking_id)
-    
-    
+    booking = Booking.query.get_or_404(booking_id)  # Use Booking instead of Room for booking_id
+
     if request.method == 'POST':
         if 'cancel' in request.form:
-            # Handle cancellation logic here
+            # Handle cancellation logic
             db.session.delete(booking)
             db.session.commit()
             flash("Booking cancelled", "info")
             return redirect(url_for('auth.index'))
-        
-        # Determine number of persons based on room type
-        if 'Single' in room.type:
-            persons = 1
-        elif 'Double' in room.type:
-            persons = 2
-        elif 'Triple' in room.type:
-            persons = 3
-        elif 'Quad' in room.type:
-            persons = 4
 
+        # Determine the number of persons based on room type
+        persons = 1 if 'Single' in room.type else \
+                  2 if 'Double' in room.type else \
+                  3 if 'Triple' in room.type else \
+                  4 if 'Quad' in room.type else 1
 
         # Handle guests
         for i in range(persons):
@@ -197,16 +191,15 @@ def book(hotel_id, room_id, booking_id):
                 db.session.add(guest)
 
         db.session.commit()
-        
         flash('Booking created successfully', 'success')
         return redirect(url_for('auth.index'))
 
     # If GET request, render the booking form
-    return redirect(url_for('auth.index'))
+    return render_template('booking_form.html', room=room, booking=booking)
 
-@booking_bp.route('/bookings', methods=['GET', 'POST'])
-@login_required
-def view_bookings():
+
+def apply_filters_and_sorting(query):
+    """Apply filtering, sorting, and role-based access to the query."""
     sort_by = request.args.get('sort_by', 'id')
     sort_order = request.args.get('sort_order', 'asc')
     filter_column = request.args.get('filter_column')
@@ -214,74 +207,74 @@ def view_bookings():
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
 
-    query = Booking.query
-
-    # Apply filtering if specified
+    # Apply filtering
     if filter_column and filter_value:
-        if filter_column == 'hotel_name':
-            query = query.filter(Booking.hotel_name.ilike(f'%{filter_value}%'))
-        elif filter_column == 'room_type':
-            query = query.filter(Booking.room_type.ilike(f'%{filter_value}%'))
-        elif filter_column == 'agent_name':
-            query = query.join(User).filter(User.username.ilike(f'%{filter_value}%'))
-        elif filter_column == 'agency_name':
-            query = query.join(Agency).filter(Agency.name.ilike(f'%{filter_value}%'))
-        elif filter_column == 'confirmation_number':
-            query = query.filter(Booking.confirmation_number.ilike(f'%{filter_value}%'))
-            
-    # Apply date range filtering if specified
+        filters = {
+            'hotel_name': Booking.hotel_name.ilike(f'%{filter_value}%'),
+            'room_type': Booking.room_type.ilike(f'%{filter_value}%'),
+            'agent_name': User.username.ilike(f'%{filter_value}%'),
+            'agency_name': Agency.name.ilike(f'%{filter_value}%'),
+            'confirmation_number': Booking.confirmation_number.ilike(f'%{filter_value}%')
+        }
+        if filter_column in filters:
+            if filter_column in ['agent_name', 'agency_name']:
+                query = query.join(User if filter_column == 'agent_name' else Agency)
+            query = query.filter(filters[filter_column])
+
+    # Apply date range filtering
     if start_date:
         start_date = datetime.strptime(start_date, '%Y-%m-%d')
         query = query.filter(Booking.check_in >= start_date)
-    
     if end_date:
         end_date = datetime.strptime(end_date, '%Y-%m-%d')
         query = query.filter(Booking.check_out <= end_date)
 
     # Apply sorting
-    if sort_by == 'hotel_name':
-        query = query.order_by(Booking.hotel_name.asc() if sort_order == 'asc' else Booking.hotel_name.desc())
-    elif sort_by == 'room_type':
-        query = query.order_by(Booking.room_type.asc() if sort_order == 'asc' else Booking.room_type.desc())
-    elif sort_by == 'selling_price':
-        query = query.order_by(Booking.selling_price.asc() if sort_order == 'asc' else Booking.selling_price.desc())
-    elif sort_by == 'check_in':
-        query = query.order_by(func.date(Booking.check_in).asc() if sort_order == 'asc' else func.date(Booking.check_in).desc())
-    elif sort_by == 'check_out':
-        query = query.order_by(func.date(Booking.check_out).asc() if sort_order == 'asc' else func.date(Booking.check_out).desc())
-    elif sort_by == 'agent_name':
-        query = query.join(User).order_by(User.username.asc() if sort_order == 'asc' else User.username.desc())
-    elif sort_by == 'agency_name':
-        query = query.join(Agency).order_by(Agency.name.asc() if sort_order == 'asc' else Agency.name.desc())
-    elif sort_by == 'confirmation_number':
-        query = query.order_by(Booking.confirmation_number.asc() if sort_order == 'asc' else Booking.confirmation_number.desc())
-    elif sort_by == 'booking_confirmed':
-        query = query.order_by(Booking.booking_confirmed.asc() if sort_order == 'asc' else Booking.booking_confirmed.desc())
-    elif sort_by == 'invoice_paid':
-        query = query.order_by(Booking.invoice_paid.asc() if sort_order == 'asc' else Booking.invoice_paid.desc())
+    sort_columns = {
+        'hotel_name': Booking.hotel_name,
+        'room_type': Booking.room_type,
+        'selling_price': Booking.selling_price,
+        'check_in': func.date(Booking.check_in),
+        'check_out': func.date(Booking.check_out),
+        'agent_name': User.username,
+        'agency_name': Agency.name,
+        'confirmation_number': Booking.confirmation_number,
+        'booking_confirmed': Booking.booking_confirmed,
+        'invoice_paid': Booking.invoice_paid,
+        'id': Booking.id
+    }
+    if sort_by in sort_columns:
+        sort_column = sort_columns[sort_by]
+        query = query.order_by(sort_column.asc() if sort_order == 'asc' else sort_column.desc())
     else:
         query = query.order_by(Booking.id.asc() if sort_order == 'asc' else Booking.id.desc())
 
+    return query
+
+@booking_bp.route('/bookings', methods=['GET', 'POST'])
+@login_required
+@roles_required('super_admin', 'admin', 'agency_admin')
+def view_bookings():
+    query = Booking.query
+    query = apply_filters_and_sorting(query)
+
     # Apply role-based filtering
     if current_user.role == 'super_admin':
-        # Super admins see all bookings
         bookings = query.all()
     elif current_user.role == 'agency_admin':
-        # Agency admins see only bookings of their agency
         bookings = query.filter_by(agency_id=current_user.agency_id).all()
     elif current_user.role == 'admin':
-        # Admins see only bookings where invoice_paid is False
         bookings = query.filter_by(invoice_paid=False).all()
 
     return render_template('booking/booking_dashboard.html', 
                            bookings=bookings, 
-                           sort_by=sort_by, 
-                           sort_order=sort_order, 
-                           filter_column=filter_column, 
-                           filter_value=filter_value,
-                           start_date=start_date,
-                           end_date=end_date)
-
+                           sort_by=request.args.get('sort_by', 'id'),
+                           sort_order=request.args.get('sort_order', 'asc'),
+                           filter_column=request.args.get('filter_column'),
+                           filter_value=request.args.get('filter_value'),
+                           start_date=request.args.get('start_date'),
+                           end_date=request.args.get('end_date'))
+    
 @booking_bp.route('/update_confirmation', methods=['POST'])
 @login_required
 @roles_required('super_admin', 'admin', 'agency_admin')
@@ -290,18 +283,27 @@ def update_confirmation():
     confirmation_number = request.form.get('confirmation_number')
     buying_price = request.form.get('buying_price')
 
-    if not booking_id or not confirmation_number or not buying_price:
+    if not booking_id or not buying_price:
         return jsonify({'status': 'error', 'message': 'Invalid data'}), 400
 
     booking = Booking.query.get(booking_id)
+    
     if booking:
-        booking.confirmation_number = confirmation_number
-        booking.buying_price = buying_price
-        booking.booking_confirmed = True
+        if not confirmation_number == 'None':
+            booking.confirmation_number = confirmation_number
+            booking.booking_confirmed = True
+            guest_name = booking.guests[0].first_name if booking.guests and booking.guests[0].first_name else 'Times Travel'
+
+            # send_confirmation_email(booking.agent.email, guest_name, confirmation_number)
+         
+        if buying_price:
+            booking.buying_price = buying_price
+        
         db.session.commit()
+        
+        
         return jsonify({'status': 'success'}), 200
     return jsonify({'status': 'error', 'message': 'Booking not found'}), 404
-
 
 @booking_bp.route('/update_invoice', methods=['POST'])
 @login_required
@@ -310,6 +312,7 @@ def update_invoice():
     booking_id = request.form.get('booking_id')
     payment_date_str = request.form.get('payment_date')
     payment_method = request.form.get('payment_method')
+    tram_num = request.form.get('tram_num')
     remarks = request.form.get('remarks')
 
     # Validate the received data
@@ -334,18 +337,23 @@ def update_invoice():
             booking_id=booking.id,
             time=payment_date,
             payment_method=payment_method,
+            tram_num=tram_num,
             remarks=remarks
         )
 
         # Add the new invoice to the session
         db.session.add(new_invoice)
         db.session.commit()
+        guest_name = booking.guests[0].first_name if booking.guests and booking.guests[0].first_name else 'Agent'
+        # send_invoice_paid_email(booking.agent.email, guest_name)
 
         return jsonify({'status': 'success'}), 200
     
     return jsonify({'status': 'error', 'message': 'Booking not found'}), 404
 
 @booking_bp.route('/get_booking_details/<int:booking_id>', methods=['GET'])
+@login_required
+@roles_required('super_admin', 'admin', 'agency_admin')
 def get_booking_details(booking_id):
     print(f"Received request for booking ID: {booking_id}")  # Debugging line
     try:
@@ -358,6 +366,8 @@ def get_booking_details(booking_id):
         return jsonify({'status': 'error', 'message': 'Failed to fetch booking details.'}), 500
 
 @booking_bp.route('/download_booking_details/<int:booking_id>', methods=['GET'])
+@login_required
+@roles_required('super_admin', 'admin', 'agency_admin')
 def download_booking_details(booking_id):
     booking = Booking.query.get_or_404(booking_id)
 
@@ -393,7 +403,7 @@ def download_booking_details(booking_id):
 
     # Convert the CSV string to bytes using BytesIO
     byte_stream = BytesIO(csv_content.encode('utf-8'))
-
+    
     # Send the file using send_file with BytesIO
     return send_file(
         byte_stream,
@@ -402,64 +412,12 @@ def download_booking_details(booking_id):
         download_name=f'booking_details_{booking_id}.csv'
     )
    
-   
 @booking_bp.route('/export_bookings', methods=['GET'])
 @login_required
+@roles_required('super_admin', 'admin', 'agency_admin')
 def export_bookings():
-    sort_by = request.args.get('sort_by', 'id')
-    sort_order = request.args.get('sort_order', 'asc')
-    filter_column = request.args.get('filter_column')
-    filter_value = request.args.get('filter_value')
-    start_date = request.args.get('start_date')
-    end_date = request.args.get('end_date')
-
     query = Booking.query
-
-    # Apply filtering if specified
-    if filter_column and filter_value:
-        if filter_column == 'hotel_name':
-            query = query.filter(Booking.hotel_name.ilike(f'%{filter_value}%'))
-        elif filter_column == 'room_type':
-            query = query.filter(Booking.room_type.ilike(f'%{filter_value}%'))
-        elif filter_column == 'agent_name':
-            query = query.join(User).filter(User.username.ilike(f'%{filter_value}%'))
-        elif filter_column == 'agency_name':
-            query = query.join(Agency).filter(Agency.name.ilike(f'%{filter_value}%'))
-        elif filter_column == 'confirmation_number':
-            query = query.filter(Booking.confirmation_number.ilike(f'%{filter_value}%'))
-            
-    # Apply date range filtering if specified
-    if start_date:
-        start_date = datetime.strptime(start_date, '%Y-%m-%d')
-        query = query.filter(Booking.check_in >= start_date)
-    
-    if end_date:
-        end_date = datetime.strptime(end_date, '%Y-%m-%d')
-        query = query.filter(Booking.check_out <= end_date)
-
-    # Apply sorting
-    if sort_by == 'hotel_name':
-        query = query.order_by(Booking.hotel_name.asc() if sort_order == 'asc' else Booking.hotel_name.desc())
-    elif sort_by == 'room_type':
-        query = query.order_by(Booking.room_type.asc() if sort_order == 'asc' else Booking.room_type.desc())
-    elif sort_by == 'selling_price':
-        query = query.order_by(Booking.selling_price.asc() if sort_order == 'asc' else Booking.selling_price.desc())
-    elif sort_by == 'check_in':
-        query = query.order_by(func.date(Booking.check_in).asc() if sort_order == 'asc' else func.date(Booking.check_in).desc())
-    elif sort_by == 'check_out':
-        query = query.order_by(func.date(Booking.check_out).asc() if sort_order == 'asc' else func.date(Booking.check_out).desc())
-    elif sort_by == 'agent_name':
-        query = query.join(User).order_by(User.username.asc() if sort_order == 'asc' else User.username.desc())
-    elif sort_by == 'agency_name':
-        query = query.join(Agency).order_by(Agency.name.asc() if sort_order == 'asc' else Agency.name.desc())
-    elif sort_by == 'confirmation_number':
-        query = query.order_by(Booking.confirmation_number.asc() if sort_order == 'asc' else Booking.confirmation_number.desc())
-    elif sort_by == 'booking_confirmed':
-        query = query.order_by(Booking.booking_confirmed.asc() if sort_order == 'asc' else Booking.booking_confirmed.desc())
-    elif sort_by == 'invoice_paid':
-        query = query.order_by(Booking.invoice_paid.asc() if sort_order == 'asc' else Booking.invoice_paid.desc())
-    else:
-        query = query.order_by(Booking.id.asc() if sort_order == 'asc' else Booking.id.desc())
+    query = apply_filters_and_sorting(query)
 
     # Apply role-based filtering
     if current_user.role == 'super_admin':
@@ -472,7 +430,7 @@ def export_bookings():
     # Generate CSV
     output = StringIO()
     writer = csv.writer(output)
-    writer.writerow(['ID', 'Hotel Name', 'Room Type', 'Check-In Date', 'Check-Out Date', 'Selling Price', 'Agent Name', 'Confirmation Number', 'Booking Confirmed', 'Invoice Paid'])
+    writer.writerow(['ID', 'Hotel Name', 'Room Type', 'Check-In Date', 'Check-Out Date', 'Selling Price', 'Buying Price', 'Vendor', 'Agent Name', 'Confirmation Number', 'Booking Confirmed', 'Invoice Paid'])
 
     for booking in bookings:
         writer.writerow([
@@ -482,6 +440,8 @@ def export_bookings():
             booking.check_in.strftime('%d-%m-%Y'),
             booking.check_out.strftime('%d-%m-%Y'),
             booking.selling_price,
+            booking.buying_price,
+            booking.hotel.vendor.name if booking.hotel and booking.hotel.vendor else 'N/A',
             booking.agent.username if booking.agent else 'N/A',
             booking.confirmation_number or 'N/A',
             'Yes' if booking.booking_confirmed else 'No',

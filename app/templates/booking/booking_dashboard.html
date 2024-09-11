@@ -181,7 +181,7 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                     {% for booking in bookings %}
                     <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 text-gray-700" onclick="openBookingDetailsModal({{ booking.id }})">{{ booking.id }}</td>
+                        <td class="px-6 py-4 text-gray-700" onclick="openBookingDetailsModal({{ booking.id }})">TTL_00{{ booking.id }}</td>
                         <td class="px-6 py-4 text-gray-700">
                             {% if booking.agency %}
                             {{ booking.agency.name }}
@@ -277,15 +277,32 @@
                 </div>
                 <div class="mb-4">
                     <label for="payment_method" class="block text-sm font-medium text-gray-700">Payment Method</label>
-                    <select id="payment_method" name="payment_method" class="border rounded-md px-4 py-2 w-full" required>
+                    <select
+                        id="payment_method"
+                        name="payment_method"
+                        class="border rounded-md px-4 py-2 w-full"
+                        required
+                        onchange="toggleTramNumberField()"
+                    >
                         <option value="">Select Payment Method</option>
                         <option value="Cash">Cash</option>
                         <option value="Bank">Bank</option>
+                        <option value="Tram">Tram Number</option> <!-- Changed value to 'Tram' -->
                     </select>
+                </div>
+                
+                <div class="mb-4" id="tram_num_container" style="display: none;"> <!-- Hidden by default -->
+                    <label for="tram_num" class="block text-sm font-medium text-gray-700">Tram Number</label>
+                    <textarea
+                        id="tram_num"
+                        name="tram_num"
+                        class="border rounded-md px-4 py-2 w-full"
+                        rows="1"
+                    ></textarea>
                 </div>
                 <div class="mb-4">
                     <label for="remarks" class="block text-sm font-medium text-gray-700">Remarks</label>
-                    <textarea id="remarks" name="remarks" class="border rounded-md px-4 py-2 w-full" rows="3"></textarea>
+                    <textarea id="remarks" name="remarks" class="border rounded-md px-4 py-2 w-full" rows="2"></textarea>
                 </div>
                 <div class="text-red-500 text-sm mb-4">
                     Are you sure you want to mark this invoice as paid?
@@ -328,7 +345,7 @@
             e.preventDefault();
             
             var bookingId = $('#booking_id').val();
-            var confirmationNumber = $('#confirmation_number').val();
+            var confirmationNumber = $('#confirmation_number').val() || 'None';
             var buyingPrice = $('#buying_price').val();
         
             var data = {
@@ -428,6 +445,18 @@
                 }
             });
         });
+
+        function toggleTramNumberField() {
+            const paymentMethod = document.getElementById('payment_method').value;
+            const tramNumContainer = document.getElementById('tram_num_container');
+    
+            // Show or hide tram number field based on the selected payment method
+            if (paymentMethod === 'Tram') {
+                tramNumContainer.style.display = 'block';
+            } else {
+                tramNumContainer.style.display = 'none';
+            }
+        }
 
         function openBookingDetailsModal(bookingId) {
             console.log("Opening modal for booking ID:", bookingId);

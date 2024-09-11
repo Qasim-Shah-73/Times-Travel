@@ -194,7 +194,7 @@
 
 <div class="">
     <h1>Booking Form</h1>
-    <form method="post" action="{{ url_for('booking.book', hotel_id=hotel.id, room_id=room.id, booking_id=booking.id) }}">
+    <form method="post" action="{{ url_for('booking.book', room_id=room.id, booking_id=booking.id) }}">
         <div class="form-container">
             <div class="form-section bg-white">
                 {% for i in range(persons) %}
@@ -257,30 +257,11 @@
     </form>
 </div>
 
-<!-- The Modal -->
-<div id="bookingModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <p>Your booking has been submitted</p>
-    </div>
-</div>
-
 <script>
     document.getElementById('book_now').addEventListener('click', function(event) {
-        event.preventDefault(); // Prevent the default form submission
 
         // Show the modal
-        document.getElementById('bookingModal').style.display = "block";
-
-        // Close the modal after 2 seconds
-        setTimeout(function() {
-            document.getElementById('bookingModal').style.display = "none";
-            document.querySelector('form').submit(); // Submit the form after showing the modal
-        }, 2000);
+        alert('Booking has been created successfully!');
     });
-
-    function closeModal() {
-        document.getElementById('bookingModal').style.display = "none";
-    }
 </script>
 {% endblock %}
