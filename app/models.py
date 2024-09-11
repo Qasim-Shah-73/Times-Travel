@@ -83,6 +83,7 @@ class Booking(db.Model):
     hotel_id = Column(Integer, ForeignKey('hotel.id'), nullable=False)  # Link to Hotel
     hotel_name = Column(String(128), nullable=False)
     room_type = Column(String(128), nullable=True)
+    room_id = Column(Integer, ForeignKey('room.id'), nullable=False)  # Link to Room
     agent_id = Column(Integer, ForeignKey('users.id'), nullable=True)
     agency_id = Column(Integer, ForeignKey('agencies.id'), nullable=True)
     confirmation_number = Column(String(64), unique=True, nullable=True)
@@ -93,10 +94,11 @@ class Booking(db.Model):
     remarks = Column(Text, nullable=True)
 
     # Relationships
+    room = relationship('Room', back_populates='bookings')  # Link to Room
     agent = relationship('User', back_populates='bookings', foreign_keys=[agent_id])
     agency = relationship('Agency', back_populates='bookings', foreign_keys=[agency_id])
     guests = relationship('Guest', back_populates='booking', cascade="all, delete-orphan")
-    hotel = relationship('Hotel', back_populates='bookings')  # New relationship to Hotel
+    hotel = relationship('Hotel', back_populates='bookings')
     invoice = relationship('Invoice', back_populates='booking', uselist=False, cascade="all, delete-orphan")
 
     def __repr__(self):
@@ -188,6 +190,9 @@ class Room(db.Model):
     november_rates = db.Column(JSON, nullable=True)
     december_rates = db.Column(JSON, nullable=True)
     total_price = db.Column(db.Float, default=0)
+    
+    # Relationships
+    bookings = relationship('Booking', back_populates='room')  # Back reference to Booking
 
     def __init__(self, **kwargs):
         super(Room, self).__init__(**kwargs)

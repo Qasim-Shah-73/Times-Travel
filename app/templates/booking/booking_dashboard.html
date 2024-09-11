@@ -199,7 +199,7 @@
                         <td class="px-6 py-4 text-gray-700">{{ booking.hotel_name }}</td>
                         <td class="px-6 py-4 text-gray-700 nowrap">{{ booking.check_in.strftime('%d-%m-%Y') }}</td>
                         <td class="px-6 py-4 text-gray-700 nowrap">{{ booking.check_out.strftime('%d-%m-%Y') }}</td>
-                        <td class="px-6 py-4 text-gray-700 nowrap">{{ booking.room_type or 'N/A' }}</td>
+                        <td class="px-6 py-4 text-gray-700 nowrap">{{ booking.room.type or booking.room_type or 'N/A' }}</td>
                         <td class="px-6 py-4 text-gray-700 nowrap">{{ booking.selling_price }}</td>
                         <td class="px-6 py-4 text-gray-700">
                             {% if booking.agent %}

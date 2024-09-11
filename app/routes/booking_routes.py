@@ -129,6 +129,7 @@ def booking_form(hotel_id, room_id):
         agent_id=agent.id if agent else None,
         agency_id=agency.id if agency else None,
         hotel_id=hotel.id, #link hotel with booking
+        room_id=room.id,
         booking_confirmed=False,  # Default as not confirmed
         invoice_paid=False,  # Default as not paid
         selling_price=price,  # Selling price from request
@@ -162,7 +163,7 @@ def booking_form(hotel_id, room_id):
 @login_required
 def book(room_id, booking_id):
     room = Room.query.get_or_404(room_id)
-    booking = Booking.query.get_or_404(booking_id)  # Use Booking instead of Room for booking_id
+    booking = Booking.query.get_or_404(booking_id)
 
     if request.method == 'POST':
         if 'cancel' in request.form:
@@ -179,6 +180,7 @@ def book(room_id, booking_id):
                   4 if 'Quad' in room.type else 1
 
         # Handle guests
+        guests = []
         for i in range(persons):
             first_name = request.form.get(f'first_name{i}')
             last_name = request.form.get(f'last_name{i}')
@@ -188,9 +190,30 @@ def book(room_id, booking_id):
                     last_name=last_name,
                     booking_id=booking.id
                 )
+                guests.append(guest)
                 db.session.add(guest)
 
         db.session.commit()
+        
+        send_tentative_email(
+            to=booking.agent.email,
+            recipient_name=booking.agent.username,
+            agency_name=booking.agency.name,
+            destination=booking.hotel.location,
+            check_in=booking.check_in.strftime('%d-%m-%Y'),
+            check_out=booking.check_out.strftime('%d-%m-%Y'),
+            booking_ref=f'TTL_00{booking.id}',
+            hotel_name=booking.hotel.name,
+            agent_ref=booking.agent.id,
+            hotel_address=booking.hotel.description,
+            nights=(booking.check_out - booking.check_in).days,
+            num_of_rooms=1,
+            room_type=room.type,
+            inclusion=room.inclusion,
+            notes=room.notes,
+            guests=guests,
+            total_price=booking.selling_price
+        )
         flash('Booking created successfully', 'success')
         return redirect(url_for('auth.index'))
 
@@ -292,9 +315,29 @@ def update_confirmation():
         if not confirmation_number == 'None':
             booking.confirmation_number = confirmation_number
             booking.booking_confirmed = True
-            guest_name = booking.guests[0].first_name if booking.guests and booking.guests[0].first_name else 'Times Travel'
+            room = booking.room
+            guests = booking.guests if booking.guests else []
 
-            # send_confirmation_email(booking.agent.email, guest_name, confirmation_number)
+            send_confirmation_email(
+                to=booking.agent.email,
+                recipient_name=booking.agent.username,
+                agency_name=booking.agency.name,
+                destination=booking.hotel.location,
+                check_in=booking.check_in.strftime('%d-%m-%Y'),
+                check_out=booking.check_out.strftime('%d-%m-%Y'),
+                booking_ref=f'TTL_00{booking.id}',
+                hotel_name=booking.hotel.name,
+                agent_ref=booking.agent.id,
+                hotel_address=booking.hotel.description,
+                nights=(booking.check_out - booking.check_in).days,
+                num_of_rooms=1,
+                room_type=room.type,
+                inclusion=room.inclusion,
+                notes=room.notes,
+                guests=guests,
+                total_price=booking.selling_price,
+                confirmation_number= confirmation_number
+            )
          
         if buying_price:
             booking.buying_price = buying_price
@@ -331,6 +374,7 @@ def update_invoice():
     if booking:
         # Mark the booking's invoice as paid
         booking.invoice_paid = True
+        room = booking.room
         
         # Create a new Invoice object and link it to the booking
         new_invoice = Invoice(
@@ -344,8 +388,29 @@ def update_invoice():
         # Add the new invoice to the session
         db.session.add(new_invoice)
         db.session.commit()
-        guest_name = booking.guests[0].first_name if booking.guests and booking.guests[0].first_name else 'Agent'
-        # send_invoice_paid_email(booking.agent.email, guest_name)
+        send_invoice_paid_email(
+                to=booking.agent.email,
+                recipient_name=booking.agent.username,
+                agency_name=booking.agency.name,
+                destination=booking.hotel.location,
+                check_in=booking.check_in.strftime('%d-%m-%Y'),
+                check_out=booking.check_out.strftime('%d-%m-%Y'),
+                booking_ref=f'TTL_00{booking.id}',
+                hotel_name=booking.hotel.name,
+                agent_ref=booking.agent.id,
+                hotel_address=booking.hotel.description,
+                nights=(booking.check_out - booking.check_in).days,
+                num_of_rooms=1,
+                room_type=room.type,
+                inclusion=room.inclusion,
+                notes=room.notes,
+                guests=booking.guests,
+                total_price=booking.selling_price,
+                invoice_id=f'TTL_00{new_invoice.id}',
+                invoice_date=payment_date.strftime('%d-%m-%Y'),
+                invoice_time=payment_date.strftime('%H:%M')
+                
+            )
 
         return jsonify({'status': 'success'}), 200
     
