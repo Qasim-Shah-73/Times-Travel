@@ -92,6 +92,7 @@ class Booking(db.Model):
     invoice_paid = Column(Boolean, default=False)
     selling_price = Column(Numeric(precision=12, scale=2), nullable=True)
     buying_price = Column(Numeric(precision=12, scale=2), nullable=True)
+    special_requests = Column(String(128), nullable=True)
     remarks = Column(Text, nullable=True)
 
     # Relationships

@@ -198,21 +198,39 @@
         <div class="form-container">
             <div class="form-section bg-white">
                 {% for i in range(persons) %}
-                <h2>Pax {{ i + 1 }}</h2>
-                <div class="person-info flex">
-                    <div class="form-group mx-12">
-                        <label for="first_name{{ i }}"><i class="fas fa-user"></i> First Name:</label>
-                        <input type="text" id="first_name{{ i }}" name="first_name{{ i }}" required>
+                    <h2>Pax {{ i + 1 }}</h2>
+                    <div class="person-info flex">
+                        <div class="form-group mx-12">
+                            <label for="first_name{{ i }}"><i class="fas fa-user"></i> First Name:</label>
+                            <input type="text" id="first_name{{ i }}" name="first_name{{ i }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="last_name{{ i }}"><i class="fas fa-user"></i> Last Name:</label>
+                            <input type="text" id="last_name{{ i }}" name="last_name{{ i }}" required>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="last_name{{ i }}"><i class="fas fa-user"></i> Last Name:</label>
-                        <input type="text" id="last_name{{ i }}" name="last_name{{ i }}" required>
-                    </div>
-                </div>
-                {% if i != persons-1 %}
-                <div class="divider"></div>
-                {% endif %}
+                    {% if i != persons-1 %}
+                        <div class="divider"></div>
+                    {% endif %}
                 {% endfor %}
+                
+                <div class="form-group mt-4">
+                    <label for="special_requests"><i class="fas fa-info-circle"></i> Special Requests:</label>
+                    <select id="special_requests" name="special_requests" onchange="toggleOtherField(this)">
+                        <option value="">Select an option</option>
+                        <option value="early_check_in">Early Check-In</option>
+                        <option value="late_check_out">Late Check-Out</option>
+                        <option value="non_smoking_room">Non-Smoking Room</option>
+                        <option value="smoking_room">Smoking Room</option>
+                        <option value="baby_cot">Baby Cot</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div id="other_request_container" class="form-group mt-4" style="display: none;">
+                    <label for="other_request"><i class="fas fa-pencil-alt"></i> Please specify:</label>
+                    <input type="text" id="other_request" name="other_request">
+                </div>
             </div>
             <div class="w-full md:w-2/5 mt-8 md:mt-0">
                 <div class="bg-white rounded-lg shadow-lg overflow-hidden p-6">
@@ -263,5 +281,15 @@
         // Show the modal
         alert('Booking has been created successfully!');
     });
+
+    function toggleOtherField(selectElement) {
+        var otherRequestContainer = document.getElementById('other_request_container');
+        if (selectElement.value === 'other') {
+            otherRequestContainer.style.display = 'block';
+        } else {
+            otherRequestContainer.style.display = 'none';
+        }
+    }
+
 </script>
 {% endblock %}

@@ -80,14 +80,8 @@
                     <i class="fas fa-map-marker-alt mr-2 text-blue-700"></i>
                     <span>{{ hotel.description }}</span>
                 </div>
-                {% set has_super_admin_room = False %}
-                {% for room in hotel.rooms %}
-                    {% if room.approval == 'super_admin' %}
-                        {% set has_super_admin_room = True %}
-                    {% endif %}
-                {% endfor %}
 
-                {% if has_super_admin_room %}
+                {% if hotel.rooms %}
                     <button onclick="toggleRoomDetails({{ hotel.id }})" class="view-rooms-btn">View Rooms</button>
                     <div id="room-details-{{ hotel.id }}" class="room-details" style="display: none;">
                         {% for room in hotel.rooms %}

@@ -35,6 +35,10 @@
                 <td class="px-4 py-2 text-gray-800">{{ booking.buying_price }}</td>
             </tr>
             <tr class="hover:bg-gray-50">
+                <td class="px-4 py-2 font-medium text-gray-600">Special Requests</td>
+                <td class="px-4 py-2 text-gray-800">{{ booking.special_requests }}</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
                 <td class="px-4 py-2 font-medium text-gray-600">Vendor</td>
                 <td class="px-4 py-2 text-gray-800">{{ booking.hotel.vendor.name if booking.hotel.vendor else 'N/A' }}</td>
             </tr>

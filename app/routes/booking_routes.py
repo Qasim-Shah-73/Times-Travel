@@ -179,6 +179,7 @@ def book(room_id, booking_id):
                   3 if 'Triple' in room.type else \
                   4 if 'Quad' in room.type else 1
 
+        
         # Handle guests
         guests = []
         for i in range(persons):
@@ -192,6 +193,10 @@ def book(room_id, booking_id):
                 )
                 guests.append(guest)
                 db.session.add(guest)
+
+        booking.special_requests = request.form['special_requests']
+        if booking.special_requests == 'other':
+            booking.special_requests = request.form['other_request']
 
         db.session.commit()
         
@@ -452,6 +457,7 @@ def download_booking_details(booking_id):
     writer.writerow(['Room Type', booking.room_type or 'N/A'])
     writer.writerow(['Selling Price', booking.selling_price])
     writer.writerow(['Buying Price', booking.buying_price])
+    writer.writerow(['Special Requests', booking.special_requests])
     writer.writerow(['Vendor', booking.hotel.vendor.name or 'N/A'])
     writer.writerow(['Agent', booking.agent.username if booking.agent else 'N/A'])
     writer.writerow(['Confirmation Number', booking.confirmation_number or 'N/A'])
