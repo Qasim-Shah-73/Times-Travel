@@ -196,7 +196,7 @@ def book(room_id, booking_id):
         db.session.commit()
         
         send_tentative_email(
-            to=booking.agent.email,
+            to='qshah73@gmail.com',
             recipient_name=booking.agent.username,
             agency_name=booking.agency.name,
             destination=booking.hotel.location,
@@ -319,7 +319,7 @@ def update_confirmation():
             guests = booking.guests if booking.guests else []
 
             send_confirmation_email(
-                to=booking.agent.email,
+                to='qshah73@gmail.com',
                 recipient_name=booking.agent.username,
                 agency_name=booking.agency.name,
                 destination=booking.hotel.location,
@@ -389,7 +389,7 @@ def update_invoice():
         db.session.add(new_invoice)
         db.session.commit()
         send_invoice_paid_email(
-                to=booking.agent.email,
+                to='qshah73@gmail.com',
                 recipient_name=booking.agent.username,
                 agency_name=booking.agency.name,
                 destination=booking.hotel.location,

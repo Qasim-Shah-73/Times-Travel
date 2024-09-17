@@ -44,10 +44,13 @@
                             {% if current_user.is_authenticated %}
                                 {% if current_user.role == 'super_admin' or current_user.role == 'admin' %}
                                     <a href="{{ url_for('booking.view_bookings') }}" class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">Bookings Dashboard</a>
+                                    <a href="{{ url_for('agency.agencies_dashboard') }}" class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">Agencies Dashboard</a>
                                     <a href="{{ url_for('hotel.view_hotels') }}" class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">View Hotels</a>
                                     <a href="{{ url_for('agency.view_agencies') }}" class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">View Agencies</a>
                                     <a href="{{ url_for('vendor.view_vendors') }}" class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">View Vendors</a>
                                 {% elif current_user.role == 'super_admin' or current_user.role == 'agency_admin' %}
+                                    <a href="{{ url_for('booking.view_bookings') }}" class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">Bookings Dashboard</a>
+                                    <a href="{{ url_for('agency.agencies_dashboard') }}" class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">Agencies Dashboard</a>
                                     <a href="{{ url_for('agency.view_agencies') }}" class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">View Agencies</a>
                                 {% endif %}
                                 <a href="{{ url_for('auth.logout') }}" class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">Logout</a>

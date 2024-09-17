@@ -3,7 +3,6 @@ from app import db, login
 from flask_login import UserMixin
 from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, BigInteger, Numeric, DateTime, Text
 from sqlalchemy.orm import relationship
-from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.dialects.sqlite import JSON
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -33,7 +32,8 @@ class Agency(db.Model):
     bookings = relationship(
         'Booking',
         back_populates='agency',
-        foreign_keys='Booking.agency_id'
+        foreign_keys='Booking.agency_id',
+        lazy='joined'
     )
 
     def __repr__(self):
@@ -80,12 +80,13 @@ class Booking(db.Model):
     id = Column(Integer, primary_key=True)
     check_in = Column(DateTime, nullable=False)
     check_out = Column(DateTime, nullable=False)
-    hotel_id = Column(Integer, ForeignKey('hotel.id'), nullable=False)  # Link to Hotel
+    hotel_id = Column(Integer, ForeignKey('hotel.id'), nullable=False)  
     hotel_name = Column(String(128), nullable=False)
     room_type = Column(String(128), nullable=True)
-    room_id = Column(Integer, ForeignKey('room.id'), nullable=False)  # Link to Room
+    room_id = Column(Integer, ForeignKey('room.id'), nullable=False)
     agent_id = Column(Integer, ForeignKey('users.id'), nullable=True)
     agency_id = Column(Integer, ForeignKey('agencies.id'), nullable=True)
+    agency = db.relationship('Agency', back_populates='bookings')
     confirmation_number = Column(String(64), unique=True, nullable=True)
     booking_confirmed = Column(Boolean, default=False)
     invoice_paid = Column(Boolean, default=False)
@@ -94,7 +95,7 @@ class Booking(db.Model):
     remarks = Column(Text, nullable=True)
 
     # Relationships
-    room = relationship('Room', back_populates='bookings')  # Link to Room
+    room = relationship('Room', back_populates='bookings')
     agent = relationship('User', back_populates='bookings', foreign_keys=[agent_id])
     agency = relationship('Agency', back_populates='bookings', foreign_keys=[agency_id])
     guests = relationship('Guest', back_populates='booking', cascade="all, delete-orphan")

@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block title %}Agency Detail - {{ agency.name }}{% endblock %}
+
+{% block content %}
+<div class="bg-gray-100 min-h-screen py-6">
+  <div class="container mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+    <!-- Header section -->
+    <div class="bg-blue-600 text-white py-6 px-6">
+      <h1 class="font-bold text-3xl mb-2">{{ agency.name }}</h1>
+    </div>
+    
+    <!-- Credit Information section -->
+    <div class="bg-white py-6 px-6 border-b">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-yellow-100 rounded-lg p-6 shadow-md">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-yellow-800 text-sm font-medium">Credit Limit</p>
+              <p class="text-yellow-900 text-2xl font-bold">{{ agency.credit_limit }} SAR</p>
+            </div>
+            <div class="bg-yellow-200 rounded-full p-3">
+              <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-red-100 rounded-lg p-6 shadow-md">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-red-800 text-sm font-medium">Used Credit</p>
+              <p class="text-red-900 text-2xl font-bold">{{ agency.used_credit }} SAR</p>
+            </div>
+            <div class="bg-red-200 rounded-full p-3">
+              <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-green-100 rounded-lg p-6 shadow-md">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-green-800 text-sm font-medium">Remaining Credit</p>
+              <p class="text-green-900 text-2xl font-bold">{{ remaining_credit }} SAR</p>
+            </div>
+            <div class="bg-green-200 rounded-full p-3">
+              <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Booking Statistics section -->
+    <div class="bg-white py-6 px-6 border-b">
+      <h2 class="text-xl font-semibold mb-4">Booking Statistics</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-blue-100 rounded-lg p-4">
+          <p class="text-blue-800 text-sm font-medium">Total Bookings</p>
+          <p class="text-blue-900 text-xl font-bold">{{ total_bookings }}</p>
+        </div>
+        <div class="bg-purple-100 rounded-lg p-4">
+          <p class="text-purple-800 text-sm font-medium">Vouchered Bookings</p>
+          <p class="text-purple-900 text-xl font-bold">{{ vouchered_bookings }}</p>
+        </div>
+        <div class="bg-green-100 rounded-lg p-4">
+          <p class="text-green-800 text-sm font-medium">Confirmed Bookings</p>
+          <p class="text-green-900 text-xl font-bold">{{ confirmed_bookings }}</p>
+        </div>
+        <div class="bg-amber-100 rounded-lg p-4">
+          <p class="text-amber-800 text-sm font-medium">Paid Bookings</p>
+          <p class="text-amber-900 text-xl font-bold">{{ paid_bookings }}</p>
+        </div>
+      </div>
+    </div>
+
+     <!-- Filter Form -->
+      <div class="mb-6 mt-6 flex px-12">
+        <form method="get" action="{{ url_for('agency.agency_detail', agency_id=agency.id) }}" class="flex items-center space-x-4">
+            <select name="filter_column" class="border rounded-md px-4 py-2">
+                <option value="">Select Filter</option>
+                <option value="hotel_name">Hotel Name</option>
+                <option value="room_type">Status</option>
+                <option value="agent_name">Agent Name</option>
+                <option value="check_in">Check-In Date</option>
+                <option value="check_out">Check-Out Date</option>
+                <option value="agency_name">Price</option>
+                <option value="confirmation_number">Payment Method</option>
+            </select>
+            <input type="text" name="filter_value" placeholder="Search..." class="border rounded-md px-4 py-2">
+
+            <!-- Date range filters -->
+            <div class="flex items-center space-x-4">
+                <input type="date" name="start_date" placeholder="Start Date" class="border rounded-md px-4 py-2">
+                <input type="date" name="end_date" placeholder="End Date" class="border rounded-md px-4 py-2">
+            </div>
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Filter</button>
+        </form>
+        <div class="flex items-center space-x-4 ml-12">
+          <button onclick="downloadAgencyDetailsAsCSV({{ agency.id }})" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-3 rounded">
+            Download Details
+          </button>
+        </div>
+      </div>
+
+    <!-- Booking Details Table -->
+    <div class="py-6 px-6">
+      <h2 class="text-xl font-semibold mb-4">Booking Details</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border border-gray-300">
+          <thead class="bg-gray-200">
+            <tr>
+                <!-- Agency ID Sorting -->
+                <th class="py-2 px-4 border-b">
+                    <a href="{{ url_for('agency.agency_detail', sort_by='agency_id', sort_order='asc' if sort_order == 'desc' else 'desc', filter_column=filter_column, filter_value=filter_value, agency_id=agency.id) }}">
+                        Agency ID
+                    </a>
+                </th>
+                
+                <!-- Agent Name Sorting -->
+                <th class="py-2 px-4 border-b">
+                    <a href="{{ url_for('agency.agency_detail', sort_by='agent_name', sort_order='asc' if sort_order == 'desc' else 'desc', filter_column=filter_column, filter_value=filter_value, agency_id=agency.id) }}">
+                        Agent Name
+                    </a>
+                </th>
+                
+                <!-- Check In Sorting -->
+                <th class="py-2 px-4 border-b">
+                    <a href="{{ url_for('agency.agency_detail', sort_by='check_in', sort_order='asc' if sort_order == 'desc' else 'desc', filter_column=filter_column, filter_value=filter_value, agency_id=agency.id) }}">
+                        Check In
+                    </a>
+                </th>
+                
+                <!-- Check Out Sorting -->
+                <th class="py-2 px-4 border-b">
+                    <a href="{{ url_for('agency.agency_detail', sort_by='check_out', sort_order='asc' if sort_order == 'desc' else 'desc', filter_column=filter_column, filter_value=filter_value, agency_id=agency.id) }}">
+                        Check Out
+                    </a>
+                </th>
+                
+                <!-- Hotel Name Sorting -->
+                <th class="py-2 px-4 border-b">
+                    <a href="{{ url_for('agency.agency_detail', sort_by='hotel_name', sort_order='asc' if sort_order == 'desc' else 'desc', filter_column=filter_column, filter_value=filter_value, agency_id=agency.id) }}">
+                        Hotel Name
+                    </a>
+                </th>
+                
+                <!-- Guest Name Sorting -->
+                <th class="py-2 px-4 border-b">
+                    <a href="{{ url_for('agency.agency_detail', sort_by='guest_name', sort_order='asc' if sort_order == 'desc' else 'desc', filter_column=filter_column, filter_value=filter_value, agency_id=agency.id) }}">
+                        Guest Name
+                    </a>
+                </th>
+                
+                <!-- Status Sorting -->
+                <th class="py-2 px-4 border-b">
+                    <a href="{{ url_for('agency.agency_detail', sort_by='status', sort_order='asc' if sort_order == 'desc' else 'desc', filter_column=filter_column, filter_value=filter_value, agency_id=agency.id) }}">
+                        Status
+                    </a>
+                </th>
+                
+                <!-- Price Sorting -->
+                <th class="py-2 px-4 border-b">
+                    <a href="{{ url_for('agency.agency_detail', sort_by='selling_price', sort_order='asc' if sort_order == 'desc' else 'desc', filter_column=filter_column, filter_value=filter_value, agency_id=agency.id) }}">
+                        Price
+                    </a>
+                </th>
+                
+                <!-- Payment Method Sorting -->
+                <th class="py-2 px-4 border-b">
+                    <a href="{{ url_for('agency.agency_detail', sort_by='payment_method', sort_order='asc' if sort_order == 'desc' else 'desc', filter_column=filter_column, filter_value=filter_value, agency_id=agency.id) }}">
+                        Payment Method
+                    </a>
+                </th>
+            </tr>
+          </thead>
+        
+          <tbody>
+            {% for booking in booking_details %}
+            <tr class="hover:bg-gray-50">
+              <td class="py-2 px-4 border-b">{{ agency.id }}</td>
+              <td class="py-2 px-4 border-b" >{{ booking.agent_name }}</td>
+              <td class="py-2 px-4 border-b" style="text-wrap: nowrap;">{{ booking.check_in.strftime('%d-%m-%Y') }}</td>
+              <td class="py-2 px-4 border-b" style="text-wrap: nowrap;">{{ booking.check_out.strftime('%d-%m-%Y') }}</td>
+              <td class="py-2 px-4 border-b">{{ booking.hotel_name }}</td>
+              <td class="py-2 px-4 border-b">{{ booking.guest_names }}</td>
+              <td class="py-2 px-4 border-b">{{ booking.status }}</td>
+              <td class="py-2 px-4 border-b" style="text-wrap: nowrap;">{{ booking.price }}</td>
+              <td class="py-2 px-4 border-b">{{ booking.payment_method }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  function downloadAgencyDetailsAsCSV(agency_id) {
+    const currentUrl = new URL(window.location.href);
+    const exportUrl = new URL('/export_agencies', window.location.origin);
+    
+    // Copy all current query parameters
+    for (let [key, value] of currentUrl.searchParams.entries()) {
+        exportUrl.searchParams.append(key, value);
+    }
+    
+    // Ensure agency_id is set
+    exportUrl.searchParams.set('agency_id', agency_id);
+    
+    window.location.href = exportUrl;
+  }
+</script>  
+{% endblock %}
