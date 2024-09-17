@@ -10,7 +10,7 @@ hotel_bp = Blueprint('hotel', __name__)
 
 @hotel_bp.route('/create_hotels', methods=['GET', 'POST'])
 @login_required
-@roles_required('super_admin', 'admin')
+@roles_required('super_admin', 'admin', 'data_entry')
 def create_hotel():
     if not is_super_admin():
         flash('You need to be logged in as an admin to access this page.', 'warning')
@@ -42,7 +42,7 @@ def create_hotel():
 
 @hotel_bp.route('/hotels/<int:hotel_id>/update', methods=['GET', 'POST'])
 @login_required
-@roles_required('super_admin', 'admin')
+@roles_required('super_admin', 'admin', 'data_entry')
 def update_hotel(hotel_id):
     if not is_super_admin():
         flash('You need to be logged in as an admin to access this page.', 'warning')
@@ -72,7 +72,7 @@ def update_hotel(hotel_id):
 
 @hotel_bp.route('/hotels', methods=['GET'])
 @login_required
-@roles_required('super_admin', 'admin')
+@roles_required('super_admin', 'admin', 'data_entry')
 def view_hotels():
     if not is_super_admin():
         flash('You need to be logged in as an admin to access this page.', 'warning')
@@ -83,7 +83,7 @@ def view_hotels():
 
 @hotel_bp.route('/hotels/<int:hotel_id>/delete', methods=['POST'])
 @login_required
-@roles_required('super_admin', 'admin')
+@roles_required('super_admin', 'admin', 'data_entry')
 def delete_hotel(hotel_id):
     if not is_super_admin():
         flash('You need to be logged in as an admin to access this page.', 'warning')

@@ -25,7 +25,7 @@ def create_user():
     form = UserCreateForm()
 
     if current_user.role == 'super_admin':
-        form.role.choices = [('agency_admin', 'Agency Admin'), ('admin', 'Admin'), ('sub_agent', 'Sub Agent')]
+        form.role.choices = [('agency_admin', 'Agency Admin'), ('admin', 'Admin'), ('sub_agent', 'Sub Agent'), ('data_entry', 'Data Entry')]
     elif current_user.role == 'agency_admin':
         form.role.choices = [('agency_admin', 'Agency Admin'), ('sub_agent', 'Sub Agent')]
     
@@ -62,7 +62,7 @@ def update_user(user_id):
 
     # Determine the current user's role and set the choices accordingly
     if current_user.role == 'super_admin':
-        form.role.choices = [('agency_admin', 'Agency Admin'), ('admin', 'Admin'), ('sub_agent', 'Sub Agent')]
+        form.role.choices = [('agency_admin', 'Agency Admin'), ('admin', 'Admin'), ('sub_agent', 'Sub Agent'), ('data_entry', 'Data Entry')]
     elif current_user.role == 'agency_admin':
         form.role.choices = [('agency_admin', 'Agency Admin'), ('sub_agent', 'Sub Agent')]
     

@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from flask_login import login_required
+from flask_login import login_required, current_user
 from app import db
 from app.models import Room, Hotel
 from app.forms import RoomForm, UpdateRoomForm
@@ -10,7 +10,7 @@ room_bp = Blueprint('room', __name__)
 
 @room_bp.route('/hotels/<int:hotel_id>/rooms/create', methods=['GET', 'POST'])
 @login_required
-@roles_required('super_admin', 'admin')
+@roles_required('super_admin', 'admin', 'data_entry')
 def create_room(hotel_id):
     if not is_super_admin():
         flash('You need to be logged in as an admin to access this page.', 'warning')
@@ -46,6 +46,7 @@ def create_room(hotel_id):
             availability=form.availability.data,
             rooms_available=form.rooms_available.data,
             inclusion=form.inclusion.data,
+            approval = current_user.role,
             notes=form.notes.data,
             january_rates={f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.january_rates.rates.data)},
             february_rates={f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.february_rates.rates.data)},
@@ -69,7 +70,7 @@ def create_room(hotel_id):
 
 @room_bp.route('/hotels/<int:hotel_id>/rooms/<int:room_id>/update', methods=['GET', 'POST'])
 @login_required
-@roles_required('super_admin', 'admin')
+@roles_required('super_admin', 'admin', 'data_entry')
 def update_room(hotel_id, room_id):
     if not is_super_admin():
         flash('You need to be logged in as an admin to access this page.', 'warning')
@@ -100,6 +101,7 @@ def update_room(hotel_id, room_id):
         room.rooms_available = form.rooms_available.data
         room.inclusion = form.inclusion.data
         room.notes = form.notes.data
+        room.approval = current_user.role
 
         for month in ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december']:
             form_field = getattr(form, f'{month}_rates')
@@ -114,7 +116,7 @@ def update_room(hotel_id, room_id):
 
 @room_bp.route('/hotel/<int:hotel_id>/room/<int:room_id>/delete', methods=['POST'])
 @login_required
-@roles_required('super_admin', 'admin')
+@roles_required('super_admin', 'admin','data_entry')
 def delete_room(hotel_id, room_id):
     if not is_super_admin():
         flash('You need to be logged in as an admin to access this page.', 'warning')
@@ -126,7 +128,7 @@ def delete_room(hotel_id, room_id):
 
 @room_bp.route('/hotels/<int:hotel_id>/rooms', methods=['GET'])
 @login_required
-@roles_required('super_admin', 'admin')
+@roles_required('super_admin', 'admin', 'data_entry')
 def view_rooms(hotel_id):
     if not is_super_admin():
         flash('You need to be logged in as an admin to access this page.', 'warning')

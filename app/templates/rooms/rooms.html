@@ -20,6 +20,7 @@
                             <p><span class="font-bold">Availability:</span> <span class="ml-2 text-right">{{ 'Available' if room.availability else 'Not Available' }}</span></p>
                             <p><span class="font-bold">Rooms Available:</span> <span class="ml-2 text-right">{{ room.rooms_available }}</span></p>
                             <p><span class="font-bold">Inclusion:</span> <span class="ml-2 text-right">{{ room.inclusion }}</span></p>
+                            <p><span class="font-bold">Approved by:</span> <span class="ml-2 text-right">{{ room.approval|title }}</span></p>
                         </div>
                     </div>
                     <div class="divide-y divide-gray-300">

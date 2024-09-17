@@ -80,27 +80,35 @@
                     <i class="fas fa-map-marker-alt mr-2 text-blue-700"></i>
                     <span>{{ hotel.description }}</span>
                 </div>
+                {% set has_super_admin_room = False %}
+                {% for room in hotel.rooms %}
+                    {% if room.approval == 'super_admin' %}
+                        {% set has_super_admin_room = True %}
+                    {% endif %}
+                {% endfor %}
 
-                {% if hotel.rooms %}
+                {% if has_super_admin_room %}
                     <button onclick="toggleRoomDetails({{ hotel.id }})" class="view-rooms-btn">View Rooms</button>
                     <div id="room-details-{{ hotel.id }}" class="room-details" style="display: none;">
                         {% for room in hotel.rooms %}
-                        <div class="room-info">
-                            <h3 style="text-align: left;"><strong>{{ room.type }}</strong></h3>
-                            <p style="text-align: left;"><strong>Price:</strong> {{ room.total_price }} (SAR)</p>
-                            <p style="text-align: left;"><strong>Inclusion:</strong> {{ room.inclusion }}</p>
-                            <p style="text-align: left;"><strong>Notes:</strong> {{ room.notes }}</p>
-                            <form action="{{ url_for('booking.booking_form', hotel_id=hotel.id, room_id=room.id) }}" method="GET" style="text-align: left;">
-                                <input type="hidden" name="hotel_id" value="{{ hotel.id }}">
-                                <input type="hidden" name="room_id" value="{{ room.id }}">
-                                <input type="hidden" name="location" value="{{ location }}">
-                                <input type="hidden" name="check_in" value="{{ check_in }}">
-                                <input type="hidden" name="check_out" value="{{ check_out }}">
-                                <input type="hidden" name="nights" value="{{ nights }}">
-                                <input type="hidden" name="price" value="{{ room.total_price }}">
-                                <button type="submit" class="book-now-btn">Book Now</button>
-                            </form>
-                        </div>
+                            {% if room.approval == 'super_admin' %}
+                                <div class="room-info">
+                                    <h3 style="text-align: left;"><strong>{{ room.type }}</strong></h3>
+                                    <p style="text-align: left;"><strong>Price:</strong> {{ room.total_price }} (SAR)</p>
+                                    <p style="text-align: left;"><strong>Inclusion:</strong> {{ room.inclusion }}</p>
+                                    <p style="text-align: left;"><strong>Notes:</strong> {{ room.notes }}</p>
+                                    <form action="{{ url_for('booking.booking_form', hotel_id=hotel.id, room_id=room.id) }}" method="GET" style="text-align: left;">
+                                        <input type="hidden" name="hotel_id" value="{{ hotel.id }}">
+                                        <input type="hidden" name="room_id" value="{{ room.id }}">
+                                        <input type="hidden" name="location" value="{{ location }}">
+                                        <input type="hidden" name="check_in" value="{{ check_in }}">
+                                        <input type="hidden" name="check_out" value="{{ check_out }}">
+                                        <input type="hidden" name="nights" value="{{ nights }}">
+                                        <input type="hidden" name="price" value="{{ room.total_price }}">
+                                        <button type="submit" class="book-now-btn">Book Now</button>
+                                    </form>
+                                </div>
+                            {% endif %}
                         {% endfor %}
                     </div>
                 {% endif %}

@@ -127,6 +127,7 @@ class RoomForm(FlaskForm):
     availability = BooleanField('Availability')
     rooms_available = IntegerField('Rooms Available', validators=[DataRequired()])
     inclusion = StringField('Inclusion')
+    approval = StringField('Approved by')
     notes = StringField('Notes')
     january_rates = FormField(RatesForm)
     february_rates = FormField(RatesForm)
@@ -148,6 +149,7 @@ class UpdateRoomForm(FlaskForm):
     availability = BooleanField('Availability')
     rooms_available = IntegerField('Rooms Available', validators=[DataRequired()])
     inclusion = StringField('Inclusion')
+    approval = StringField('Approved by')
     notes = StringField('Notes')
     
     # Instead of using FormField, we'll use FieldList directly
