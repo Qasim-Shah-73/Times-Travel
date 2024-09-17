@@ -12,10 +12,6 @@ room_bp = Blueprint('room', __name__)
 @login_required
 @roles_required('super_admin', 'admin', 'data_entry')
 def create_room(hotel_id):
-    if not is_super_admin():
-        flash('You need to be logged in as an admin to access this page.', 'warning')
-        return redirect(url_for('auth.index'))
-
     form = RoomForm()
     form.hotel_id.data = hotel_id  # Set the hotel_id field with the provided value
 
@@ -72,10 +68,6 @@ def create_room(hotel_id):
 @login_required
 @roles_required('super_admin', 'admin', 'data_entry')
 def update_room(hotel_id, room_id):
-    if not is_super_admin():
-        flash('You need to be logged in as an admin to access this page.', 'warning')
-        return redirect(url_for('main.index'))
-
     room = Room.query.get_or_404(room_id)
     form = UpdateRoomForm(obj=room)
 
@@ -130,10 +122,6 @@ def delete_room(hotel_id, room_id):
 @login_required
 @roles_required('super_admin', 'admin', 'data_entry')
 def view_rooms(hotel_id):
-    if not is_super_admin():
-        flash('You need to be logged in as an admin to access this page.', 'warning')
-        return redirect(url_for('auth.index'))
-    
     hotel = Hotel.query.get_or_404(hotel_id)
     rooms = Room.query.filter_by(hotel_id=hotel_id).all()
     return render_template('rooms/rooms.html', hotel=hotel, rooms=rooms)

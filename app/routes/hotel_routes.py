@@ -11,11 +11,7 @@ hotel_bp = Blueprint('hotel', __name__)
 @hotel_bp.route('/create_hotels', methods=['GET', 'POST'])
 @login_required
 @roles_required('super_admin', 'admin', 'data_entry')
-def create_hotel():
-    if not is_super_admin():
-        flash('You need to be logged in as an admin to access this page.', 'warning')
-        return redirect(url_for('auth.index'))
-    
+def create_hotel(): 
     form = HotelForm()
     form.vendor_id.choices = [(v.id, v.name) for v in Vendor.query.all()]
     if form.validate_on_submit():
@@ -43,11 +39,7 @@ def create_hotel():
 @hotel_bp.route('/hotels/<int:hotel_id>/update', methods=['GET', 'POST'])
 @login_required
 @roles_required('super_admin', 'admin', 'data_entry')
-def update_hotel(hotel_id):
-    if not is_super_admin():
-        flash('You need to be logged in as an admin to access this page.', 'warning')
-        return redirect(url_for('auth.index'))
-    
+def update_hotel(hotel_id): 
     hotel = Hotel.query.get_or_404(hotel_id)
     form = UpdateHotelForm(obj=hotel)
     form.vendor_id.choices = [(v.id, v.name) for v in Vendor.query.all()] 
@@ -74,10 +66,6 @@ def update_hotel(hotel_id):
 @login_required
 @roles_required('super_admin', 'admin', 'data_entry')
 def view_hotels():
-    if not is_super_admin():
-        flash('You need to be logged in as an admin to access this page.', 'warning')
-        return redirect(url_for('auth.index'))
-    
     hotels = Hotel.query.all()
     return render_template('hotels/hotels.html', hotels=hotels)
 

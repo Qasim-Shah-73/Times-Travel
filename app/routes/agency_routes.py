@@ -15,12 +15,8 @@ agency_bp = Blueprint('agency', __name__)
 
 @agency_bp.route('/create_agency', methods=['GET', 'POST'])
 @login_required
-@roles_required('super_admin')
+@roles_required('super_admin', 'admin')
 def create_agency():
-    if not is_super_admin():
-        flash('You need to be logged in as a Super admin to access this page.', 'warning')
-        return redirect(url_for('auth.index'))
-
     form = AgencyForm()
 
     if form.validate_on_submit():
@@ -54,7 +50,7 @@ def create_agency():
 
 @agency_bp.route('/update_agency/<int:agency_id>', methods=['GET', 'POST'])
 @login_required
-@roles_required('super_admin', 'agency_admin')
+@roles_required('super_admin', 'agency_admin', 'admin')
 def update_agency(agency_id):
     agency = Agency.query.get_or_404(agency_id)
 
@@ -84,9 +80,9 @@ def update_agency(agency_id):
 
 @agency_bp.route('/agencies', methods=['GET'])
 @login_required
-@roles_required('super_admin', 'agency_admin')
+@roles_required('super_admin', 'agency_admin', 'admin')
 def view_agencies():
-    if is_super_admin():
+    if is_super_admin() or current_user.role == 'admin':
         agencies = Agency.query.all()
     else:
         agencies = [current_user.agency]
@@ -124,10 +120,10 @@ def get_agency_booking_stats(agency_id):
 
 @agency_bp.route('/agencies_dashboard', methods=['GET'])
 @login_required
-@roles_required('super_admin', 'agency_admin')
+@roles_required('super_admin', 'agency_admin', 'admin')
 def agencies_dashboard():
     # Check if the user is super admin and get agencies accordingly
-    if is_super_admin():
+    if is_super_admin() or current_user.role == 'admin':
         agencies = Agency.query.options(joinedload(Agency.bookings)).all()
     else:
         agencies = [current_user.agency]
@@ -145,9 +141,8 @@ def agencies_dashboard():
 
 @agency_bp.route('/agency_detail/<int:agency_id>', methods=['GET'])
 @login_required
-@roles_required('super_admin', 'agency_admin')
+@roles_required('super_admin', 'agency_admin', 'admin')
 def agency_detail(agency_id):
-    # agency_id = request.args.get('agency_id', type=int)
     if not agency_id:
         return redirect(url_for('auth.index'))
 

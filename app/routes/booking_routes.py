@@ -8,7 +8,7 @@ from app.decorators import roles_required
 from datetime import datetime, timedelta
 from flask_login import current_user
 from sqlalchemy import func
-from app.email import send_tentative_email, send_confirmation_email, send_invoice_paid_email
+from app.email import send_tentative_email, send_confirmation_email, send_invoice_paid_email, send_invoice_email
 
 booking_bp = Blueprint('booking', __name__)
 
@@ -219,6 +219,29 @@ def book(room_id, booking_id):
             guests=guests,
             total_price=booking.selling_price
         )
+        
+        
+        send_invoice_email(
+                to='qshah73@gmail.com',
+                recipient_name=booking.agent.username,
+                agency_name=booking.agency.name,
+                destination=booking.hotel.location,
+                check_in=booking.check_in.strftime('%d-%m-%Y'),
+                check_out=booking.check_out.strftime('%d-%m-%Y'),
+                booking_ref=f'TTL_00{booking.id}',
+                hotel_name=booking.hotel.name,
+                agent_ref=booking.agent.id,
+                hotel_address=booking.hotel.description,
+                nights=(booking.check_out - booking.check_in).days,
+                num_of_rooms=1,
+                room_type=room.type,
+                inclusion=room.inclusion,
+                notes=room.notes,
+                guests=booking.guests,
+                total_price=booking.selling_price                
+            )
+
+
         flash('Booking created successfully', 'success')
         return redirect(url_for('auth.index'))
 

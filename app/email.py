@@ -89,3 +89,29 @@ def send_invoice_paid_email(to, recipient_name, agency_name, destination, check_
                     invoice_time=invoice_time
         ))
     mail.send(msg)
+
+
+def send_invoice_email(to, recipient_name, agency_name, destination, check_in, check_out, booking_ref, hotel_name, 
+                         agent_ref, hotel_address, nights, num_of_rooms, room_type, inclusion, notes, guests, total_price):
+    msg = Message(subject=f"Invoice for Booking { booking_ref }",
+                  recipients=[to],
+                  html=render_template
+                  ('emails/invoice_email.html',
+                    recipient_name=recipient_name,
+                    agency_name=agency_name,
+                    destination=destination,
+                    check_in=check_in,
+                    check_out=check_out,
+                    booking_ref=booking_ref,
+                    hotel_name=hotel_name,
+                    agent_ref=agent_ref,
+                    hotel_address=hotel_address,
+                    nights=nights,
+                    num_of_rooms=num_of_rooms,
+                    room_type=room_type,
+                    inclusion=inclusion,
+                    notes=notes,
+                    guests=guests,
+                    total_price=total_price
+        ))
+    mail.send(msg)

@@ -9,10 +9,10 @@ def roles_required(*roles):
         def decorated_function(*args, **kwargs):
             if not current_user.is_authenticated:
                 flash('You need to be logged in to access this page.', 'danger')
-                return redirect(url_for('login'))
+                return redirect(url_for('auth.login'))
             if current_user.role not in roles:
                 flash('You do not have the required role to access this page.', 'danger')
-                return redirect(url_for('index'))
+                return redirect(url_for('auth.index'))
             return f(*args, **kwargs)
         return decorated_function
     return decorator

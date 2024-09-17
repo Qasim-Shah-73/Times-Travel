@@ -9,7 +9,7 @@ vendor_bp = Blueprint('vendor', __name__)
 
 @vendor_bp.route('/create_vendor', methods=['GET', 'POST'])
 @login_required
-@roles_required('super_admin', 'admin')
+@roles_required('super_admin', 'admin', 'data_entry')
 def create_vendor():
     form = VendorCreateForm()
     if form.validate_on_submit():
@@ -28,7 +28,7 @@ def create_vendor():
 
 @vendor_bp.route('/update_vendor/<int:vendor_id>', methods=['GET', 'POST'])
 @login_required
-@roles_required('super_admin', 'admin')
+@roles_required('super_admin', 'admin', 'data_entry')
 def update_vendor(vendor_id):
     vendor = Vendor.query.get_or_404(vendor_id)
     form = VendorUpdateForm(obj=vendor)
@@ -45,14 +45,14 @@ def update_vendor(vendor_id):
 
 @vendor_bp.route('/vendors', methods=['GET'])
 @login_required
-@roles_required('super_admin', 'admin')
+@roles_required('super_admin', 'admin', 'data_entry')
 def view_vendors():
     vendors = Vendor.query.all()
     return render_template('vendors/view_vendors.html', title='View Vendors', vendors=vendors)
 
 @vendor_bp.route('/delete_vendor/<int:vendor_id>', methods=['POST'])
 @login_required
-@roles_required('super_admin', 'admin')
+@roles_required('super_admin', 'admin', 'data_entry')
 def delete_vendor(vendor_id):
     vendor = Vendor.query.get_or_404(vendor_id)
     db.session.delete(vendor)
