@@ -5,6 +5,8 @@ from app.models import Room, Hotel
 from app.forms import RoomForm, UpdateRoomForm
 from app.decorators import roles_required
 from .utils import is_super_admin
+from datetime import datetime, timedelta
+from sqlalchemy.orm.attributes import flag_modified
 
 room_bp = Blueprint('room', __name__)
 
@@ -125,3 +127,66 @@ def view_rooms(hotel_id):
     hotel = Hotel.query.get_or_404(hotel_id)
     rooms = Room.query.filter_by(hotel_id=hotel_id).all()
     return render_template('rooms/rooms.html', hotel=hotel, rooms=rooms)
+
+@room_bp.route('/hotel/<int:hotel_id>/room/<int:room_id>/update_prices', methods=['POST'])
+@login_required
+@roles_required('super_admin', 'admin', 'data_entry')
+def update_prices(hotel_id, room_id):
+    hotel = Hotel.query.get_or_404(hotel_id)
+    room = Room.query.get_or_404(room_id)
+    
+    # Retrieve form data
+    start_date = request.form.get('start_date')
+    end_date = request.form.get('end_date')
+    weekday_price = request.form.get('weekday_price')
+    weekend_price = request.form.get('weekend_price')
+    
+    # Ensure all fields are provided
+    if not all([start_date, end_date, weekday_price, weekend_price]):
+        flash('All fields are required', 'error')
+        return redirect(url_for('hotel.view_hotels', hotel_id=hotel_id))
+    
+    try:
+        # Convert string inputs to appropriate types
+        start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+        end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+        weekday_price = float(weekday_price)
+        weekend_price = float(weekend_price)
+    except ValueError:
+        flash('Invalid date or price format', 'error')
+        return redirect(url_for('room.view_rooms', hotel_id=hotel.id, room_id=room_id))
+    
+    # Ensure valid date range
+    if start_date > end_date:
+        flash('Start date must be before end date', 'error')
+        return redirect(url_for('room.view_rooms', hotel_id=hotel.id, room_id=room_id))
+    
+    # Update room prices for each day in the date range
+    current_date = start_date
+    while current_date <= end_date:
+        # Get the month and day to update the correct field
+        month_name = current_date.strftime('%B').lower() + '_rates'
+        day_of_month = f'Day{current_date.day}'  # Use the 'DayX' format
+        
+        # Fetch current month's rates or initialize if it's None
+        month_rates = getattr(room, month_name) or {}
+        
+        # Apply weekday or weekend price
+        if current_date.weekday() < 4 or current_date.weekday() == 6:  # Monday-Thursday = Weekday
+            month_rates[day_of_month] = weekday_price
+        else:  # Friday-Saturday = Weekend
+            month_rates[day_of_month] = weekend_price
+        
+        # Update the rates back to the room
+        setattr(room, month_name, month_rates)
+        flag_modified(room, month_name)  # Ensure SQLAlchemy tracks the change
+        
+        # Move to the next day
+        current_date += timedelta(days=1)
+    
+    # Commit the changes to the database once after all updates
+    db.session.commit()
+    
+    flash('Room prices updated successfully', 'success')
+    return redirect(url_for('room.view_rooms', hotel_id=hotel.id, room_id=room_id))
+
