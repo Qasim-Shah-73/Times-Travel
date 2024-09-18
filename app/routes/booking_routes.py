@@ -69,7 +69,7 @@ def search_hotels():
                 current_date += timedelta(days=1)
 
             # Multiply total price by number of persons
-            total_price *= persons
+            #total_price *= persons
 
             # Store the calculated total price in the room object
             room.total_price = total_price
