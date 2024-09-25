@@ -73,14 +73,17 @@ def search_hotels():
 
             # Store the calculated total price in the room object
             room.total_price = total_price
+            check_in_dt = check_in_date.strftime("%d-%m-%Y")
+            check_out_dt = check_out_date.strftime("%d-%m-%Y")
+            diffDays = (check_out_date - check_in_date).days
 
     return render_template('booking/search_hotels.html', 
                            hotels=available_hotels, 
                            month=check_in_month, 
-                           check_in=check_in_date,
-                           check_out=check_out_date,
+                           check_in=check_in_dt,
+                           check_out=check_out_dt,
                            location=location,
-                           nights=request.args.get('total_nights'))
+                           nights=diffDays)
 
 def is_month_available(hotel, check_in_month):
     """
@@ -106,11 +109,12 @@ def booking_form(hotel_id, room_id):
 
     # Example agency fetch based on the agent's info
     agency = agent.agency if agent.agency else None
-    # Convert check_in and check_out to datetime objects if they are strings
+    
+     # Convert check_in and check_out to datetime objects if they are strings
     try:
         if check_in_str and check_out_str:
-            check_in = datetime.strptime(check_in_str, '%Y-%m-%d %H:%M:%S')
-            check_out = datetime.strptime(check_out_str, '%Y-%m-%d %H:%M:%S')
+            check_in = datetime.strptime(check_in_str, '%d-%m-%Y')  # Update to match your input format
+            check_out = datetime.strptime(check_out_str, '%d-%m-%Y')  # Update to match your input format
             print(f"Parsed check_in: {check_in}")
             print(f"Parsed check_out: {check_out}")
         else:
@@ -118,7 +122,8 @@ def booking_form(hotel_id, room_id):
             return redirect(url_for('auth.index'))
     except ValueError as e:
         print(f"Error parsing dates. Check-in: {check_in_str}, Check-out: {check_out_str}. Error: {e}")
-        flash("Invalid date format. Please use YYYY-MM-DD HH:MM:SS.", "danger")
+        flash("Invalid date format. Please use DD-MM-YYYY.", "danger")
+        return redirect(url_for('auth.index'))  # Redirect to a safe location
 
     # Create the booking object
     new_booking = Booking(
@@ -154,7 +159,6 @@ def booking_form(hotel_id, room_id):
         persons = 4
 
 
-
     return render_template('booking/booking_form.html', hotel=hotel, room=room, booking=new_booking,
                            nights=nights, persons=persons, hotel_name=hotel.name)
 
@@ -163,7 +167,7 @@ def booking_form(hotel_id, room_id):
 @login_required
 def book(room_id, booking_id):
     room = Room.query.get_or_404(room_id)
-    booking = Booking.query.get_or_404(booking_id)
+    booking = Booking.query.get_or_404(booking_id)    
 
     if request.method == 'POST':
         if 'cancel' in request.form:
@@ -183,20 +187,27 @@ def book(room_id, booking_id):
         # Handle guests
         guests = []
         for i in range(persons):
-            first_name = request.form.get(f'first_name{i}')
-            last_name = request.form.get(f'last_name{i}')
+            first_name = request.form.get(f'first_name{i}', None)
+            last_name = request.form.get(f'last_name{i}', None)
+            email = request.form.get(f'email{i}')
+            phone_number = request.form.get(f'phone_number{i}')
+            print(i)
+            print(first_name,last_name)
             if first_name and last_name:
                 guest = Guest(
                     first_name=first_name,
                     last_name=last_name,
+                    email = email,
+                    phone_number = phone_number,
                     booking_id=booking.id
                 )
+                print(guest)
                 guests.append(guest)
                 db.session.add(guest)
 
-        booking.special_requests = request.form['special_requests']
+        booking.special_requests = request.form.get('special_requests')
         if booking.special_requests == 'other':
-            booking.special_requests = request.form['other_request']
+            booking.special_requests = request.form.get('other_request')
 
         db.session.commit()
         
@@ -246,8 +257,10 @@ def book(room_id, booking_id):
         return redirect(url_for('auth.index'))
 
     # If GET request, render the booking form
-    return render_template('booking_form.html', room=room, booking=booking)
+    return redirect(url_for('auth.index'))
+    
 
+################################ Booking Dashboard ################################################
 
 def apply_filters_and_sorting(query):
     """Apply filtering, sorting, and role-based access to the query."""

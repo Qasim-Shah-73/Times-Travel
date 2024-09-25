@@ -59,6 +59,51 @@ def create_room(hotel_id):
             november_rates={f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.november_rates.rates.data)},
             december_rates={f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.december_rates.rates.data)}
         )
+        # Retrieve form data
+        start_date = request.form.get('start_date')
+        end_date = request.form.get('end_date')
+        weekday_price = request.form.get('weekday_price')
+        weekend_price = request.form.get('weekend_price')
+        
+        if start_date and end_date:
+            try:
+                # Convert string inputs to appropriate types
+                start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+                end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+                weekday_price = float(weekday_price)
+                weekend_price = float(weekend_price)
+            except ValueError:
+                flash('Invalid date or price format', 'error')
+                return redirect(url_for('room.view_rooms', hotel_id=hotel_id, room_id=new_room.id))
+
+        # Ensure valid date range
+        if start_date > end_date:
+            flash('Start date must be before end date', 'error')
+            return redirect(url_for('room.view_rooms', hotel_id=hotel_id, room_id=new_room.id))
+        
+        # Update room prices for each day in the date range
+        current_date = start_date
+        while current_date <= end_date:
+            # Get the month and day to update the correct field
+            month_name = current_date.strftime('%B').lower() + '_rates'
+            day_of_month = f'Day{current_date.day}'  # Use the 'DayX' format
+            
+            # Fetch current month's rates or initialize if it's None
+            month_rates = getattr(new_room, month_name) or {}
+            
+            # Apply weekday or weekend price
+            if current_date.weekday() < 4 or current_date.weekday() == 6:  # Monday-Thursday = Weekday
+                month_rates[day_of_month] = weekday_price
+            else:  # Friday-Saturday = Weekend
+                month_rates[day_of_month] = weekend_price
+            
+            # Update the rates back to the room
+            setattr(new_room, month_name, month_rates)
+            flag_modified(new_room, month_name)  # Ensure SQLAlchemy tracks the change
+            
+            # Move to the next day
+            current_date += timedelta(days=1)
+        
         db.session.add(new_room)
         db.session.commit()
         flash('Room created successfully', 'success')

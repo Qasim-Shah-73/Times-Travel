@@ -54,7 +54,7 @@ class AgencyForm(FlaskForm):
     credit_limit = DecimalField('Credit Limit', validators=[Optional(), NumberRange(min=0)], default=0.00)
     used_credit = DecimalField('Used Credit', validators=[Optional(), NumberRange(min=0)], default=0.00)
     paid_back = DecimalField('Paid Back', validators=[Optional(), NumberRange(min=0)], default=0.00)
-    allowed_accounts = IntegerField('Allowed Accounts', validators=[DataRequired(), NumberRange(min=0)], default=0)
+    allowed_accounts = IntegerField('Allowed Accounts', validators=[NumberRange(min=0)], default=0)
 
 
     # Fields for Admin User
@@ -102,6 +102,7 @@ class HotelForm(FlaskForm):
     location = SelectField('Location', choices=[('Makkah', 'Makkah, Saudi Arabia'), ('Madinah', 'Madinah, Saudi Arabia')], validators=[InputRequired()])
     availability = WTFormField(MonthAvailabilityForm)
     image = FileField('Hotel Image', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
+    stars = IntegerField('Stars', validators=[InputRequired(), NumberRange(min=1, max=5)], default=1)
     vendor_id = SelectField('Vendor', choices=[], coerce=int, validators=[InputRequired()])
     submit = SubmitField('Submit')
 
@@ -111,6 +112,7 @@ class UpdateHotelForm(FlaskForm):
     location = SelectField('Location', choices=[('Makkah', 'Makkah, Saudi Arabia'), ('Madinah', 'Madinah, Saudi Arabia')], validators=[InputRequired()], render_kw={"size": 1})
     availability = WTFormField(MonthAvailabilityForm)
     image = FileField('Update Hotel Image', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
+    stars = IntegerField('Stars', validators=[InputRequired(), NumberRange(min=1, max=5)], default=1)
     vendor_id = SelectField('Vendor', choices=[], coerce=int, validators=[InputRequired()])
     submit = SubmitField('Update')
 

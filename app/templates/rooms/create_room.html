@@ -44,8 +44,26 @@
             {{ form.notes(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
         </div>
 
-        {% for month_form in [form.january_rates, form.february_rates, form.march_rates, form.april_rates, form.may_rates, form.june_rates, form.july_rates, form.august_rates, form.september_rates, form.october_rates, form.november_rates, form.december_rates] %}
+        <!-- New fields for date range and pricing -->
         <div class="mb-4">
+            <label for="start_date" class="block text-gray-700 text-sm font-bold mb-2">Start Date:</label>
+            <input type="date" id="start_date" name="start_date" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <div class="mb-4">
+            <label for="end_date" class="block text-gray-700 text-sm font-bold mb-2">End Date:</label>
+            <input type="date" id="end_date" name="end_date" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <div class="mb-4">
+            <label for="weekday_price" class="block text-gray-700 text-sm font-bold mb-2">Weekday Price:</label>
+            <input type="number" step="0.01" id="weekday_price" name="weekday_price" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <div class="mb-4">
+            <label for="weekend_price" class="block text-gray-700 text-sm font-bold mb-2">Weekend Price:</label>
+            <input type="number" step="0.01" id="weekend_price" name="weekend_price" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+
+        {% for month_form in [form.january_rates, form.february_rates, form.march_rates, form.april_rates, form.may_rates, form.june_rates, form.july_rates, form.august_rates, form.september_rates, form.october_rates, form.november_rates, form.december_rates] %}
+        <div class="mb-4" style="display: none;">
             <h3 class="text-lg font-semibold mb-2">{{ month_form.label.text }}</h3>
             {{ month_form.hidden_tag() }}
             <div class="flex flex-wrap -mx-2">

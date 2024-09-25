@@ -27,6 +27,13 @@
             {% endfor %}
         </div>
         <div class="mb-4">
+            {{ form.stars.label(class="block text-gray-700 font-bold mb-2") }}
+            {{ form.stars(class_="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline", min=1, max=5) }}
+            {% for error in form.stars.errors %}
+            <span class="text-red-500">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-4">
             {{ form.image.label(class="block text-gray-700 font-bold mb-2") }}  <!-- Image label -->
             {{ form.image(class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}  <!-- Image input -->
             {% for error in form.image.errors %}

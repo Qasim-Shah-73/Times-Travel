@@ -44,7 +44,7 @@ class User(UserMixin, db.Model):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
-    username = Column(String(64), unique=True, nullable=False)
+    username = Column(String(64), nullable=False)
     email = Column(String(120), unique=True, nullable=False)
     hashed_password = Column(String(128), nullable=False)
     role = Column(String(64), nullable=False, default='user')
@@ -113,6 +113,8 @@ class Guest(db.Model):
     id = Column(Integer, primary_key=True)
     first_name = Column(String(64), nullable=False)
     last_name = Column(String(64), nullable=False)
+    email = Column(String(120), nullable=True)
+    phone_number = Column(BigInteger, nullable=True)
     booking_id = Column(Integer, ForeignKey('bookings.id'), nullable=False)  # Link to Booking model
 
     # Relationship to Booking model
@@ -135,6 +137,7 @@ class Hotel(db.Model):
     location = Column(String(100), nullable=False)
     availability = Column(db.JSON, nullable=False)
     image = Column(String(255), nullable=True)
+    stars = Column(Integer, nullable=False, default= 1)
     vendor_id = Column(Integer, ForeignKey('vendors.id'), nullable=True)
 
     # Relationships

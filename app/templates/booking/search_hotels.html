@@ -63,19 +63,39 @@
     book-now-btn:hover {
         background-color: #0056b3;
     }
+    .stars-spacing{
+        margin-top: 5px;
+        margin-left: 14px;
+    }
 </style>
 
 {% extends "index.html" %}
 {% block title %}Hotel Results{% endblock %}
 {% block content %}
 <div class="container mx-auto">
-    <h1 class="text-4xl font-bold text-left text-blue-700 my-8">{{ hotels|length }} Available Hotels in {{ location }}</h1>
+    <h1 class="text-4xl font-bold text-blue-700 my-8 text-left">
+        {{ hotels|length }} Available Hotels in {{ location }}
+        <span class="block text-lg font-medium text-gray-600 mt-2">
+            Check-in: {{ check_in }} | Check-out: {{ check_out }} | Total Nights: {{ nights }}
+        </span>
+    </h1>    
     {% if hotels %}
         {% for hotel in hotels %}
         <div class="hotel-container">
             <img class="hotel-image" src="{{ url_for('static', filename='images/' ~ hotel.image) if hotel.image else url_for('static', filename='images/hotel_2.jpg') }}" alt="{{ hotel.name }}">
             <div class="hotel-info">
-                <h2 class="hotel-name">{{ hotel.name }}</h2>
+                <div class="flex">
+                    <h2 class="hotel-name">{{ hotel.name }}</h2>
+                    <div class="stars-spacing">
+                        {% for star in range(1, 6) %}
+                            {% if star <= hotel.stars %}
+                              <i style="color: gold;" class="fas fa-star text-yellow-500"></i>
+                            {% else %}
+                                <i class="far fa-star text-gray-300"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
                 <div class="hotel-location">
                     <i class="fas fa-map-marker-alt mr-2 text-blue-700"></i>
                     <span>{{ hotel.description }}</span>

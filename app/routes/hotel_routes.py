@@ -27,6 +27,7 @@ def create_hotel():
             location=form.location.data,
             availability=availability,
             image=image_file,
+            stars=form.stars.data,
             vendor_id=form.vendor_id.data
         )
         db.session.add(new_hotel)
@@ -53,6 +54,7 @@ def update_hotel(hotel_id):
         hotel.name = form.name.data
         hotel.description = form.description.data
         hotel.location = form.location.data
+        hotel.stars = form.stars.data
         hotel.availability = {month: getattr(form.availability, month).data for month in ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']}
         hotel.vendor_id = form.vendor_id.data
         
@@ -79,6 +81,8 @@ def delete_hotel(hotel_id):
 
     hotel = Hotel.query.get_or_404(hotel_id)
     Room.query.filter_by(hotel_id=hotel_id).delete()
+    if hotel.image:
+                delete_image(hotel.image)
     db.session.delete(hotel)
     db.session.commit()
     return redirect(url_for('hotel.view_hotels'))
