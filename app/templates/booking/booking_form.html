@@ -184,12 +184,12 @@
         <div class="summary-item">
             <i class="fas fa-calendar-alt"></i>
             <h3>Check In:</h3>
-            <p>{{ booking.check_in }}</p>
+            <p>{{ booking.check_in.strftime('%d-%m-%Y') }}</p>
         </div>
         <div class="summary-item">
             <i class="fas fa-calendar-alt"></i>
             <h3>Check Out:</h3>
-            <p>{{ booking.check_out }}</p>
+            <p>{{ booking.check_out.strftime('%d-%m-%Y') }}</p>
         </div>
         <div class="summary-item">
             <i class="fas fa-moon"></i>
@@ -221,7 +221,7 @@
         document.querySelector('.btn-cancel').addEventListener('click', function() {
             if (confirm('Are you sure you want to cancel this booking?')) {
                 alert('Booking cancelled');
-                // Add logic to handle cancellation
+                window.location.href = "{{ url_for('auth.index') }}";
             }
         });
     });
