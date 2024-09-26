@@ -47,6 +47,22 @@
                 <td class="px-4 py-2 text-gray-800">{{ booking.agent.username if booking.agent else 'N/A' }}</td>
             </tr>
             <tr class="hover:bg-gray-50">
+                <td class="px-4 py-2 font-medium text-gray-600">Hotel Times Confirmed</td>
+                <td class="px-4 py-2">
+                    <span class="px-2 py-1 text-xs font-medium rounded {{ 'bg-green-100 text-green-700' if booking.booking_confirmed else 'bg-red-100 text-red-700' }}">
+                        {{ 'Yes' if booking.times_confirmed else 'No' }}
+                    </span>
+                </td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-2 font-medium text-gray-600">Times Confirmation Number</td>
+                <td class="px-4 py-2 text-gray-800">{{ booking.times_con_number or 'N/A' }}</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-2 font-medium text-gray-600">Remarks</td>
+                <td class="px-4 py-2 text-gray-800">{{ booking.remarks if booking.remarks else 'N/A' }}</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
                 <td class="px-4 py-2 font-medium text-gray-600">Confirmation Number</td>
                 <td class="px-4 py-2 text-gray-800">{{ booking.confirmation_number or 'N/A' }}</td>
             </tr>

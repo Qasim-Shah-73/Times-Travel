@@ -155,7 +155,10 @@
                             <a href="{{ url_for('booking.view_bookings', sort_by='agent_name', sort_order='asc' if sort_order == 'desc' else 'desc', filter_column=filter_column, filter_value=filter_value) }}">Agent Name</a>
                         </th>
                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-                            <a href="{{ url_for('booking.view_bookings', sort_by='confirmation_number', sort_order='asc' if sort_order == 'desc' else 'desc', filter_column=filter_column, filter_value=filter_value) }}">Confirmation Number</a>
+                            <a href="{{ url_for('booking.view_bookings', sort_by='times_confirmation_number', sort_order='asc' if sort_order == 'desc' else 'desc', filter_column=filter_column, filter_value=filter_value) }}">Times Confirmation Number</a>
+                        </th>
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                            <a href="{{ url_for('booking.view_bookings', sort_by='confirmation_number', sort_order='asc' if sort_order == 'desc' else 'desc', filter_column=filter_column, filter_value=filter_value) }}">Hotel Confirmation Number</a>
                         </th>
                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">
                             <a href="{{ url_for('booking.view_bookings', sort_by='booking_confirmed', sort_order='asc' if sort_order == 'desc' else 'desc', filter_column=filter_column, filter_value=filter_value) }}">
@@ -199,6 +202,20 @@
                             N/A
                             {% endif %}
                         </td>
+                        <td class="px-6 py-4 text-center">
+                            {% if not booking.times_confirmed %}
+                            <button 
+                                    onclick="openTCNModal('{{ booking.id }}', '{{ booking.times_con_number }}', '{{ booking.remarks }}')" 
+                                    class="bg-green-500 hover:bg-green-600 text-white font-semibold text-sm py-1.5 px-3 rounded-md shadow-sm transition duration-300 ease-in-out transform hover:scale-105">
+                                    Update TCN
+                            </button>
+                            {% else %}
+                            <span
+                                class="inline-block px-2 py-1 text-xs font-medium text-white rounded-full {{ 'bg-green-500' if booking.booking_confirmed else 'bg-red-500' }}">
+                                {{ booking.times_con_number }}
+                            </span>
+                            {% endif %}
+                        </td>
                         <td class="px-6 py-4 text-gray-700">{{ booking.confirmation_number or 'N/A' }}</td>
                         <td class="px-6 py-4 text-center">
                             {% if not booking.booking_confirmed %}
@@ -233,6 +250,44 @@
             </table>
         </div>
     </div>
+
+    <!-- Update Times Confirmation Modal -->
+    <div id="updateTCNModal" class="modal hidden">
+        <div class="modal-content">
+            <h2 class="text-xl font-bold mb-4">Update Times Confirmation</h2>
+            <form id="updateTCNForm">
+                <input type="hidden" name="booking_id" id="tcn_booking_id">
+                
+                <!-- Times Confirmed Selection -->
+                <div class="mb-4">
+                    <label for="times_confirmed" class="block text-sm font-medium text-gray-700">Times Confirmed</label>
+                    <select id="times_confirmed" name="times_confirmed" class="border rounded-md px-4 py-2 w-full" onchange="toggleTimesConfirmationFields()" required>
+                        <option value="">Select...</option>
+                        <option value="true">True</option>
+                        <option value="false">False</option>
+                    </select>
+                </div>
+
+                <!-- Times Confirmation Number (only if times_confirmed is true) -->
+                <div class="mb-4" id="timesConNumberContainer" style="display: none;">
+                    <label for="times_con_number" class="block text-sm font-medium text-gray-700">Times Confirmation Number</label>
+                    <input type="text" id="times_con_number" name="times_con_number" class="border rounded-md px-4 py-2 w-full">
+                </div>
+
+                <!-- Remarks (only if times_confirmed is false) -->
+                <div class="mb-4" id="remarksContainer" style="display: none;">
+                    <label for="remarks" class="block text-sm font-medium text-gray-700">Remarks</label>
+                    <textarea id="remarks" name="remarks" class="border rounded-md px-4 py-2 w-full" rows="2"></textarea>
+                </div>
+
+                <div class="flex justify-end">
+                    <button type="button" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded mr-2" onclick="closeTCNModal()">Cancel</button>
+                    <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 
     <!-- Update Confirmation Modal -->
     <div id="updateConfirmationModal" class="modal">
@@ -323,6 +378,80 @@
     </div>
 
     <script>
+        // Function to toggle fields based on times_confirmed selection
+        function toggleTimesConfirmationFields() {
+            const timesConfirmed = document.getElementById('times_confirmed').value;
+            const timesConNumberContainer = document.getElementById('timesConNumberContainer');
+            const remarksContainer = document.getElementById('remarksContainer');
+
+            if (timesConfirmed === 'true') {
+                timesConNumberContainer.style.display = 'block';
+                remarksContainer.style.display = 'none';
+            } else if (timesConfirmed === 'false') {
+                timesConNumberContainer.style.display = 'none';
+                remarksContainer.style.display = 'block';
+            } else {
+                timesConNumberContainer.style.display = 'none';
+                remarksContainer.style.display = 'none';
+            }
+        }
+
+        // Open the Times Confirmation Modal
+        function openTCNModal(bookingId, timesConfirmed, timesConNumber, remarks) {
+            $('#tcn_booking_id').val(bookingId);
+            $('#times_confirmed').val(timesConfirmed || '');
+
+            if (timesConfirmed === 'true') {
+                $('#times_con_number').val(timesConNumber || '');
+                toggleTimesConfirmationFields();
+            } else if (timesConfirmed === 'false') {
+                $('#remarks').val(remarks || '');
+                toggleTimesConfirmationFields();
+            }
+
+            $('#updateTCNModal').show();
+        }
+
+        // Close the Times Confirmation Modal
+        function closeTCNModal() {
+            $('#updateTCNModal').hide();
+        }
+
+        // Submit the Times Confirmation Form
+        $('#updateTCNForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            const bookingId = $('#tcn_booking_id').val();
+            const timesConfirmed = $('#times_confirmed').val();
+            const timesConNumber = $('#times_con_number').val();
+            const remarks = $('#remarks').val();
+
+            const data = {
+                booking_id: bookingId,
+                times_confirmed: timesConfirmed,
+                times_confirmation_number: timesConfirmed === 'true' ? timesConNumber : '',
+                remarks: timesConfirmed === 'false' ? remarks : ''
+            };            
+
+            $.ajax({
+                url: "{{ url_for('booking.update_times_confirmation') }}", // Ensure this route is handled in Flask
+                method: "POST",
+                data: data,
+                success: function(response) {
+                    if (response.status === 'success') {
+                        alert('Times confirmation updated successfully!');
+                        closeTCNModal();
+                        location.reload(); // Reload page to reflect changes
+                    } else {
+                        alert(response.message || 'Failed to update times confirmation.');
+                    }
+                },
+                error: function() {
+                    alert('Failed to update times confirmation.');
+                }
+            });
+        });
+
         function openUpdateModal(bookingId) {
             $('#booking_id').val(bookingId);
             $('#updateConfirmationModal').show();

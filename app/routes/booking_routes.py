@@ -389,6 +389,38 @@ def update_confirmation():
         return jsonify({'status': 'success'}), 200
     return jsonify({'status': 'error', 'message': 'Booking not found'}), 404
 
+@booking_bp.route('/update_times_confirmation', methods=['POST'])
+@login_required
+@roles_required('super_admin', 'admin', 'agency_admin')
+def update_times_confirmation():
+    booking_id = request.form.get('booking_id')
+    times_confirmation_number = request.form.get('times_confirmation_number')
+    times_confirmed = request.form.get('times_confirmed') == 'true'
+    remarks = request.form.get('remarks')
+
+    if not booking_id:
+        return jsonify({'status': 'error', 'message': 'Booking ID is required'}), 400
+
+    booking = Booking.query.get(booking_id)
+    if not booking:
+        return jsonify({'status': 'error', 'message': 'Booking not found'}), 404
+
+    # Update times confirmation based on whether it's confirmed or not
+    booking.times_confirmed = times_confirmed
+    if times_confirmed:
+        if not times_confirmation_number:
+            return jsonify({'status': 'error', 'message': 'Confirmation number is required'}), 400
+        booking.times_con_number = times_confirmation_number
+    else:
+        booking.times_con_number = None
+        booking.remarks = remarks
+
+    # Commit changes to the database
+    db.session.commit()
+
+    return jsonify({'status': 'success'}), 200
+
+
 @booking_bp.route('/update_invoice', methods=['POST'])
 @login_required
 @roles_required('super_admin', 'admin', 'agency_admin')
@@ -497,6 +529,7 @@ def download_booking_details(booking_id):
     writer.writerow(['Vendor', booking.hotel.vendor.name or 'N/A'])
     writer.writerow(['Agent', booking.agent.username if booking.agent else 'N/A'])
     writer.writerow(['Confirmation Number', booking.confirmation_number or 'N/A'])
+    writer.writerow(['Times Confirmation Number', booking.times_con_number or 'N/A'])
     writer.writerow(['Booking Confirmed', 'Yes' if booking.booking_confirmed else 'No'])
     writer.writerow(['Invoice Paid', 'Yes' if booking.invoice_paid else 'No'])
 
@@ -537,7 +570,7 @@ def export_bookings():
     # Generate CSV
     output = StringIO()
     writer = csv.writer(output)
-    writer.writerow(['ID', 'Hotel Name', 'Room Type', 'Check-In Date', 'Check-Out Date', 'Selling Price', 'Buying Price', 'Vendor', 'Agent Name', 'Confirmation Number', 'Booking Confirmed', 'Invoice Paid'])
+    writer.writerow(['ID', 'Hotel Name', 'Room Type', 'Check-In Date', 'Check-Out Date', 'Selling Price', 'Buying Price', 'Vendor', 'Agent Name','Times Confirmation Number', 'Confirmation Number', 'Booking Confirmed', 'Invoice Paid'])
 
     for booking in bookings:
         writer.writerow([
@@ -550,6 +583,7 @@ def export_bookings():
             booking.buying_price,
             booking.hotel.vendor.name if booking.hotel and booking.hotel.vendor else 'N/A',
             booking.agent.username if booking.agent else 'N/A',
+            booking.times_con_number or 'N/A',
             booking.confirmation_number or 'N/A',
             'Yes' if booking.booking_confirmed else 'No',
             'Yes' if booking.invoice_paid else 'No'
