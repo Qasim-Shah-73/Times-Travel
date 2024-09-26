@@ -113,9 +113,12 @@
     <div class="booking-form">
         <form id="bookingForm" method="post" action="{{ url_for('booking.book', room_id=room.id, booking_id=booking.id) }}">
             <div class="guest-details">
-                <h2>Room 1 </h2>
                 {% for i in range(persons) %}
-                    <p class="lead-guest">Guest {{i +1}} (Adult)</p>
+                    <p class="lead-guest">Guest {{i +1}} 
+                        {% if i == 0 %}
+                            Lead 
+                        {% endif %}
+                    </p>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="title1">Title</label>
@@ -134,16 +137,18 @@
                             <input type="text" id="last_name{{ i }}" name="last_name{{ i }}" required>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="email{{ i }}">Guest Email</label>
-                            <input type="email" id="email{{ i }}" name="email{{ i }}">
+                    {% if i == 0 %}
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="email{{ i }}">Guest Email (Optional)</label>
+                                <input type="email" id="email{{ i }}" name="email{{ i }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="phone_number{{ i }}">Phone No (Optional)</label>
+                                <input type="tel" id="phone_number{{ i }}" name="phone_number{{ i }}">
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="phone_number{{ i }}">Phone No</label>
-                            <input type="tel" id="phone_number{{ i }}" name="phone_number{{ i }}">
-                        </div>
-                    </div>
+                    {% endif %}
                 {% endfor %}
             </div>
 

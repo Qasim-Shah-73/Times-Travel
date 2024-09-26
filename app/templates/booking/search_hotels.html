@@ -105,7 +105,7 @@
                     <button onclick="toggleRoomDetails({{ hotel.id }})" class="view-rooms-btn">View Rooms</button>
                     <div id="room-details-{{ hotel.id }}" class="room-details" style="display: none;">
                         {% for room in hotel.rooms %}
-                            {% if room.approval == 'super_admin' %}
+                            {% if room.approval == 'super_admin' and room.availability and room.rooms_available > 0 %}
                                 <div class="room-info">
                                     <h3 style="text-align: left;"><strong>{{ room.type }}</strong></h3>
                                     <p style="text-align: left;"><strong>Price:</strong> {{ room.total_price }} (SAR)</p>

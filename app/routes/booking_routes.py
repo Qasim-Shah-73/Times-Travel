@@ -98,69 +98,73 @@ def booking_form(hotel_id, room_id):
     hotel = Hotel.query.get_or_404(hotel_id)
     room = Room.query.get_or_404(room_id)
     
-    # Extract query parameters
-    check_in_str = request.args.get('check_in')
-    check_out_str = request.args.get('check_out')
-    nights = request.args.get('nights')
-    price = request.args.get('price')
+    if room.availability:
+        # Extract query parameters
+        check_in_str = request.args.get('check_in')
+        check_out_str = request.args.get('check_out')
+        nights = request.args.get('nights')
+        price = request.args.get('price')
 
-    # Assuming the current user is the agent making the booking
-    agent = current_user
+        # Assuming the current user is the agent making the booking
+        agent = current_user
 
-    # Example agency fetch based on the agent's info
-    agency = agent.agency if agent.agency else None
-    
-     # Convert check_in and check_out to datetime objects if they are strings
-    try:
-        if check_in_str and check_out_str:
-            check_in = datetime.strptime(check_in_str, '%d-%m-%Y')  # Update to match your input format
-            check_out = datetime.strptime(check_out_str, '%d-%m-%Y')  # Update to match your input format
-            print(f"Parsed check_in: {check_in}")
-            print(f"Parsed check_out: {check_out}")
-        else:
-            flash("Check-in and check-out dates are required.", "danger")
-            return redirect(url_for('auth.index'))
-    except ValueError as e:
-        print(f"Error parsing dates. Check-in: {check_in_str}, Check-out: {check_out_str}. Error: {e}")
-        flash("Invalid date format. Please use DD-MM-YYYY.", "danger")
-        return redirect(url_for('auth.index'))  # Redirect to a safe location
+        # Example agency fetch based on the agent's info
+        agency = agent.agency if agent.agency else None
+        
+        # Convert check_in and check_out to datetime objects if they are strings
+        try:
+            if check_in_str and check_out_str:
+                check_in = datetime.strptime(check_in_str, '%d-%m-%Y')  # Update to match your input format
+                check_out = datetime.strptime(check_out_str, '%d-%m-%Y')  # Update to match your input format
+                print(f"Parsed check_in: {check_in}")
+                print(f"Parsed check_out: {check_out}")
+            else:
+                flash("Check-in and check-out dates are required.", "danger")
+                return redirect(url_for('auth.index'))
+        except ValueError as e:
+            print(f"Error parsing dates. Check-in: {check_in_str}, Check-out: {check_out_str}. Error: {e}")
+            flash("Invalid date format. Please use DD-MM-YYYY.", "danger")
+            return redirect(url_for('auth.index'))  # Redirect to a safe location
 
-    # Create the booking object
-    new_booking = Booking(
-        check_in=check_in,
-        check_out=check_out,
-        hotel_name=hotel.name,
-        room_type=room.type,  # Updated to use `room.room_type` for consistency
-        agent_id=agent.id if agent else None,
-        agency_id=agency.id if agency else None,
-        hotel_id=hotel.id, #link hotel with booking
-        room_id=room.id,
-        booking_confirmed=False,  # Default as not confirmed
-        invoice_paid=False,  # Default as not paid
-        selling_price=price,  # Selling price from request
-        buying_price=None,  # Set if you have a buying price (could be calculated separately)
-        remarks=f"Booking created by {agent.username}."
-    )
+        # Create the booking object
+        new_booking = Booking(
+            check_in=check_in,
+            check_out=check_out,
+            hotel_name=hotel.name,
+            room_type=room.type,  # Updated to use `room.room_type` for consistency
+            agent_id=agent.id if agent else None,
+            agency_id=agency.id if agency else None,
+            hotel_id=hotel.id, #link hotel with booking
+            room_id=room.id,
+            booking_confirmed=False,  # Default as not confirmed
+            invoice_paid=False,  # Default as not paid
+            selling_price=price,  # Selling price from request
+            buying_price=None,  # Set if you have a buying price (could be calculated separately)
+            remarks=f"Booking created by {agent.username}."
+        )
 
-    # Add the new booking to the session and commit
-    db.session.add(new_booking)
-    db.session.commit()
-    
-    flash('Booking created successfully', 'success')
+        # Add the new booking to the session and commit
+        db.session.add(new_booking)
+        db.session.commit()
+        
+        flash('Booking created successfully', 'success')
 
-    # Determine number of persons based on room type
-    if 'Single' in room.type:
-        persons = 1
-    elif 'Double' in room.type:
-        persons = 2
-    elif 'Triple' in room.type:
-        persons = 3
-    elif 'Quad' in room.type:
-        persons = 4
+        # Determine number of persons based on room type
+        if 'Single' in room.type:
+            persons = 1
+        elif 'Double' in room.type:
+            persons = 2
+        elif 'Triple' in room.type:
+            persons = 3
+        elif 'Quad' in room.type:
+            persons = 4
 
 
-    return render_template('booking/booking_form.html', hotel=hotel, room=room, booking=new_booking,
-                           nights=nights, persons=persons, hotel_name=hotel.name)
+        return render_template('booking/booking_form.html', hotel=hotel, room=room, booking=new_booking,
+                            nights=nights, persons=persons, hotel_name=hotel.name)
+    else:
+        flash("Room is not available", "info")
+        return redirect(url_for('auth.index'))
 
 #booking is created here
 @booking_bp.route('/book/<int:room_id>/<int:booking_id>', methods=['GET', 'POST'])
@@ -191,8 +195,6 @@ def book(room_id, booking_id):
             last_name = request.form.get(f'last_name{i}', None)
             email = request.form.get(f'email{i}')
             phone_number = request.form.get(f'phone_number{i}')
-            print(i)
-            print(first_name,last_name)
             if first_name and last_name:
                 guest = Guest(
                     first_name=first_name,
@@ -208,6 +210,8 @@ def book(room_id, booking_id):
         booking.special_requests = request.form.get('special_requests')
         if booking.special_requests == 'other':
             booking.special_requests = request.form.get('other_request')
+        
+        booking.room.rooms_available -= 1
 
         db.session.commit()
         
@@ -230,7 +234,6 @@ def book(room_id, booking_id):
             guests=guests,
             total_price=booking.selling_price
         )
-        
         
         send_invoice_email(
                 to=booking.agent.email,
