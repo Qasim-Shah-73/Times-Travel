@@ -89,6 +89,8 @@ class Booking(db.Model):
     agency = db.relationship('Agency', back_populates='bookings')
     confirmation_number = Column(String(64), unique=True, nullable=True)
     booking_confirmed = Column(Boolean, default=False)
+    times_con_number = Column(String(64), unique=True, nullable=True)
+    times_confirmed = Column(Boolean, default=False)
     invoice_paid = Column(Boolean, default=False)
     selling_price = Column(Numeric(precision=12, scale=2), nullable=True)
     buying_price = Column(Numeric(precision=12, scale=2), nullable=True)
