@@ -8,7 +8,7 @@ from app.decorators import roles_required
 from datetime import datetime, timedelta
 from flask_login import current_user
 from sqlalchemy import func
-from app.email import send_tentative_email, send_confirmation_email, send_invoice_paid_email, send_invoice_email
+from app.email import send_tentative_email, send_confirmation_email, send_invoice_paid_email, send_invoice_email, send_tcn_confirmation_email
 
 booking_bp = Blueprint('booking', __name__)
 
@@ -415,6 +415,29 @@ def update_times_confirmation():
         booking.times_con_number = None
         booking.remarks = remarks
 
+    room = booking.room
+    guests = booking.guests if booking.guests else []
+    
+    send_tcn_confirmation_email(
+                to=booking.agent.email,
+                recipient_name=booking.agent.username,
+                agency_name=booking.agency.name,
+                destination=booking.hotel.location,
+                check_in=booking.check_in.strftime('%d-%m-%Y'),
+                check_out=booking.check_out.strftime('%d-%m-%Y'),
+                booking_ref=f'TTL_00{booking.id}',
+                hotel_name=booking.hotel.name,
+                agent_ref=booking.agent.id,
+                hotel_address=booking.hotel.description,
+                nights=(booking.check_out - booking.check_in).days,
+                num_of_rooms=1,
+                room_type=room.type,
+                inclusion=room.inclusion,
+                notes=room.notes,
+                guests=guests,
+                total_price=booking.selling_price,
+                confirmation_number= times_confirmation_number
+            )
     # Commit changes to the database
     db.session.commit()
 
