@@ -21,9 +21,13 @@ def search_hotels():
     check_out_date_str = request.args.get('check_out')
     check_in_month = datetime.strptime(check_in_date_str, '%Y-%m-%d').strftime('%B')  # Get the month name
 
-    # Format dates to 'd m y'
-    check_in_date = datetime.strptime(check_in_date_str, '%Y-%m-%d').strftime('%d-%m-%Y')
-    check_out_date = datetime.strptime(check_out_date_str, '%Y-%m-%d').strftime('%d-%m-%Y')
+    # Format dates to 'd-m-Y'
+    check_in_date = datetime.strptime(check_in_date_str, '%Y-%m-%d')
+    check_out_date = datetime.strptime(check_out_date_str, '%Y-%m-%d')
+
+    # Initialize check-in and check-out display variables
+    check_in_dt = check_in_date.strftime("%d-%m-%Y")
+    check_out_dt = check_out_date.strftime("%d-%m-%Y")
 
     # Determine the location type based on the presence of "Makkah" or "Madinah" in the location string
     location_type = None
@@ -39,6 +43,8 @@ def search_hotels():
     available_hotels = [hotel for hotel in hotels if is_month_available(hotel, check_in_month)]
 
     # Calculate price for each room in available hotels
+    diff_days = (check_out_date - check_in_date).days  # Calculate the number of nights
+
     for hotel in available_hotels:
         for room in hotel.rooms:
             # Determine number of persons based on room type
@@ -52,10 +58,7 @@ def search_hotels():
             elif 'Quad' in room.type:
                 persons = 4
             
-            # Calculate price based on check-in and check-out dates
-            check_in_date = datetime.strptime(check_in_date_str, '%Y-%m-%d')
-            check_out_date = datetime.strptime(check_out_date_str, '%Y-%m-%d')
-
+            # Calculate total price for the room
             total_price = 0
 
             # Loop through each day and add the corresponding rate for that day
@@ -68,14 +71,8 @@ def search_hotels():
                 # Move to the next day
                 current_date += timedelta(days=1)
 
-            # Multiply total price by number of persons
-            #total_price *= persons
-
             # Store the calculated total price in the room object
             room.total_price = total_price
-            check_in_dt = check_in_date.strftime("%d-%m-%Y")
-            check_out_dt = check_out_date.strftime("%d-%m-%Y")
-            diffDays = (check_out_date - check_in_date).days
 
     return render_template('booking/search_hotels.html', 
                            hotels=available_hotels, 
@@ -83,7 +80,7 @@ def search_hotels():
                            check_in=check_in_dt,
                            check_out=check_out_dt,
                            location=location,
-                           nights=diffDays)
+                           nights=diff_days)
 
 def is_month_available(hotel, check_in_month):
     """

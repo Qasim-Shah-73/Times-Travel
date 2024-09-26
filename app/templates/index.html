@@ -190,6 +190,7 @@
     </div>
 </div>
 
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const form = document.getElementById('hotel-search-form');
@@ -198,26 +199,39 @@
         const totalNightsInput = document.getElementById('total_nights');
         const submitButton = document.querySelector('button[type="submit"]');
         const checkOutError = document.getElementById('check_out_error');
-
+    
+        // Set minimum date for check-in to today
+        const today = new Date().toISOString().split('T')[0];
+        checkInInput.min = today;
+    
         checkInInput.addEventListener('input', updateTotalNights);
         checkOutInput.addEventListener('input', updateTotalNights);
-
+    
         form.addEventListener('submit', function(event) {
             if (validateForm()) {
                 // Here you would typically send the form data to a server
             }
         });
-
+    
         function updateTotalNights() {
             const checkInDate = new Date(checkInInput.value);
             const checkOutDate = new Date(checkOutInput.value);
-
+            const currentDate = new Date();
+            currentDate.setHours(0, 0, 0, 0); // Reset time to start of day
+    
             resetErrors();
-
+    
+            if (checkInDate < currentDate) {
+                showError("Check-in date cannot be before today.");
+                totalNightsInput.value = '';
+                submitButton.disabled = true;
+                return;
+            }
+    
             if (checkInDate && checkOutDate) {
                 const diffTime = checkOutDate - checkInDate;
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
+    
                 if (diffDays < 0) {
                     showError("Check-out date cannot be before check-in date.");
                     totalNightsInput.value = '';
@@ -231,24 +245,27 @@
                 submitButton.disabled = false;
             }
         }
-
+    
         function showError(message) {
             checkOutError.textContent = message;
             checkOutError.style.display = 'block';
             checkOutInput.classList.add('error');
         }
-
+    
         function resetErrors() {
             checkOutError.textContent = '';
             checkOutError.style.display = 'none';
             checkOutInput.classList.remove('error');
         }
-
+    
         function validateForm() {
             let isValid = true;
             resetErrors();
             if (!checkInInput.value) {
                 showError('Please select a check-in date');
+                isValid = false;
+            } else if (new Date(checkInInput.value) < new Date().setHours(0, 0, 0, 0)) {
+                showError('Check-in date cannot be before today');
                 isValid = false;
             }
             if (!checkOutInput.value) {
