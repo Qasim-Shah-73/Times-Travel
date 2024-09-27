@@ -8,6 +8,7 @@ from app.decorators import roles_required
 from datetime import datetime, timedelta
 from flask_login import current_user
 from sqlalchemy import func
+from decimal import Decimal
 from app.email import send_tentative_email, send_confirmation_email, send_invoice_paid_email, send_invoice_email, send_tcn_confirmation_email
 
 booking_bp = Blueprint('booking', __name__)
@@ -19,11 +20,11 @@ def search_hotels():
     location = request.args.get('location')
     check_in_date_str = request.args.get('check_in')
     check_out_date_str = request.args.get('check_out')
-    check_in_month = datetime.strptime(check_in_date_str, '%Y-%m-%d').strftime('%B')  # Get the month name
+    check_in_month = datetime.strptime(check_in_date_str, '%d-%m-%Y').strftime('%B')  # Get the month name
 
     # Format dates to 'd-m-Y'
-    check_in_date = datetime.strptime(check_in_date_str, '%Y-%m-%d')
-    check_out_date = datetime.strptime(check_out_date_str, '%Y-%m-%d')
+    check_in_date = datetime.strptime(check_in_date_str, '%d-%m-%Y')
+    check_out_date = datetime.strptime(check_out_date_str, '%d-%m-%Y')
 
     # Initialize check-in and check-out display variables
     check_in_dt = check_in_date.strftime("%d-%m-%Y")
@@ -122,46 +123,54 @@ def booking_form(hotel_id, room_id):
             print(f"Error parsing dates. Check-in: {check_in_str}, Check-out: {check_out_str}. Error: {e}")
             flash("Invalid date format. Please use DD-MM-YYYY.", "danger")
             return redirect(url_for('auth.index'))  # Redirect to a safe location
-
-        # Create the booking object
-        new_booking = Booking(
-            check_in=check_in,
-            check_out=check_out,
-            hotel_name=hotel.name,
-            room_type=room.type,  # Updated to use `room.room_type` for consistency
-            agent_id=agent.id if agent else None,
-            agency_id=agency.id if agency else None,
-            hotel_id=hotel.id, #link hotel with booking
-            room_id=room.id,
-            booking_confirmed=False,  # Default as not confirmed
-            invoice_paid=False,  # Default as not paid
-            selling_price=price,  # Selling price from request
-            buying_price=None,  # Set if you have a buying price (could be calculated separately)
-            remarks=f"Booking created by {agent.username}."
-        )
-
-        # Add the new booking to the session and commit
-        db.session.add(new_booking)
-        db.session.commit()
         
-        flash('Booking created successfully', 'success')
+        remaining = agency.credit_limit - agency.used_credit + agency.paid_back
+        price = Decimal(price)
+        try:
+            if  remaining > price:
+                # Create the booking object
+                new_booking = Booking(
+                    check_in=check_in,
+                    check_out=check_out,
+                    hotel_name=hotel.name,
+                    room_type=room.type,  # Updated to use `room.room_type` for consistency
+                    agent_id=agent.id if agent else None,
+                    agency_id=agency.id if agency else None,
+                    hotel_id=hotel.id, #link hotel with booking
+                    room_id=room.id,
+                    booking_confirmed=False,  # Default as not confirmed
+                    invoice_paid=False,  # Default as not paid
+                    selling_price=price,  # Selling price from request
+                    buying_price=None,  # Set if you have a buying price (could be calculated separately)
+                    remarks=f"Booking created by {agent.username}."
+                )
+                
+                agency.used_credit += price
 
-        # Determine number of persons based on room type
-        if 'Single' in room.type:
-            persons = 1
-        elif 'Double' in room.type:
-            persons = 2
-        elif 'Triple' in room.type:
-            persons = 3
-        elif 'Quad' in room.type:
-            persons = 4
+
+                # Add the new booking to the session and commit
+                db.session.add(new_booking)
+                db.session.commit()
+                
+                # Determine number of persons based on room type
+                if 'Single' in room.type:
+                    persons = 1
+                elif 'Double' in room.type:
+                    persons = 2
+                elif 'Triple' in room.type:
+                    persons = 3
+                elif 'Quad' in room.type:
+                    persons = 4
 
 
-        return render_template('booking/booking_form.html', hotel=hotel, room=room, booking=new_booking,
-                            nights=nights, persons=persons, hotel_name=hotel.name)
-    else:
-        flash("Room is not available", "info")
-        return redirect(url_for('auth.index'))
+                return render_template('booking/booking_form.html', hotel=hotel, room=room, booking=new_booking,
+                                    nights=nights, persons=persons, hotel_name=hotel.name)
+            else:
+                flash("You have exceeded your credit limit. Contact Support Team for further queries.", "danger")
+                return redirect(url_for('auth.index'))
+        except ValueError as e:
+            flash("You have exceeded your credit limit. Contact Support Team for further queries.", "danger")
+            return redirect(url_for('auth.index'))  
 
 #booking is created here
 @booking_bp.route('/book/<int:room_id>/<int:booking_id>', methods=['GET', 'POST'])
@@ -265,7 +274,7 @@ def book(room_id, booking_id):
 def apply_filters_and_sorting(query):
     """Apply filtering, sorting, and role-based access to the query."""
     sort_by = request.args.get('sort_by', 'id')
-    sort_order = request.args.get('sort_order', 'asc')
+    sort_order = request.args.get('sort_order', 'desc' if sort_by == 'id' else 'asc')
     filter_column = request.args.get('filter_column')
     filter_value = request.args.get('filter_value')
     start_date = request.args.get('start_date')
@@ -309,9 +318,9 @@ def apply_filters_and_sorting(query):
     }
     if sort_by in sort_columns:
         sort_column = sort_columns[sort_by]
-        query = query.order_by(sort_column.asc() if sort_order == 'asc' else sort_column.desc())
+        query = query.order_by(sort_column.desc() if sort_order == 'desc' else sort_column.asc())
     else:
-        query = query.order_by(Booking.id.asc() if sort_order == 'asc' else Booking.id.desc())
+        query = query.order_by(Booking.id.desc())
 
     return query
 
@@ -470,6 +479,7 @@ def update_invoice():
     if booking:
         # Mark the booking's invoice as paid
         booking.invoice_paid = True
+        booking.agency.paid_back += booking.selling_price
         room = booking.room
         
         # Create a new Invoice object and link it to the booking

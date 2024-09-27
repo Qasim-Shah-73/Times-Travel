@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}Home{% endblock %}
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css">
 {% block content %}
 <style>
     body {
@@ -139,34 +139,76 @@
         width: auto;
         padding: 10px 20px;
     }
+    .select-wrapper {
+        position: relative;
+        width: 100%;
+    }
+    
+    .custom-select {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 100%;
+        padding: 10px 30px 10px 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: white;
+        font-size: 1rem;
+        color: #333;
+        cursor: pointer;
+    }
+    
+    .select-wrapper::after {
+        content: "\25BC";
+        font-size: 0.7rem;
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        pointer-events: none;
+        color: #007bff;
+    }
+    
+    .custom-select:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+    }
+    
+    /* Style for the placeholder option */
+    .custom-select option[value=""][disabled] {
+        display: none;
+    }
+    .form-group .select-wrapper {
+        flex: 2.1;
+    }
 </style>
 
 <div class="container">
     <div class="search-section">
-        
         <div class="search-form">
             <div class="form-title"><h1>Welcome Times Travel</h1></div>
             <form id="hotel-search-form" action="{{ url_for('booking.search_hotels') }}" method="GET">
                 <div class="form-group">
                     <i class="fas fa-map-marker-alt"></i>
                     <label for="location">Destination</label>
-                    <select name="location" id="location" style="margin-left: 15%;" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                        <option value="">Select destination</option>
-                        <option value="Makkah, Saudi Arabia">Makkah, Saudi Arabia</option>
-                        <option value="Madinah, Saudi Arabia">Madinah, Saudi Arabia</option>
-                    </select>
+                    <div class="select-wrapper">
+                        <select name="location" id="location" class="custom-select" required>
+                            <option value="" disabled selected>Select a destination</option>
+                            <option value="Makkah, Saudi Arabia">Makkah, Saudi Arabia</option>
+                            <option value="Madinah, Saudi Arabia">Madinah, Saudi Arabia</option>
+                        </select>
+                    </div>
                 </div>
-
                 <div class="form-group">
                     <i class="fas fa-calendar-alt"></i>
                     <label for="check_in">Check-in</label>
-                    <input type="date" name="check_in" id="check_in" required>
+                    <input type="text" name="check_in" id="check_in" placeholder="dd-mm-yyyy" required>
                 </div>
-
+            
                 <div class="form-group">
                     <i class="fas fa-calendar-alt"></i>
                     <label for="check_out">Check-out</label>
-                    <input type="date" name="check_out" id="check_out" required>
+                    <input type="text" name="check_out" id="check_out" placeholder="dd-mm-yyyy" required>
                 </div>
                 <div id="check_out_error" class="error-message"></div>
 
@@ -189,9 +231,9 @@
         <button>Know more</button>
     </div>
 </div>
-
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
 <script>
+
     document.addEventListener("DOMContentLoaded", function () {
         const form = document.getElementById('hotel-search-form');
         const checkInInput = document.getElementById('check_in');
@@ -201,32 +243,39 @@
         const checkOutError = document.getElementById('check_out_error');
     
         // Set minimum date for check-in to today
-        const today = new Date().toISOString().split('T')[0];
-        checkInInput.min = today;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
     
-        checkInInput.addEventListener('input', updateTotalNights);
-        checkOutInput.addEventListener('input', updateTotalNights);
+        // Flatpickr configuration
+        const flatpickrConfig = {
+            dateFormat: "d-m-Y",
+            minDate: "today",
+            allowInput: true,
+            onClose: function(selectedDates, dateStr, instance) {
+                updateTotalNights();
+            }
+        };
     
-        form.addEventListener('submit', function(event) {
-            if (validateForm()) {
-                // Here you would typically send the form data to a server
+        // Initialize Flatpickr for check-in and check-out
+        const checkInPicker = flatpickr(checkInInput, {
+            ...flatpickrConfig,
+            onChange: function(selectedDates) {
+                checkOutPicker.set('minDate', selectedDates[0]);
+            }
+        });
+    
+        const checkOutPicker = flatpickr(checkOutInput, {
+            ...flatpickrConfig,
+            onChange: function(selectedDates) {
+                checkInPicker.set('maxDate', selectedDates[0]);
             }
         });
     
         function updateTotalNights() {
-            const checkInDate = new Date(checkInInput.value);
-            const checkOutDate = new Date(checkOutInput.value);
-            const currentDate = new Date();
-            currentDate.setHours(0, 0, 0, 0); // Reset time to start of day
+            const checkInDate = checkInPicker.selectedDates[0];
+            const checkOutDate = checkOutPicker.selectedDates[0];
     
             resetErrors();
-    
-            if (checkInDate < currentDate) {
-                showError("Check-in date cannot be before today.");
-                totalNightsInput.value = '';
-                submitButton.disabled = true;
-                return;
-            }
     
             if (checkInDate && checkOutDate) {
                 const diffTime = checkOutDate - checkInDate;
@@ -261,19 +310,26 @@
         function validateForm() {
             let isValid = true;
             resetErrors();
-            if (!checkInInput.value) {
+            if (!checkInPicker.selectedDates[0]) {
                 showError('Please select a check-in date');
                 isValid = false;
-            } else if (new Date(checkInInput.value) < new Date().setHours(0, 0, 0, 0)) {
+            } else if (checkInPicker.selectedDates[0] < today) {
                 showError('Check-in date cannot be before today');
                 isValid = false;
             }
-            if (!checkOutInput.value) {
+            if (!checkOutPicker.selectedDates[0]) {
                 showError('Please select a check-out date');
                 isValid = false;
             }
             return isValid;
         }
+    
+        form.addEventListener('submit', function(event) {
+            if (!validateForm()) {
+                event.preventDefault();
+            }
+        });
     });
+    
 </script>
 {% endblock %}

@@ -5,6 +5,7 @@
     <title>{% block title %}Travel Website{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -24,6 +25,11 @@
         font-family: Arial, sans-serif;
         background-color: #f0f8ff; /* Light blue color */
         text-align: center;
+    }
+
+    /* Hide the alert after 3 seconds */
+    .flash-alert {
+        transition: opacity 0.5s ease-out;
     }
     </style>
 </head>
@@ -68,18 +74,36 @@
         </div>
     </nav>
 
-    <!-- <div class="mt-3 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"> 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        {% for category, message in messages %}
-        <div class="{{ category }}">{{ message }}</div>
-        {% endfor %}
-        {% endif %}
+    <!-- Flash Message Section -->
+    <div class="mt-6 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                <div id="flash-container">
+                    {% for category, message in messages %}
+                        <div class="flash-alert bg-{{ 'green' if category == 'success' else 'red' }}-500 text-white px-4 py-2 rounded shadow mb-4">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
         {% endwith %}
-    </div> -->
+    </div>
 
     <div class="mt-6 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"> 
         {% block content %}{% endblock %}
     </div>
+
+    <script>
+        // Flash messages disappear after 6 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashMessages = document.querySelectorAll('.flash-alert');
+            setTimeout(() => {
+                flashMessages.forEach(flash => {
+                    flash.style.opacity = '0'; // fade out
+                    setTimeout(() => flash.remove(), 1000); // remove after fade out
+                });
+            }, 3000); // disappear after 3 seconds
+        });
+    </script>
 </body>
 </html>
