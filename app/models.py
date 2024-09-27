@@ -92,6 +92,8 @@ class Booking(db.Model):
     times_con_number = Column(String(64), unique=True, nullable=True)
     times_confirmed = Column(Boolean, default=False)
     invoice_paid = Column(Boolean, default=False)
+    vendor_paid = Column(Boolean, default=False)
+    payment_number = Column(String(64), unique=True, nullable=True)
     selling_price = Column(Numeric(precision=12, scale=2), nullable=True)
     buying_price = Column(Numeric(precision=12, scale=2), nullable=True)
     special_requests = Column(String(128), nullable=True)

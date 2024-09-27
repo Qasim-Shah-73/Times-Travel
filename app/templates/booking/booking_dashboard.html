@@ -170,6 +170,13 @@
                                 Invoice Paid
                             </a>
                         </th>
+                        {% if current_user.role == 'super_admin' or current_user.role == 'admin'  %}
+                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                            <a href="{{ url_for('booking.view_bookings', sort_by='vendor_paid', sort_order='asc' if sort_order == 'desc' else 'desc', filter_column=filter_column, filter_value=filter_value) }}">
+                                Vendor Paid
+                            </a>
+                        </th>
+                        {% endif %}
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -243,7 +250,22 @@
                                 {{ 'Yes' if booking.invoice_paid else 'No' }}
                             </span>
                             {% endif %}
-                        </td>                        
+                        </td>
+                        {% if current_user.role == 'super_admin' or current_user.role == 'admin'  %}
+                            <td class="px-6 py-4 text-center">
+                                {% if not booking.vendor_paid %}
+                                <!-- Button to open the modal -->
+                                <button class="bg-blue-500 hover:bg-blue-600 text-white font-semibold text-sm py-1.5 px-3 rounded-md shadow-sm transition duration-300 ease-in-out transform hover:scale-105"
+                                onclick="openVendorPaymentModal('{{ booking.id }}')">
+                                Mark as Paid
+                                </button>
+                                {% else %}
+                                <span class="inline-block px-2 py-1 text-xs font-medium text-white rounded-full {{ 'bg-green-500' if booking.invoice_paid else 'bg-red-500' }}">
+                                    {{ 'Yes' if booking.vendor_paid else 'No' }}
+                                </span>
+                                {% endif %}
+                            </td>   
+                        {% endif %}                     
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -257,6 +279,11 @@
             <h2 class="text-xl font-bold mb-4">Update Times Confirmation</h2>
             <form id="updateTCNForm">
                 <input type="hidden" name="booking_id" id="tcn_booking_id">
+
+                <div class="mb-4">
+                    <label for="buying_price" class="block text-sm font-medium text-gray-700">Buying Price</label>
+                    <input type="number" id="buying_price" name="buying_price" class="border rounded-md px-4 py-2 w-full" required>
+                </div>
                 
                 <!-- Times Confirmed Selection -->
                 <div class="mb-4">
@@ -299,10 +326,6 @@
                     <label for="confirmation_number" class="block text-sm font-medium text-gray-700">Confirmation Number</label>
                     <input type="text" id="confirmation_number" name="confirmation_number" class="border rounded-md px-4 py-2 w-full" required>
                 </div>
-                <div class="mb-4">
-                    <label for="buying_price" class="block text-sm font-medium text-gray-700">Buying Price</label>
-                    <input type="number" id="buying_price" name="buying_price" class="border rounded-md px-4 py-2 w-full" required>
-                </div>
                 <div class="flex justify-end">
                     <button type="button" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded mr-2" onclick="closeModal()">Cancel</button>
                     <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">Update</button>
@@ -321,23 +344,12 @@
                     <label for="payment_date" class="block text-sm font-medium text-gray-700">Payment Date</label>
                     <input type="datetime-local" id="payment_date" name="payment_date" class="border rounded-md px-4 py-2 w-full" required>
                 </div>
-                <div class="mb-4">
+                <div class="mb-4" style="display: none;">
                     <label for="payment_method" class="block text-sm font-medium text-gray-700">Payment Method</label>
-                    <select
-                        id="payment_method"
-                        name="payment_method"
-                        class="border rounded-md px-4 py-2 w-full"
-                        required
-                        onchange="toggleTramNumberField()"
-                    >
-                        <option value="">Select Payment Method</option>
-                        <option value="Cash">Cash</option>
-                        <option value="Bank">Bank</option>
-                        <option value="Tram">Tram Number</option> <!-- Changed value to 'Tram' -->
-                    </select>
+                    <input type="text" id="payment_method" value="Tram" />
                 </div>
                 
-                <div class="mb-4" id="tram_num_container" style="display: none;"> <!-- Hidden by default -->
+                <div class="mb-4" id="tram_num_container"> <!-- Hidden by default -->
                     <label for="tram_num" class="block text-sm font-medium text-gray-700">Tram Number</label>
                     <textarea
                         id="tram_num"
@@ -352,6 +364,36 @@
                 </div>
                 <div class="text-red-500 text-sm mb-4">
                     Are you sure you want to mark this invoice as paid?
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded mr-2" onclick="closePaymentModal()">Cancel</button>
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Mark as Paid</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+      <!-- Mark Vendor as Paid Modal -->
+      <div id="markVendorPaidModal" class="modal hidden">
+        <div class="modal-content">
+            <h2 class="text-xl font-bold mb-4">Mark Vendor as Paid</h2>
+            <form id="markVendorPaidForm">
+                <input type="hidden" name="booking_id" id="vendor_booking_id">
+                    <div class="mb-4"> 
+                    <label for="payment_number" class="block text-sm font-medium text-gray-700">Payment Number</label>
+                    <textarea
+                        id="payment_number"
+                        name="payment_number"
+                        class="border rounded-md px-4 py-2 w-full"
+                        rows="1"
+                    ></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="remarks" class="block text-sm font-medium text-gray-700">Remarks</label>
+                    <textarea id="remarks" name="remarks" class="border rounded-md px-4 py-2 w-full" rows="2"></textarea>
+                </div>
+                <div class="text-red-500 text-sm mb-4">
+                    Are you sure you want to mark this Vendor as paid?
                 </div>
                 <div class="flex justify-end">
                     <button type="button" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded mr-2" onclick="closePaymentModal()">Cancel</button>
@@ -425,12 +467,14 @@
             const timesConfirmed = $('#times_confirmed').val();
             const timesConNumber = $('#times_con_number').val();
             const remarks = $('#remarks').val();
+            const buying_price = $('#buying_price').val();
 
             const data = {
                 booking_id: bookingId,
                 times_confirmed: timesConfirmed,
                 times_confirmation_number: timesConfirmed === 'true' ? timesConNumber : '',
-                remarks: timesConfirmed === 'false' ? remarks : ''
+                remarks: timesConfirmed === 'false' ? remarks : '',
+                buying_price: buying_price || ''
             };            
 
             $.ajax({
@@ -496,8 +540,6 @@
         function openConfirmationModal(bookingId, confirmationNumber, buyingPrice) {
             $('#booking_id').val(bookingId);
             $('#confirmation_number').val(confirmationNumber || '');
-            $('#buying_price').val(buyingPrice || '');
-        
             $('#updateConfirmationModal').show();
         }
 
@@ -566,17 +608,49 @@
             });
         });
 
-        function toggleTramNumberField() {
-            const paymentMethod = document.getElementById('payment_method').value;
-            const tramNumContainer = document.getElementById('tram_num_container');
-    
-            // Show or hide tram number field based on the selected payment method
-            if (paymentMethod === 'Tram') {
-                tramNumContainer.style.display = 'block';
-            } else {
-                tramNumContainer.style.display = 'none';
-            }
+        // Open the modal to mark the invoice as paid
+        function openVendorPaymentModal(bookingId) {
+            $('#vendor_booking_id').val(bookingId);
+            $('#markVendorPaidModal').show();
         }
+
+        // Close the modal
+        function closeVendorPaymentModal() {
+            $('#markVendorPaidModal').hide();
+        }
+        
+        // Handle form submission
+        $('#markVendorPaidModal').on('submit', function(e) {
+            e.preventDefault();
+            
+            var bookingId = $('#vendor_booking_id').val();
+            var paymentNumber = $('#payment_number').val();
+            var remarks = $('#remarks').val();
+
+            var data = {
+                booking_id: bookingId,
+                payment_number: paymentNumber,
+                remarks: remarks
+            };
+
+            $.ajax({
+                url: "{{ url_for('booking.vendor_paid') }}",
+                method: "POST",
+                data: data,
+                success: function(response) {
+                    if (response.status === 'success') {
+                        alert('Vendor marked as paid successfully!');
+                        closePaymentModal();
+                        location.reload(); // Reload page to reflect changes
+                    } else {
+                        alert(response.message || 'Failed to mark Vendor as paid.');
+                    }
+                },
+                error: function() {
+                    alert('Failed to mark Vendor as paid.');
+                }
+            });
+        });
 
         function openBookingDetailsModal(bookingId) {
             console.log("Opening modal for booking ID:", bookingId);

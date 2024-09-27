@@ -241,27 +241,6 @@ def book(room_id, booking_id):
             total_price=booking.selling_price
         )
         
-        send_invoice_email(
-                to=booking.agent.email,
-                recipient_name=booking.agent.username,
-                agency_name=booking.agency.name,
-                destination=booking.hotel.location,
-                check_in=booking.check_in.strftime('%d-%m-%Y'),
-                check_out=booking.check_out.strftime('%d-%m-%Y'),
-                booking_ref=f'TTL_00{booking.id}',
-                hotel_name=booking.hotel.name,
-                agent_ref=booking.agent.id,
-                hotel_address=booking.hotel.description,
-                nights=(booking.check_out - booking.check_in).days,
-                num_of_rooms=1,
-                room_type=room.type,
-                inclusion=room.inclusion,
-                notes=room.notes,
-                guests=booking.guests,
-                total_price=booking.selling_price                
-            )
-
-
         flash('Booking created successfully', 'success')
         return redirect(url_for('auth.index'))
 
@@ -354,9 +333,8 @@ def view_bookings():
 def update_confirmation():
     booking_id = request.form.get('booking_id')
     confirmation_number = request.form.get('confirmation_number')
-    buying_price = request.form.get('buying_price')
 
-    if not booking_id or not buying_price:
+    if not booking_id:
         return jsonify({'status': 'error', 'message': 'Invalid data'}), 400
 
     booking = Booking.query.get(booking_id)
@@ -388,9 +366,6 @@ def update_confirmation():
                 total_price=booking.selling_price,
                 confirmation_number= confirmation_number
             )
-         
-        if buying_price:
-            booking.buying_price = buying_price
         
         db.session.commit()
         
@@ -406,6 +381,7 @@ def update_times_confirmation():
     times_confirmation_number = request.form.get('times_confirmation_number')
     times_confirmed = request.form.get('times_confirmed') == 'true'
     remarks = request.form.get('remarks')
+    buying_price = request.form.get('buying_price')
 
     if not booking_id:
         return jsonify({'status': 'error', 'message': 'Booking ID is required'}), 400
@@ -424,6 +400,9 @@ def update_times_confirmation():
         booking.times_con_number = None
         booking.remarks = remarks
 
+    if buying_price:
+            booking.buying_price = buying_price
+            
     room = booking.room
     guests = booking.guests if booking.guests else []
     
@@ -447,6 +426,27 @@ def update_times_confirmation():
                 total_price=booking.selling_price,
                 confirmation_number= times_confirmation_number
             )
+    
+    send_invoice_email(
+                to=booking.agent.email,
+                recipient_name=booking.agent.username,
+                agency_name=booking.agency.name,
+                destination=booking.hotel.location,
+                check_in=booking.check_in.strftime('%d-%m-%Y'),
+                check_out=booking.check_out.strftime('%d-%m-%Y'),
+                booking_ref=f'TTL_00{booking.id}',
+                hotel_name=booking.hotel.name,
+                agent_ref=booking.agent.id,
+                hotel_address=booking.hotel.description,
+                nights=(booking.check_out - booking.check_in).days,
+                num_of_rooms=1,
+                room_type=room.type,
+                inclusion=room.inclusion,
+                notes=room.notes,
+                guests=booking.guests,
+                total_price=booking.selling_price                
+            )
+
     # Commit changes to the database
     db.session.commit()
 
@@ -521,6 +521,29 @@ def update_invoice():
         return jsonify({'status': 'success'}), 200
     
     return jsonify({'status': 'error', 'message': 'Booking not found'}), 404
+
+@booking_bp.route('/vendor_paid', methods=['POST'])
+@login_required
+@roles_required('super_admin', 'admin')
+def vendor_paid():
+    booking_id = request.form.get('booking_id')
+    payment_number = request.form.get('payment_number')
+    remarks = request.form.get('remarks')
+
+    booking = Booking.query.get(booking_id)
+
+    if booking:
+        # Mark the booking's vendor as paid
+        booking.vendor_paid = True
+        booking.remarks = remarks
+        booking.payment_number = payment_number
+
+        db.session.commit()
+
+        return jsonify({'status': 'success'}), 200
+    
+    return jsonify({'status': 'error', 'message': 'Booking not found'}), 404
+
 
 @booking_bp.route('/get_booking_details/<int:booking_id>', methods=['GET'])
 @login_required

@@ -82,6 +82,20 @@
                     </span>
                 </td>
             </tr>
+            {% if current_user.role == 'super_admin' or current_user.role == 'admin'  %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-2 font-medium text-gray-600">Vendor Paid</td>
+                    <td class="px-4 py-2">
+                        <span class="px-2 py-1 text-xs font-medium rounded {{ 'bg-green-100 text-green-700' if booking.vendor_paid else 'bg-red-100 text-red-700' }}">
+                            {{ 'Yes' if booking.vendor_paid else 'No' }}
+                        </span>
+                    </td>
+                </tr>
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-2 font-medium text-gray-600">Payment Number</td>
+                    <td class="px-4 py-2 text-gray-800">{{ booking.payment_number or 'N/A' }}</td>
+                </tr>
+            {% endif %}
         </tbody>
     </table>
 
