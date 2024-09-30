@@ -182,6 +182,7 @@ class Room(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     hotel_id = db.Column(db.Integer, db.ForeignKey('hotel.id'), nullable=False)
     type = db.Column(db.String(100), nullable=False)
+    view_type = db.Column(db.String(100), nullable=False)
     availability = db.Column(db.Boolean, nullable=False)
     rooms_available = db.Column(db.Integer, nullable=False)
     inclusion = db.Column(db.String(100))

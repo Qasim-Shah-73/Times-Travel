@@ -125,7 +125,18 @@ class RatesForm(FlaskForm):
 
 class RoomForm(FlaskForm):
     hotel_id = IntegerField('Hotel ID', validators=[DataRequired()])
-    type = StringField('Room Type', validators=[DataRequired()])
+    type = SelectField('Room Type', choices=[
+        ('Double', 'Double'),
+        ('Triple', 'Triple'),
+        ('Quad', 'Quad'),
+        ('Other', 'Other')
+    ], validators=[DataRequired()])
+    other_type = StringField('Other Room Type')
+    view_type = SelectField('View Type', choices=[
+        ('Standard', 'Standard'),
+        ('City', 'City'),
+        ('Haram/Kabba', 'Haram/Kabba')
+    ], validators=[DataRequired()])
     availability = BooleanField('Availability')
     rooms_available = IntegerField('Rooms Available', validators=[DataRequired()])
     inclusion = StringField('Inclusion')
@@ -147,7 +158,18 @@ class RoomForm(FlaskForm):
     
 class UpdateRoomForm(FlaskForm):
     hotel_id = IntegerField('Hotel ID', validators=[DataRequired()])
-    type = StringField('Room Type', validators=[DataRequired()])
+    type = SelectField('Room Type', choices=[
+        ('Double', 'Double'),
+        ('Triple', 'Triple'),
+        ('Quad', 'Quad'),
+        ('Other', 'Other')
+    ], validators=[DataRequired()])
+    other_type = StringField('Other Room Type')
+    view_type = SelectField('View Type', choices=[
+        ('Standard', 'Standard'),
+        ('City', 'City'),
+        ('Haram/Kabba', 'Haram/Kabba')
+    ], validators=[DataRequired()])
     availability = BooleanField('Availability')
     rooms_available = IntegerField('Rooms Available', validators=[DataRequired()])
     inclusion = StringField('Inclusion')

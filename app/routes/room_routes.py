@@ -15,7 +15,7 @@ room_bp = Blueprint('room', __name__)
 @roles_required('super_admin', 'admin', 'data_entry')
 def create_room(hotel_id):
     form = RoomForm()
-    form.hotel_id.data = hotel_id  # Set the hotel_id field with the provided value
+    form.hotel_id.data = hotel_id
 
     def set_days(form_field, days):
         while len(form_field.rates) < days:
@@ -37,14 +37,20 @@ def create_room(hotel_id):
     set_days(form.december_rates, 31)
 
     if form.validate_on_submit():
+        # Determine the room type
+        room_type = form.type.data
+        if room_type == 'Other':
+            room_type = form.other_type.data
+
         # Create Room object with rate dictionaries
         new_room = Room(
             hotel_id=form.hotel_id.data,
-            type=form.type.data,
+            type=room_type,
+            view_type=form.view_type.data,
             availability=form.availability.data,
             rooms_available=form.rooms_available.data,
             inclusion=form.inclusion.data,
-            approval = current_user.role,
+            approval=current_user.role,
             notes=form.notes.data,
             january_rates={f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.january_rates.rates.data)},
             february_rates={f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.february_rates.rates.data)},
@@ -59,7 +65,8 @@ def create_room(hotel_id):
             november_rates={f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.november_rates.rates.data)},
             december_rates={f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.december_rates.rates.data)}
         )
-        # Retrieve form data
+
+        # Retrieve form data for date range pricing
         start_date = request.form.get('start_date')
         end_date = request.form.get('end_date')
         weekday_price = request.form.get('weekday_price')
@@ -76,34 +83,33 @@ def create_room(hotel_id):
                 flash('Invalid date or price format', 'error')
                 return redirect(url_for('room.view_rooms', hotel_id=hotel_id, room_id=new_room.id))
 
-        # Ensure valid date range
-        if start_date > end_date:
-            flash('Start date must be before end date', 'error')
-            return redirect(url_for('room.view_rooms', hotel_id=hotel_id, room_id=new_room.id))
+            # Ensure valid date range
+            if start_date > end_date:
+                flash('Start date must be before end date', 'error')
+                return redirect(url_for('room.view_rooms', hotel_id=hotel_id, room_id=new_room.id))
         
-        # Update room prices for each day in the date range
-        current_date = start_date
-        while current_date <= end_date:
-            # Get the month and day to update the correct field
-            month_name = current_date.strftime('%B').lower() + '_rates'
-            day_of_month = f'Day{current_date.day}'  # Use the 'DayX' format
-            
-            # Fetch current month's rates or initialize if it's None
-            month_rates = getattr(new_room, month_name) or {}
-            
-            # Apply weekday or weekend price
-            if current_date.weekday() < 4 or current_date.weekday() == 6:  # Monday-Thursday = Weekday
-                month_rates[day_of_month] = weekday_price
-            else:  # Friday-Saturday = Weekend
-                month_rates[day_of_month] = weekend_price
-            
-            # Update the rates back to the room
-            setattr(new_room, month_name, month_rates)
-            flag_modified(new_room, month_name)  # Ensure SQLAlchemy tracks the change
-            
-            # Move to the next day
-            current_date += timedelta(days=1)
-        
+            # Update room prices for each day in the date range
+            current_date = start_date
+            while current_date <= end_date:
+                # Get the month and day to update the correct field
+                month_name = current_date.strftime('%B').lower() + '_rates'
+                day_of_month = f'Day{current_date.day}'
+                
+                # Fetch current month's rates
+                month_rates = getattr(new_room, month_name)
+                
+                # Apply weekday or weekend price
+                if current_date.weekday() < 4 or current_date.weekday() == 6:  # Monday-Thursday = Weekday
+                    month_rates[day_of_month] = weekday_price
+                else:  # Friday-Saturday = Weekend
+                    month_rates[day_of_month] = weekend_price
+                
+                # Update the rates back to the room
+                setattr(new_room, month_name, month_rates)
+                
+                # Move to the next day
+                current_date += timedelta(days=1)
+
         db.session.add(new_room)
         db.session.commit()
         flash('Room created successfully', 'success')
@@ -122,6 +128,10 @@ def update_room(hotel_id, room_id):
         # Populate form with existing data
         form.hotel_id.data = room.hotel_id
         form.type.data = room.type
+        if room.type not in ['Double', 'Triple', 'Quad']:
+            form.type.data = 'Other'
+            form.other_type.data = room.type
+        form.view_type.data = room.view_type
         form.availability.data = room.availability
         form.rooms_available.data = room.rooms_available
         form.inclusion.data = room.inclusion
@@ -135,7 +145,13 @@ def update_room(hotel_id, room_id):
                 rate.process_data(rates.get(f'Day{i+1}', 0))
 
     if request.method == 'POST':
-        room.type = form.type.data
+        # Determine the room type
+        room_type = form.type.data
+        if room_type == 'Other':
+            room_type = form.other_type.data
+
+        room.type = room_type
+        room.view_type = form.view_type.data
         room.availability = form.availability.data
         room.rooms_available = form.rooms_available.data
         room.inclusion = form.inclusion.data
@@ -146,6 +162,44 @@ def update_room(hotel_id, room_id):
             form_field = getattr(form, f'{month}_rates')
             rates = {f'Day{i+1}': rate.data if rate.data is not None else 0 for i, rate in enumerate(form_field)}
             setattr(room, f'{month}_rates', rates)
+            flag_modified(room, f'{month}_rates')
+
+        # Handle date range pricing updates
+        start_date = request.form.get('start_date')
+        end_date = request.form.get('end_date')
+        weekday_price = request.form.get('weekday_price')
+        weekend_price = request.form.get('weekend_price')
+        
+        if start_date and end_date and weekday_price and weekend_price:
+            try:
+                start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+                end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+                weekday_price = float(weekday_price)
+                weekend_price = float(weekend_price)
+            except ValueError:
+                flash('Invalid date or price format', 'error')
+                return render_template('rooms/update_room.html', form=form, room=room)
+
+            if start_date > end_date:
+                flash('Start date must be before end date', 'error')
+                return render_template('rooms/update_room.html', form=form, room=room)
+        
+            current_date = start_date
+            while current_date <= end_date:
+                month_name = current_date.strftime('%B').lower() + '_rates'
+                day_of_month = f'Day{current_date.day}'
+                
+                month_rates = getattr(room, month_name)
+                
+                if current_date.weekday() < 4 or current_date.weekday() == 6:
+                    month_rates[day_of_month] = weekday_price
+                else:
+                    month_rates[day_of_month] = weekend_price
+                
+                setattr(room, month_name, month_rates)
+                flag_modified(room, month_name)
+                
+                current_date += timedelta(days=1)
 
         db.session.commit()
         flash('Room updated successfully', 'success')

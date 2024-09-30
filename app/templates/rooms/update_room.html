@@ -27,40 +27,52 @@
         <form method="post" class="space-y-6">
             {{ form.hidden_tag() }}
             
-            <div>
-                {{ form.type.label(class="block text-sm font-medium text-gray-700") }}
-                {{ form.type(class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
-                {% for error in form.type.errors %}
-                    <p class="mt-2 text-sm text-red-600">{{ error }}</p>
-                {% endfor %}
-            </div>
-
-            <div class="flex items-center">
-                <label for="availability" class="flex items-center cursor-pointer">
-                    <div class="relative">
-                        {{ form.availability(class="sr-only", id="availability") }}
-                        <div class="block bg-gray-300 w-14 h-8 rounded-full"></div>
-                        <div class="toggle-dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition-transform duration-300 ease-in-out"></div>
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div>
+                    {{ form.type.label(class="block text-sm font-medium text-gray-700") }}
+                    {{ form.type(class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", onchange="toggleOtherType()") }}
+                    {% for error in form.type.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+                    {% endfor %}
+                    <div id="other-type-container" class="mt-2 hidden">
+                        {{ form.other_type.label(class="block text-sm font-medium text-gray-700") }}
+                        {{ form.other_type(class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
                     </div>
-                    <div class="ml-3 text-sm font-medium text-gray-700">Availability</div>
-                </label>
+                </div>
+
+                <div>
+                    {{ form.view_type.label(class="block text-sm font-medium text-gray-700") }}
+                    {{ form.view_type(class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
+                    {% for error in form.view_type.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+                    {% endfor %}
+                </div>
             </div>
 
-            <div>
-                {{ form.rooms_available.label(class="block text-sm font-medium text-gray-700") }}
-                {{ form.rooms_available(class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
-                {% for error in form.rooms_available.errors %}
-                    <p class="mt-2 text-sm text-red-600">{{ error }}</p>
-                {% endfor %}
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-5">
+                <!-- Smaller availability field -->
+                <div class="sm:col-span-1">
+                    {{ form.availability.label(class="block text-sm font-medium text-gray-700") }}
+                    {{ form.availability(class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
+                </div>
+                <!-- Adjust rooms_available to take more space -->
+                <div class="sm:col-span-2">
+                    {{ form.rooms_available.label(class="block text-sm font-medium text-gray-700") }}
+                    {{ form.rooms_available(class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
+                    {% for error in form.rooms_available.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                <!-- Adjust inclusion to take more space -->
+                <div class="sm:col-span-2">
+                    {{ form.inclusion.label(class="block text-sm font-medium text-gray-700") }}
+                    {{ form.inclusion(class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
+                    {% for error in form.inclusion.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+                    {% endfor %}
+                </div>
             </div>
-
-            <div>
-                {{ form.inclusion.label(class="block text-sm font-medium text-gray-700") }}
-                {{ form.inclusion(class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
-                {% for error in form.inclusion.errors %}
-                    <p class="mt-2 text-sm text-red-600">{{ error }}</p>
-                {% endfor %}
-            </div>
+            
 
             <div>
                 {{ form.notes.label(class="block text-sm font-medium text-gray-700") }}
@@ -92,4 +104,21 @@
         </form>
     </div>
 </div>
+
+<script>
+function toggleOtherType() {
+    var typeSelect = document.getElementById('type');
+    var otherTypeContainer = document.getElementById('other-type-container');
+    if (typeSelect.value === 'Other') {
+        otherTypeContainer.classList.remove('hidden');
+    } else {
+        otherTypeContainer.classList.add('hidden');
+    }
+}
+
+// Call the function on page load to set the initial state
+document.addEventListener('DOMContentLoaded', function() {
+    toggleOtherType();
+});
+</script>
 {% endblock %}
