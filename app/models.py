@@ -1,7 +1,7 @@
 from datetime import datetime
 from app import db, login
 from flask_login import UserMixin
-from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, BigInteger, Numeric, DateTime, Text
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, BigInteger, Numeric, DateTime, Text, Date
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.sqlite import JSON
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -62,6 +62,13 @@ class User(UserMixin, db.Model):
         'Booking',
         back_populates='agent',
         foreign_keys='Booking.agent_id'
+    )
+
+    # Relationship to BookingRequest model
+    booking_requests = relationship(
+        'BookingRequest',  # This must match the table name BookingRequest
+        back_populates='agent',  # Ensure this matches the back_populates in BookingRequest
+        foreign_keys='BookingRequest.agent_id'
     )
 
     def set_password(self, password):
@@ -130,6 +137,30 @@ class Guest(db.Model):
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
+
+#Define Booking Requests
+class BookingRequest(db.Model):
+    __tablename__ = 'booking_request'
+
+    id = Column(Integer, primary_key=True)
+    hotel_name = Column(String(128), nullable=False)
+    room_type = Column(String(128), nullable=False)
+    check_in = Column(Date, nullable=False)
+    check_out = Column(Date, nullable=False)
+    guest_name = Column(String(128), nullable=True)
+    status = Column(Boolean, default=False)
+    agent_id = Column(Integer, ForeignKey('users.id'), nullable=True)
+
+    # Relationships
+    agent = relationship(
+        'User',  # This must match the User model
+        back_populates='booking_requests',  # This must match the back_populates in User model
+        foreign_keys=[agent_id]
+    )
+
+    def __repr__(self):
+        return f"<BookingRequest {self.hotel_name}, {self.room_type}, {self.check_in} - {self.check_out}>"
+
 
 # Define the Hotel model
 class Hotel(db.Model):

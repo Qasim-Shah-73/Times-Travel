@@ -73,12 +73,22 @@
 {% block title %}Hotel Results{% endblock %}
 {% block content %}
 <div class="container mx-auto">
-    <h1 class="text-4xl font-bold text-blue-700 my-8 text-left">
-        {{ hotels|length }} Available Hotels in {{ location }}
-        <span class="block text-lg font-medium text-gray-600 mt-2">
-            Check-in: {{ check_in }} | Check-out: {{ check_out }} | Total Nights: {{ nights }}
-        </span>
-    </h1>    
+    <div class="flex items-center justify-between my-8">
+        <!-- Heading on the left -->
+        <h1 class="text-4xl font-bold text-blue-700">
+            {{ hotels|length }} Available Hotels in {{ location }}
+            <span class="block text-lg font-medium text-gray-600 mt-2">
+                Check-in: {{ check_in }} | Check-out: {{ check_out }} | Total Nights: {{ nights }}
+            </span>
+        </h1>
+    
+        <!-- Button on the right -->
+        <button id="requestBookingBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+            Request Booking
+        </button>
+    </div>
+    
+
     {% if hotels %}
         {% for hotel in hotels %}
         <div class="hotel-container">
@@ -107,8 +117,8 @@
                         {% for room in hotel.rooms %}
                             {% if room.approval == 'super_admin' and room.availability and room.rooms_available > 0 %}
                                 <div class="room-info">
-                                    <h3 style="text-align: left;"><strong>{{ room.type }}</strong></h3>
-                                    <p style="text-align: left;"><strong>Price:</strong> {{ room.total_price }} (SAR)</p>
+                                    <h3 style="text-align: left;"><strong>{{ room.type }} with {{ room.view_type }} View</strong></h3>
+                                    <p style="text-align: left;"><strong>Price:</strong> {{ room.total_price | int }} (SAR)</p>
                                     <p style="text-align: left;"><strong>Inclusion:</strong> {{ room.inclusion }}</p>
                                     <p style="text-align: left;"><strong>Notes:</strong> {{ room.notes }}</p>
                                     <form action="{{ url_for('booking.booking_form', hotel_id=hotel.id, room_id=room.id) }}" method="GET" style="text-align: left;">
@@ -131,6 +141,38 @@
         {% endfor %}
     {% else %}
         <p class="text-left text-gray-600 mt-8">No hotels available for the selected location and dates.</p>
+        
+        <!-- The Modal -->
+        <div id="bookingModal" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center">
+            <div class="bg-white rounded-lg p-8 shadow-lg w-1/3">
+                <div class="mb-4">
+                    <h2 class="text-2xl font-bold mb-2">Request a Booking</h2>
+                    <p>Please fill in the details below and submit a booking request.</p>
+                </div>
+                <form action="{{ url_for('booking.booking_requests') }}" method="POST">
+                    <div class="mb-4">
+                        <label for="hotel_name" class="block text-left font-semibold">Hotel Name:</label>
+                        <input type="text" name="hotel_name" id="hotel_name" class="w-full border rounded p-2" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="room_type" class="block text-left font-semibold">Room Type:</label>
+                        <input type="text" name="room_type" id="room_type" class="w-full border rounded p-2" required>
+                    </div>
+                    <input type="hidden" name="check_in" value="{{ check_in }}">
+                    <input type="hidden" name="check_out" value="{{ check_out }}">
+
+                    <div class="mb-4">
+                        <label for="guestName" class="block text-left font-semibold">Guest Name (Optional):</label>
+                        <input type="text" name="guest_name" id="guestName" class="w-full border rounded p-2">
+                    </div>
+
+                    <div class="flex justify-between">
+                        <button type="button" class="view-rooms-btn" onclick="closeModal()">Cancel</button>
+                        <button type="submit" class="book-now-btn">Submit Request</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     {% endif %}
 </div>
 
@@ -138,6 +180,15 @@
     function toggleRoomDetails(hotelId) {
         var roomDetails = document.getElementById("room-details-" + hotelId);
         roomDetails.style.display = roomDetails.style.display === "none" ? "block" : "none";
+    }
+    // Open the modal when the button is clicked
+    document.getElementById("requestBookingBtn").addEventListener("click", function() {
+        document.getElementById("bookingModal").classList.remove("hidden");
+    });
+
+    // Close the modal
+    function closeModal() {
+        document.getElementById("bookingModal").classList.add("hidden");
     }
 </script>
 {% endblock %}

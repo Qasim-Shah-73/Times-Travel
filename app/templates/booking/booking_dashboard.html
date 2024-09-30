@@ -120,6 +120,11 @@
                     Download Bookings
                 </button>
             </div>
+            <div class="flex items-center space-x-4 ml-12">
+                <button onclick="view_booking_requests()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-3 rounded">
+                    View Bookings Requests
+                </button>
+            </div>
         </div>
 
         <!-- Booking Table -->
@@ -699,6 +704,17 @@
             for (const [key, value] of params.entries()) {
                 exportUrl.searchParams.append(key, value);
             }
+
+            // Redirect to the export URL to download the CSV
+            window.location.href = exportUrl;
+        }
+
+        function view_booking_requests() {
+            // Create a new URL object based on the current URL
+            const url = new URL(window.location.href);
+
+            // Create a new URL object for the export request
+            const exportUrl = new URL('/view_booking_requests', window.location.origin);
 
             // Redirect to the export URL to download the CSV
             window.location.href = exportUrl;

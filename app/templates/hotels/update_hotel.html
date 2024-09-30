@@ -1,68 +1,75 @@
 {% extends 'base.html' %}
 
+{% block title %}Update Hotel{% endblock %}
+
 {% block content %}
-<div class="max-w-md mx-auto my-8 bg-white rounded-lg shadow-md p-8">
-    <h2 class="text-3xl font-bold mb-6 text-center text-gray-800">Update Hotel</h2>
-    <form method="post" enctype="multipart/form-data">  <!-- Add enctype here -->
-        {{ form.hidden_tag() }}
-        <div class="mb-4">
-            {{ form.name.label(class="block text-gray-700 font-bold mb-2") }}
-            {{ form.name(size=32, class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
-            {% for error in form.name.errors %}
-            <span class="text-red-500">{{ error }}</span>
-            {% endfor %}
-        </div>
-        <div class="mb-4">
-            {{ form.description.label(class="block text-gray-700 font-bold mb-2") }}
-            {{ form.description(class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
-            {% for error in form.description.errors %}
-            <span class="text-red-500">{{ error }}</span>
-            {% endfor %}
-        </div>
-        <div class="mb-4">
-            {{ form.location.label(class="block text-gray-700 font-bold mb-2") }}
-            {{ form.location(class_="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
-            {% for error in form.location.errors %}
-            <span class="text-red-500">{{ error }}</span>
-            {% endfor %}
-        </div>
-        <div class="mb-4">
-            {{ form.stars.label(class="block text-gray-700 font-bold mb-2") }}
-            {{ form.stars(class_="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline", min=1, max=5) }}
-            {% for error in form.stars.errors %}
-            <span class="text-red-500">{{ error }}</span>
-            {% endfor %}
-        </div>
-        <div class="mb-4">
-            {{ form.image.label(class="block text-gray-700 font-bold mb-2") }}  <!-- Image label -->
-            {{ form.image(class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}  <!-- Image input -->
-            {% for error in form.image.errors %}
-            <span class="text-red-500">{{ error }}</span>
-            {% endfor %}
-        </div>
-        <div class="mb-4">
-            {{ form.vendor_id.label(class="block text-gray-700 font-bold mb-2") }}  <!-- Vendor label -->
-            {{ form.vendor_id(class_="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}  <!-- Vendor dropdown -->
-            {% for error in form.vendor_id.errors %}
-            <span class="text-red-500">{{ error }}</span>
-            {% endfor %}
-        </div>
-        <div class="mb-6">
-            <h3 class="text-xl font-bold mb-2">Availability:</h3>
-            <div class="grid grid-cols-2 gap-4">
-                {% for field in form.availability %}
-                <div class="flex items-center">
-                    {% if field.label.text != 'CSRF Token' %}
-                    <label class="inline-block text-gray-700 font-bold mr-2">{{ field.label }}</label>
-                    {% endif %}
-                    {{ field(class="form-checkbox h-5 w-5 text-indigo-600") }}
-                </div>
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+    <div class="bg-white shadow-lg rounded-lg p-8 border border-gray-200">
+        <h1 class="text-3xl font-bold mb-6 text-indigo-800">Update Hotel</h1>
+        <form method="POST" enctype="multipart/form-data" class="space-y-6">
+            {{ form.hidden_tag() }}
+            {% for field in form.errors %}
+                {% for error in form.errors[field] %}
+                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded-r-md" role="alert">
+                        <p class="font-bold">Error in {{ field }}:</p>
+                        <p>{{ error }}</p>
+                    </div>
                 {% endfor %}
+            {% endfor %}
+
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div>
+                    {{ form.name.label(class="block text-sm font-medium text-gray-700") }}
+                    {{ form.name(class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border") }}
+                </div>
+
+                <div>
+                    {{ form.location.label(class="block text-sm font-medium text-gray-700") }}
+                    {{ form.location(class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
+                </div>
             </div>
-        </div>
-        <div class="text-center">
-            {{ form.submit(class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-200") }}
-        </div>
-    </form>
+
+            <div>
+                {{ form.description.label(class="block text-sm font-medium text-gray-700") }}
+                {{ form.description(class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm h-24") }}
+            </div>
+
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div>
+                    {{ form.stars.label(class="block text-sm font-medium text-gray-700") }}
+                    {{ form.stars(class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", min=1, max=5) }}
+                </div>
+
+                <div>
+                    {{ form.vendor_id.label(class="block text-sm font-medium text-gray-700") }}
+                    {{ form.vendor_id(class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
+                </div>
+            </div>
+
+            <div>
+                {{ form.image.label(class="block text-sm font-medium text-gray-700") }}
+                {{ form.image(class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md") }}
+            </div>
+
+            <div class="mt-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Availability</h3>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    {% for field in form.availability %}
+                    <div class="flex items-center">
+                        {% if field.label.text != 'CSRF Token' %}
+                        {{ field(class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded") }}
+                        <label for="{{ field.id }}" class="ml-2 block text-sm text-gray-900">{{ field.label.text }}</label>
+                    {% endif %}
+
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mt-8">
+                {{ form.submit(class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out") }}
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}

@@ -3,7 +3,7 @@ from io import StringIO, BytesIO
 import csv
 from flask_login import login_required
 from app import db
-from app.models import User, Hotel, Room, Agency, Booking, Guest, User, Invoice
+from app.models import User, Hotel, Room, Agency, Booking, Guest, User, Invoice, BookingRequest
 from app.decorators import roles_required
 from datetime import datetime, timedelta
 from flask_login import current_user
@@ -82,6 +82,87 @@ def search_hotels():
                            check_out=check_out_dt,
                            location=location,
                            nights=diff_days)
+
+@booking_bp.route('/booking_requests', methods=['POST'])
+@login_required
+def booking_requests():
+    try:
+        # Get user inputs
+        hotel_name = request.form.get('hotel_name')
+        room_type = request.form.get('room_type')
+        guest_name = request.form.get('guest_name', None)  # Optional field
+        check_in_date = request.form.get('check_in')
+        check_out_date = request.form.get('check_out')
+        
+        # Validate required inputs
+        if not hotel_name or not room_type or not check_in_date or not check_out_date:
+            flash("Missing required fields. Please fill in all required information.", "danger")
+            return redirect(url_for('auth.index'))
+
+        # Convert check-in and check-out dates to Python date objects
+        check_in_date = datetime.strptime(check_in_date, '%d-%m-%Y').date()
+        check_out_date = datetime.strptime(check_out_date, '%d-%m-%Y').date()
+
+        # Create the new booking request
+        new_request = BookingRequest(
+            hotel_name=hotel_name,
+            room_type=room_type,
+            check_in=check_in_date,
+            check_out=check_out_date,
+            guest_name=guest_name if guest_name else 'N/A',
+            agent_id = current_user.id 
+        )
+
+        # Add and commit the request to the database
+        db.session.add(new_request)
+        db.session.commit()
+
+        # Log the successful booking request
+        flash(f"Booking request submitted for {hotel_name} - Room: {room_type} by {current_user.username}", "success")
+    except Exception as e:
+        # Log the error
+        flash(f"Error while submitting booking request: {e}")
+        db.session.rollback()
+        flash("An error occurred while processing your request. Please try again.", "danger")
+    
+    return redirect(url_for('auth.index'))
+
+@booking_bp.route('/view_booking_requests', methods=['GET'])
+@login_required
+@roles_required('super_admin', 'admin')
+def view_booking_requests():
+    requests = BookingRequest.query.all()
+    return render_template('booking/view_booking_requests.html', requests=requests)
+    
+
+@booking_bp.route('/update_reservation/<int:request_id>', methods=['POST'])
+@login_required
+@roles_required('super_admin', 'admin')
+def update_reservation(request_id):
+    # Fetch the booking request from the database
+    booking_request = BookingRequest.query.get_or_404(request_id)
+
+    # Parse JSON data from the request body
+    data = request.get_json()
+
+    # Extract status and price from the incoming request data
+    status = data.get('status')
+    price = data.get('price', None) 
+
+    # Update the booking request status and price if applicable
+    if status == 'approved':
+        booking_request.status = True
+    elif status == 'rejected':
+        booking_request.status = False
+
+    # Commit changes to the database
+    try:
+        db.session.commit()
+        flash('Status updated successfully for booking request')
+        return jsonify({'message': f'Request {status} successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
 
 def is_month_available(hotel, check_in_month):
     """
