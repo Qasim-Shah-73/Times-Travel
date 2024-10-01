@@ -9,7 +9,8 @@ from datetime import datetime, timedelta
 from flask_login import current_user
 from sqlalchemy import func
 from decimal import Decimal
-from app.email import send_tentative_email, send_confirmation_email, send_invoice_paid_email, send_invoice_email, send_tcn_confirmation_email
+from app.email import send_tentative_email, send_confirmation_email, send_invoice_paid_email, send_invoice_email, \
+                        send_tcn_confirmation_email, send_booking_reservation_status
 
 booking_bp = Blueprint('booking', __name__)
 
@@ -152,13 +153,33 @@ def update_reservation(request_id):
     # Update the booking request status and price if applicable
     if status == 'approved':
         booking_request.status = True
+        send_booking_reservation_status(
+                to=booking_request.agent.email,
+                recipient_name=booking_request.agent.username,
+                agency_name=booking_request.agent.agency.name,
+                check_in=booking_request.check_in.strftime('%d-%m-%Y'),
+                check_out=booking_request.check_out.strftime('%d-%m-%Y'),
+                hotel_name=booking_request.hotel_name,
+                room_type=booking_request.room_type,
+                price=price, 
+                status= booking_request.status)
     elif status == 'rejected':
         booking_request.status = False
+        send_booking_reservation_status(
+                to=booking_request.agent.email,
+                recipient_name=booking_request.agent.username,
+                agency_name=booking_request.agent.agency.name,
+                check_in=booking_request.check_in.strftime('%d-%m-%Y'),
+                check_out=booking_request.check_out.strftime('%d-%m-%Y'),
+                hotel_name=booking_request.hotel_name,
+                room_type=booking_request.room_type,
+                price=price, 
+                status= booking_request.status)
 
     # Commit changes to the database
     try:
         db.session.commit()
-        flash('Status updated successfully for booking request')
+        flash('Status updated successfully for booking request','success')
         return jsonify({'message': f'Request {status} successfully'}), 200
     except Exception as e:
         db.session.rollback()

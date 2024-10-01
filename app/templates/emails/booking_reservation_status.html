@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Request Status</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        h1 {
+            color: #3490dc;
+            font-size: 24px;
+        }
+        p {
+            margin: 15px 0;
+        }
+        .status {
+            font-weight: bold;
+            color: {% if status %}#28a745{% else %}#dc3545{% endif %};
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #777;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Booking Request Status</h1>
+        <p>Dear {{ recipient_name }},</p>
+        <p>We are writing to inform you about the status of your booking request for the following details:</p>
+        <ul>
+            <li><strong>Agency:</strong> {{ agency_name }}</li>
+            <li><strong>Hotel:</strong> {{ hotel_name }}</li>
+            <li><strong>Room Type:</strong> {{ room_type }}</li>
+            <li><strong>Check-in Date:</strong> {{ check_in }}</li>
+            <li><strong>Check-out Date:</strong> {{ check_out }}</li>
+        </ul>
+
+        {% if status %}
+            <p class="status">Status: Accepted</p>
+            {% if price %}
+                <p>The approved price for this booking is <strong>{{ price }}</strong>.</p>
+            {% endif %}
+            <p>Your booking request has been accepted. You can now proceed with the necessary arrangements via our system. If you have any questions, feel free to reach out to us.</p>
+        {% else %}
+            <p class="status">Status: Rejected</p>
+            <p>Unfortunately, we could not process your booking request at this time. Please contact us if you need further assistance or wish to discuss alternative options.</p>
+        {% endif %}
+
+        <p>If you have any questions, please contact Times Travel at <strong>+44 0208 089 5000</strong>.</p>
+
+        <p>Best regards,</p>
+        <p>The Times Travel Team</p>
+
+        <div class="footer">
+            <p>© {{ agency_name }}. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
