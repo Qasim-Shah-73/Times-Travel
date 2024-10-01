@@ -45,7 +45,7 @@ def update_hotel(hotel_id):
     form = UpdateHotelForm(obj=hotel)
     form.vendor_id.choices = [(v.id, v.name) for v in Vendor.query.all()] 
     
-    if form.validate_on_submit():
+    if request.method == 'POST':
         if form.image.data:
             if hotel.image:
                 delete_image(hotel.image)

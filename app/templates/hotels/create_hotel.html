@@ -1,74 +1,102 @@
-{% extends "base.html" %}
-{% block title %}Create Hotel{% endblock %}
-
-{% block content %}
-<div class="container mx-auto px-4 py-8 max-w-4xl">
-    <div class="bg-white shadow-lg rounded-lg p-8 border border-gray-200">
-        <h1 class="text-3xl font-bold mb-6 text-indigo-800">Create New Hotel</h1>
-        <form method="POST" enctype="multipart/form-data" class="space-y-6">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Hotel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="max-w-lg w-full bg-white rounded-lg shadow-md p-8 space-y-6">
+        <h1 class="text-4xl font-bold text-center text-gray-800">Create Hotel</h1>
+        <form method="POST" enctype="multipart/form-data">
             {{ form.hidden_tag() }}
-            {% for field in form.errors %}
-                {% for error in form.errors[field] %}
-                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded-r-md" role="alert">
-                        <p class="font-bold">Error in {{ field }}:</p>
-                        <p>{{ error }}</p>
-                    </div>
+            
+            <!-- Name Field -->
+            <div>
+                {{ form.name.label(class="block text-gray-700 font-semibold mb-2") }}
+                {{ form.name(class="shadow border border-gray-300 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-indigo-500 transition duration-200") }}
+                {% for error in form.name.errors %}
+                    <span class="text-red-500 text-sm">{{ error }}</span>
                 {% endfor %}
-            {% endfor %}
-
-            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                <div>
-                    {{ form.name.label(class="block text-sm font-medium text-gray-700") }}
-                    {{ form.name(class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border") }}
-                </div>
-
-                <div>
-                    {{ form.location.label(class="block text-sm font-medium text-gray-700") }}
-                    {{ form.location(class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
-                </div>
             </div>
-
+            
+            <!-- Description Field -->
             <div>
-                {{ form.description.label(class="block text-sm font-medium text-gray-700") }}
-                {{ form.description(class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm h-24") }}
+                {{ form.description.label(class="block text-gray-700 font-semibold mb-2") }}
+                {{ form.description(class="shadow border border-gray-300 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-indigo-500 transition duration-200", rows=4) }}
+                {% for error in form.description.errors %}
+                    <span class="text-red-500 text-sm">{{ error }}</span>
+                {% endfor %}
             </div>
 
-            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                <div>
-                    <label for="{{ form.stars.id }}" class="block text-sm font-medium text-gray-700">Stars</label>
-                    {{ form.stars(class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", min=1, max=5) }}
-                </div>
-
-                <div>
-                    {{ form.vendor_id.label(class="block text-sm font-medium text-gray-700") }}
-                    {{ form.vendor_id(class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
-                </div>
-            </div>
-
+            <!-- Location Field -->
             <div>
-                {{ form.image.label(class="block text-sm font-medium text-gray-700") }}
-                {{ form.image(class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md") }}
+                {{ form.location.label(class="block text-gray-700 font-semibold mb-2") }}
+                {{ form.location(class="shadow border border-gray-300 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-indigo-500 transition duration-200") }}
+                {% for error in form.location.errors %}
+                    <span class="text-red-500 text-sm">{{ error }}</span>
+                {% endfor %}
             </div>
 
-            <div class="mt-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Availability</h3>
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <!-- Stars Field -->
+            <div>
+                {{ form.stars.label(class="block text-gray-700 font-semibold mb-2") }}
+                {{ form.stars(class="shadow border border-gray-300 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-indigo-500 transition duration-200") }}
+                {% for error in form.stars.errors %}
+                    <span class="text-red-500 text-sm">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <!-- Image Upload Field -->
+            <div>
+                {{ form.image.label(class="block text-gray-700 font-semibold mb-2") }}
+                {{ form.image(class="shadow border border-gray-300 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-indigo-500 transition duration-200") }}
+                {% for error in form.image.errors %}
+                    <span class="text-red-500 text-sm">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <!-- Vendor Dropdown -->
+            <div>
+                {{ form.vendor_id.label(class="block text-gray-700 font-semibold mb-2") }}
+                {{ form.vendor_id(class="shadow border border-gray-300 rounded-md w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-indigo-500 transition duration-200") }}
+                {% for error in form.vendor_id.errors %}
+                    <span class="text-red-500 text-sm">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <!-- Availability Section -->
+            <div>
+                <h3 class="text-xl font-bold mb-2">Availability:</h3>
+                <div class="grid grid-cols-2 gap-4">
                     {% for field in form.availability %}
-                    <div class="flex items-center">
-                        {% if field.label.text != 'CSRF Token' %}
-                        {{ field(class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded") }}
-                        <label for="{{ field.id }}" class="ml-2 block text-sm text-gray-900">{{ field.label.text }}</label>
-                        {% endif %}
-
-                    </div>
+                        <div class="flex items-center">
+                            {% if field.label.text != 'CSRF Token' %}
+                                <label class="inline-block text-gray-700 font-semibold mr-2">{{ field.label }}</label>
+                            {% endif %}
+                            {{ field(class="form-checkbox h-5 w-5 text-indigo-600") }}
+                        </div>
                     {% endfor %}
                 </div>
             </div>
 
-            <div class="mt-8">
-                {{ form.submit(class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out") }}
+            <!-- Submit Button -->
+            <div class="text-center">
+                {{ form.submit(class="w-full bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-3 rounded focus:outline-none focus:shadow-outline transition-colors duration-200") }}
             </div>
         </form>
     </div>
-</div>
-{% endblock %}
+</body>
+</html>
