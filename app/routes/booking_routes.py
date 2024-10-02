@@ -670,6 +670,13 @@ def download_booking_details(booking_id):
     # Create a CSV file in memory using StringIO
     output = StringIO()
     writer = csv.writer(output)
+    
+    # Format dates to 'd-m-Y'
+    check_in_date = booking.check_in
+    check_out_date = booking.check_out
+    
+    # Calculate price for each room in available hotels
+    diff_days = (check_out_date - check_in_date).days  # Calculate the number of nights
 
     # Write the headers
     writer.writerow(['Field', 'Value'])
@@ -678,8 +685,9 @@ def download_booking_details(booking_id):
     writer.writerow(['Booking ID', booking.id])
     writer.writerow(['Agency', booking.agency.name if booking.agency else 'N/A'])
     writer.writerow(['Hotel Name', booking.hotel_name])
-    writer.writerow(['Check-In', booking.check_in.strftime('%d-%m-%Y')])
-    writer.writerow(['Check-Out', booking.check_out.strftime('%d-%m-%Y')])
+    writer.writerow(['Check-In', check_in_date.strftime('%d-%m-%Y')])
+    writer.writerow(['Check-Out', check_out_date.strftime('%d-%m-%Y')])
+    writer.writerow(['NIghts', diff_days])
     writer.writerow(['Room Type', booking.room_type or 'N/A'])
     writer.writerow(['Selling Price', booking.selling_price])
     writer.writerow(['Buying Price', booking.buying_price])
@@ -728,15 +736,20 @@ def export_bookings():
     # Generate CSV
     output = StringIO()
     writer = csv.writer(output)
-    writer.writerow(['ID', 'Hotel Name', 'Room Type', 'Check-In Date', 'Check-Out Date', 'Selling Price', 'Buying Price', 'Vendor', 'Agent Name','Times Confirmation Number', 'Confirmation Number', 'Booking Confirmed', 'Invoice Paid'])
+    writer.writerow(['ID', 'Hotel Name', 'Room Type', 'Check-In Date', 'Check-Out Date','Nights' ,'Selling Price', 'Buying Price', 'Vendor', 'Agent Name','Times Confirmation Number', 'Confirmation Number', 'Booking Confirmed', 'Invoice Paid'])
 
     for booking in bookings:
+        check_in_date = booking.check_in
+        check_out_date = booking.check_out
+        # Calculate price for each room in available hotels
+        diff_days = (check_out_date - check_in_date).days  # Calculate the number of nights
         writer.writerow([
             booking.id,
             booking.hotel_name,
             booking.room_type or 'N/A',
-            booking.check_in.strftime('%d-%m-%Y'),
-            booking.check_out.strftime('%d-%m-%Y'),
+            check_in_date.strftime('%d-%m-%Y'),
+            check_out_date.strftime('%d-%m-%Y'),
+            diff_days,
             booking.selling_price,
             booking.buying_price,
             booking.hotel.vendor.name if booking.hotel and booking.hotel.vendor else 'N/A',
