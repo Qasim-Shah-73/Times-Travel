@@ -150,6 +150,7 @@ class BookingRequest(db.Model):
     check_out = Column(Date, nullable=False)
     guest_name = Column(String(128), nullable=True)
     status = Column(Boolean, default=False)
+    view_status = Column(Boolean, default=False)
     agent_id = Column(Integer, ForeignKey('users.id'), nullable=True)
 
     # Relationships

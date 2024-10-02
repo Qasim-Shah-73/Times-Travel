@@ -18,7 +18,22 @@
                     }
                 }
             }
-        }          
+        }  
+        function fetchBookingRequestCount() {
+            fetch('/booking_requests/count')
+                .then(response => response.json())
+                .then(data => {
+                    const countElement = document.getElementById('booking-request-count');
+                    countElement.textContent = data.count;
+                    countElement.style.display = data.count > 0 ? 'flex' : 'none';  // Hide badge if count is 0
+                })
+                .catch(error => console.error('Error fetching booking request count:', error));
+        }
+    
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchBookingRequestCount();
+            setInterval(fetchBookingRequestCount, 30000); // Update every 30 seconds
+        });        
     </script>
     <style>
         body {
@@ -48,6 +63,21 @@
             max-width: 500px;
             border-radius: 8px;
         }
+        #booking-request-count {
+            position: absolute;
+            top: -8px;  /* Adjust the position to your preference */
+            right: -8px;  /* Adjust the position to your preference */
+            width: 24px;  /* Set the width of the badge */
+            height: 24px; /* Set the height of the badge */
+            background-color: #f44336; /* Red background */
+            color: white;  /* White text */
+            border-radius: 50%;  /* Makes it circular */
+            text-align: center;  /* Centers the text */
+            line-height: 24px;  /* Centers the text vertically */
+            font-size: 12px;  /* Font size */
+            font-weight: bold; /* Make the text bold */
+        }
+        
     </style>
 </head>
 <body class="bg-primary-100">
@@ -118,9 +148,12 @@
                     Download Bookings
                 </button>
             </div>
-            <div class="flex items-center space-x-4 ml-12">
+            <div class="flex items-center space-x-4 ml-12 relative">
+                <div id="booking-request-count" class="absolute top-0 right-0 w-6 h-6 bg-red-600 text-white text-xs rounded-full flex items-center justify-center">
+                    0  <!-- Initial count can be set to 0 -->
+                </div>
                 <button onclick="view_booking_requests()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-3 rounded">
-                    View Bookings Requests
+                    View Booking Requests
                 </button>
             </div>
         </div>
@@ -724,6 +757,19 @@
             // Redirect to the export URL to download the CSV
             window.location.href = exportUrl;
         }
+        
+        function fetchBookingRequestCount() {
+            fetch('/booking_requests/count')
+                .then(response => response.json())
+                .then(data => {
+                    const countElement = document.getElementById('booking-request-count');
+                    countElement.textContent = data.count;  // Update the count in the DOM
+                })
+                .catch(error => console.error('Error fetching booking request count:', error));
+        }
+        
+        // Call the function when the page loads
+        document.addEventListener('DOMContentLoaded', fetchBookingRequestCount);
         
     </script>
 </body>
