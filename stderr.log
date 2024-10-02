@@ -20572,3 +20572,949 @@ Traceback (most recent call last):
   File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
     "Could not parse SQLAlchemy URL from string '%s'" % name
 sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 11, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 11, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 11, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 11, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 11, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 11, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 11, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 11, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 11, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 11, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 11, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 11, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 11, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 11, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 11, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 11, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 11, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 11, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 11, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 11, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 11, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 11, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 11, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 11, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 11, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 13, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 13, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 13, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 11, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 13, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 13, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 13, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 13, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 13, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 13, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 13, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 13, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 13, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 13, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 13, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 13, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 13, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''Traceback (most recent call last):
+  File "/home/booksaud/repositories/Times-Travel/passenger_wsgi.py", line 8, in <module>
+    wsgi = imp.load_source('wsgi', 'wsgi.py')
+  File "/opt/alt/python37/lib64/python3.7/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 696, in _load
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "wsgi.py", line 13, in <module>
+    app = create_app()
+  File "/home/booksaud/repositories/Times-Travel/app/__init__.py", line 18, in create_app
+    db.init_app(app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 328, in init_app
+    self._apply_driver_defaults(options, app)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib/python3.7/site-packages/flask_sqlalchemy/extension.py", line 559, in _apply_driver_defaults
+    url = sa.engine.make_url(options["url"])
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 842, in make_url
+    return _parse_url(name_or_url)
+  File "/home/booksaud/virtualenv/repositories/Times-Travel/3.7/lib64/python3.7/site-packages/sqlalchemy/engine/url.py", line 909, in _parse_url
+    "Could not parse SQLAlchemy URL from string '%s'" % name
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from string ''mysql+pymysql://booksaud_qasim:Anthonian567#@localhost/booksaud_times_db''
+
