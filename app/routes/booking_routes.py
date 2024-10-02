@@ -407,7 +407,7 @@ def apply_filters_and_sorting(query):
 
 @booking_bp.route('/bookings', methods=['GET', 'POST'])
 @login_required
-@roles_required('super_admin', 'admin', 'agency_admin')
+@roles_required('super_admin', 'admin')
 def view_bookings():
     query = Booking.query
     query = apply_filters_and_sorting(query)
@@ -415,8 +415,6 @@ def view_bookings():
     # Apply role-based filtering
     if current_user.role == 'super_admin':
         bookings = query.all()
-    elif current_user.role == 'agency_admin':
-        bookings = query.filter_by(agency_id=current_user.agency_id).all()
     elif current_user.role == 'admin':
         bookings = query.filter_by(invoice_paid=False).all()
 
@@ -431,7 +429,7 @@ def view_bookings():
     
 @booking_bp.route('/update_confirmation', methods=['POST'])
 @login_required
-@roles_required('super_admin', 'admin', 'agency_admin')
+@roles_required('super_admin', 'admin')
 def update_confirmation():
     booking_id = request.form.get('booking_id')
     confirmation_number = request.form.get('confirmation_number')
@@ -477,7 +475,7 @@ def update_confirmation():
 
 @booking_bp.route('/update_times_confirmation', methods=['POST'])
 @login_required
-@roles_required('super_admin', 'admin', 'agency_admin')
+@roles_required('super_admin', 'admin')
 def update_times_confirmation():
     booking_id = request.form.get('booking_id')
     times_confirmation_number = request.form.get('times_confirmation_number')
@@ -557,7 +555,7 @@ def update_times_confirmation():
 
 @booking_bp.route('/update_invoice', methods=['POST'])
 @login_required
-@roles_required('super_admin', 'admin', 'agency_admin')
+@roles_required('super_admin', 'admin')
 def update_invoice():
     booking_id = request.form.get('booking_id')
     payment_date_str = request.form.get('payment_date')
@@ -649,7 +647,7 @@ def vendor_paid():
 
 @booking_bp.route('/get_booking_details/<int:booking_id>', methods=['GET'])
 @login_required
-@roles_required('super_admin', 'admin', 'agency_admin')
+@roles_required('super_admin', 'admin')
 def get_booking_details(booking_id):
     print(f"Received request for booking ID: {booking_id}")  # Debugging line
     try:
@@ -663,7 +661,7 @@ def get_booking_details(booking_id):
 
 @booking_bp.route('/download_booking_details/<int:booking_id>', methods=['GET'])
 @login_required
-@roles_required('super_admin', 'admin', 'agency_admin')
+@roles_required('super_admin', 'admin')
 def download_booking_details(booking_id):
     booking = Booking.query.get_or_404(booking_id)
 
@@ -728,8 +726,6 @@ def export_bookings():
     # Apply role-based filtering
     if current_user.role == 'super_admin':
         bookings = query.all()
-    elif current_user.role == 'agency_admin':
-        bookings = query.filter_by(agency_id=current_user.agency_id).all()
     elif current_user.role == 'admin':
         bookings = query.filter_by(invoice_paid=False).all()
 
