@@ -74,9 +74,7 @@
                                     <a href="{{ url_for('agency.view_agencies') }}" class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">View Agencies</a>
                                     <a href="{{ url_for('vendor.view_vendors') }}" class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">View Vendors</a>
                                 {% elif current_user.role == 'super_admin' or current_user.role == 'agency_admin' %}
-                                    <a href="{{ url_for('booking.view_bookings') }}" class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">Bookings Dashboard</a>
                                     <a href="{{ url_for('agency.agencies_dashboard') }}" class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">Agencies Dashboard</a>
-                                    <a href="{{ url_for('agency.view_agencies') }}" class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">View Agencies</a>
                                 {% endif %}
                                 <a href="{{ url_for('auth.logout') }}" class="text-blue-600 hover:text-blue-900 px-3 py-2 rounded-md text-sm font-medium">Logout</a>
                             {% else %}
@@ -289,6 +287,11 @@
                     <label for="buying_price" class="block text-sm font-medium text-gray-700">Buying Price</label>
                     <input type="number" id="buying_price" name="buying_price" class="border rounded-md px-4 py-2 w-full" required>
                 </div>
+
+                <div class="mb-4">
+                    <label for="discount" class="block text-sm font-medium text-gray-700">Discount</label>
+                    <input type="number" id="discount" name="discount" class="border rounded-md px-4 py-2 w-full">
+                </div>
                 
                 <!-- Times Confirmed Selection -->
                 <div class="mb-4">
@@ -473,13 +476,15 @@
             const timesConNumber = $('#times_con_number').val();
             const remarks = $('#remarks').val();
             const buying_price = $('#buying_price').val();
+            const discount = $('#discount').val();
 
             const data = {
                 booking_id: bookingId,
                 times_confirmed: timesConfirmed,
                 times_confirmation_number: timesConfirmed === 'true' ? timesConNumber : '',
                 remarks: timesConfirmed === 'false' ? remarks : '',
-                buying_price: buying_price || ''
+                buying_price: buying_price || '0',
+                discount: discount || '0'
             };            
 
             $.ajax({

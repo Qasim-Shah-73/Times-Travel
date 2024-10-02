@@ -103,6 +103,7 @@ class Booking(db.Model):
     payment_number = Column(String(64), unique=True, nullable=True)
     selling_price = Column(Numeric(precision=12, scale=2), nullable=True)
     buying_price = Column(Numeric(precision=12, scale=2), nullable=True)
+    discount = Column(Numeric(precision=12, scale=2), nullable=True)
     special_requests = Column(String(128), nullable=True)
     remarks = Column(Text, nullable=True)
 

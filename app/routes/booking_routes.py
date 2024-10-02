@@ -482,6 +482,7 @@ def update_times_confirmation():
     times_confirmed = request.form.get('times_confirmed') == 'true'
     remarks = request.form.get('remarks')
     buying_price = request.form.get('buying_price')
+    discount = request.form.get('discount') 
 
     if not booking_id:
         return jsonify({'status': 'error', 'message': 'Booking ID is required'}), 400
@@ -502,6 +503,10 @@ def update_times_confirmation():
 
     if buying_price:
             booking.buying_price = buying_price
+            
+    if discount:
+        booking.discount = Decimal(discount)
+        booking.selling_price -= Decimal(discount) 
             
     room = booking.room
     guests = booking.guests if booking.guests else []
@@ -688,11 +693,13 @@ def download_booking_details(booking_id):
     writer.writerow(['NIghts', diff_days])
     writer.writerow(['Room Type', booking.room_type or 'N/A'])
     writer.writerow(['Selling Price', booking.selling_price])
+    writer.writerow(['Discount', booking.discount])
     writer.writerow(['Buying Price', booking.buying_price])
     writer.writerow(['Special Requests', booking.special_requests])
     writer.writerow(['Vendor', booking.hotel.vendor.name or 'N/A'])
+    writer.writerow(['Agency', booking.agency.name or 'N/A'])
     writer.writerow(['Agent', booking.agent.username if booking.agent else 'N/A'])
-    writer.writerow(['Confirmation Number', booking.confirmation_number or 'N/A'])
+    writer.writerow(['Hotel Confirmation Number', booking.confirmation_number or 'N/A'])
     writer.writerow(['Times Confirmation Number', booking.times_con_number or 'N/A'])
     writer.writerow(['Booking Confirmed', 'Yes' if booking.booking_confirmed else 'No'])
     writer.writerow(['Invoice Paid', 'Yes' if booking.invoice_paid else 'No'])
@@ -732,7 +739,9 @@ def export_bookings():
     # Generate CSV
     output = StringIO()
     writer = csv.writer(output)
-    writer.writerow(['ID', 'Hotel Name', 'Room Type', 'Check-In Date', 'Check-Out Date','Nights' ,'Selling Price', 'Buying Price', 'Vendor', 'Agent Name','Times Confirmation Number', 'Confirmation Number', 'Booking Confirmed', 'Invoice Paid'])
+    writer.writerow(['ID', 'Hotel Name', 'Room Type', 'Check-In Date', 'Check-Out Date','Nights' ,'Selling Price',
+                     'Discount', 'Buying Price', 'Vendor', 'Agency' ,'Agent Name','Times Confirmation Number', 
+                     'Hotel Confirmation Number', 'Booking Confirmed', 'Invoice Paid'])
 
     for booking in bookings:
         check_in_date = booking.check_in
@@ -747,8 +756,10 @@ def export_bookings():
             check_out_date.strftime('%d-%m-%Y'),
             diff_days,
             booking.selling_price,
+            booking.discount,
             booking.buying_price,
             booking.hotel.vendor.name if booking.hotel and booking.hotel.vendor else 'N/A',
+            booking.agency.name if booking.agency else 'N/A',
             booking.agent.username if booking.agent else 'N/A',
             booking.times_con_number or 'N/A',
             booking.confirmation_number or 'N/A',
