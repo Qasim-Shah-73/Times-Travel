@@ -78,14 +78,17 @@
             {% if messages %}
                 <div id="flash-container">
                     {% for category, message in messages %}
-                        <div class="flash-alert bg-{{ 'green' if category == 'success' else 'red' }}-500 text-white px-4 py-2 rounded shadow mb-4">
-                            {{ message }}
-                        </div>
+                        {% if message != 'Please log in to access this page.' %}
+                            <div class="flash-alert bg-{{ 'green' if category == 'success' else 'red' }}-500 text-white px-4 py-2 rounded shadow mb-4">
+                                {{ message }}
+                            </div>
+                        {% endif %}
                     {% endfor %}
                 </div>
             {% endif %}
         {% endwith %}
     </div>
+
 
     <div class="mt-6 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"> 
         {% block content %}{% endblock %}
