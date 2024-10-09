@@ -71,6 +71,42 @@
         color: #333;
     }
 
+    .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .button-group button {
+        flex: 1;
+        padding: 10px 20px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        font-family: fangsong;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .search-btn {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .request-btn {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .search-btn:hover {
+        background-color: #0056b3;
+    }
+
+    .request-btn:hover {
+        background-color: #218838;
+    }
+
     button {
         background-color: #007bff;
         color: white;
@@ -181,6 +217,18 @@
     .form-group .select-wrapper {
         flex: 2.1;
     }
+    .custom-type-input.hidden {
+        display: none;
+    }
+    
+    #indexBookingModal {
+        z-index: 1000;
+    }
+    
+    .modal-content {
+        max-height: 80vh;
+        overflow-y: auto;
+    }
 </style>
 
 <div class="container">
@@ -218,7 +266,10 @@
                     <input type="text" name="total_nights" id="total_nights" placeholder="Total Nights" readonly>
                 </div>
                 
-                <button type="submit"><i class="fas fa-search mx-2"></i>Search</button>
+                <div class="button-group">
+                    <button type="submit" class="search-btn"><i class="fas fa-search mx-2"></i>Search</button>
+                    <button type="button" id="navRequestBookingBtn" class="request-btn"><i class="fas fa-book mx-2"></i>Custom Request</button>
+                </div>
             </form>
         </div>
     </div>
@@ -230,10 +281,80 @@
         <p>This May, we're giving away 5x £200 vouchers towards your holiday wardrobe. All you have to do for your chance to win is book with Times Travel between now and 31 May '24.</p>
         <button>Know more</button>
     </div>
+
+    <!-- Add this modal HTML just before the closing body tag in your index template -->
+    <div id="indexBookingModal" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-50">
+        <div class="bg-white rounded-lg p-8 shadow-lg w-full max-w-2xl">
+            <div class="modal-content">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold mb-2">Request a Booking</h2>
+                    <p class="text-gray-600">Please fill in the details below to submit a booking request.</p>
+                </div>
+                
+                <form id="indexBookingForm" action="{{ url_for('booking.booking_requests') }}" method="POST">
+                    <!-- Destination -->
+                    <div class="mb-4">
+                        <label for="index_destination" class="block text-sm font-medium text-gray-700 mb-1">Destination</label>
+                        <select id="index_destination" name="destination" class="w-full p-2 border border-gray-300 rounded-md" required>
+                            <option value="" disabled selected>Select destination</option>
+                            <option value="Makkah, Saudi Arabia">Mecca</option>
+                            <option value="Madinah, Saudi Arabia">Madinah</option>
+                        </select>
+                    </div>
+
+                    <!-- Hotel Name -->
+                    <div class="mb-4">
+                        <label for="index_hotel_name" class="block text-sm font-medium text-gray-700 mb-1">Hotel Name</label>
+                        <input type="text" id="index_hotel_name" name="hotel_name" class="w-full p-2 border border-gray-300 rounded-md" required>
+                    </div>
+
+                    <!-- Check In/Out Dates -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="index_check_in" class="block text-sm font-medium text-gray-700 mb-1">Check In</label>
+                            <input type="text" id="index_check_in" name="check_in" class="w-full p-2 border border-gray-300 rounded-md" required>
+                        </div>
+                        <div>
+                            <label for="index_check_out" class="block text-sm font-medium text-gray-700 mb-1">Check Out</label>
+                            <input type="text" id="index_check_out" name="check_out" class="w-full p-2 border border-gray-300 rounded-md" required>
+                        </div>
+                    </div>
+
+                    <!-- Number of Rooms -->
+                    <div class="mb-4">
+                        <label for="index_num_rooms" class="block text-sm font-medium text-gray-700 mb-1">Number of Rooms</label>
+                        <select id="index_num_rooms" name="num_rooms" class="w-full p-2 border border-gray-300 rounded-md" onchange="updateIndexRoomFields()" required>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+
+                    <!-- Room Details Container -->
+                    <div id="indexRoomDetailsContainer">
+                        <!-- Room details will be dynamically added here -->
+                    </div>
+
+                    <!-- Lead Guest -->
+                    <div class="mb-6">
+                        <label for="index_lead_guest" class="block text-sm font-medium text-gray-700 mb-1">Lead Guest</label>
+                        <input type="text" id="index_lead_guest" name="lead_guest" class="w-full p-2 border border-gray-300 rounded-md">
+                    </div>
+
+                    <!-- Form Buttons -->
+                    <div class="flex justify-end space-x-2">
+                        <button type="button" onclick="closeIndexModal()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancel</button>
+                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Submit Request</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
 <script>
-
     document.addEventListener("DOMContentLoaded", function () {
         const form = document.getElementById('hotel-search-form');
         const checkInInput = document.getElementById('check_in');
@@ -330,6 +451,87 @@
             }
         });
     });
-    
+    document.getElementById("navRequestBookingBtn").addEventListener("click", function() {
+        document.getElementById("indexBookingModal").classList.remove("hidden");
+    });
+
+    function closeIndexModal() {
+        document.getElementById("indexBookingModal").classList.add("hidden");
+    }
+
+    function updateIndexRoomFields() {
+        const numRooms = parseInt(document.getElementById('index_num_rooms').value);
+        const container = document.getElementById('indexRoomDetailsContainer');
+        container.innerHTML = '';
+
+        for (let i = 0; i < numRooms; i++) {
+            const roomHTML = `
+                <div class="room-type-container mb-4 p-4 border border-gray-200 rounded">
+                    <h3 class="font-medium mb-2">Room ${i + 1}</h3>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Room Type</label>
+                        <select name="room_type_${i}" onchange="toggleIndexCustomInput(${i})" class="w-full p-2 border border-gray-300 rounded-md" required>
+                            <option value="">Select room type</option>
+                            <option value="double">Double Room</option>
+                            <option value="triple">Triple Room</option>
+                            <option value="quad">Quad Room</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <input type="text" name="custom_room_type_${i}" placeholder="Specify room type" 
+                               class="custom-type-input mt-2 w-full p-2 border border-gray-300 rounded-md hidden">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Inclusion</label>
+                        <select name="inclusion_${i}" class="w-full p-2 border border-gray-300 rounded-md" required>
+                            <option value="">Select inclusion</option>
+                            <option value="room_only">Room Only</option>
+                            <option value="bb">Bed & Breakfast</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Budget (Optional)</label>
+                        <input type="number" name="price_to_beat_${i}" placeholder="Enter price" 
+                               class="w-full p-2 border border-gray-300 rounded-md">
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', roomHTML);
+        }
+    }
+
+    function toggleIndexCustomInput(roomIndex) {
+        const select = document.querySelector(`select[name="room_type_${roomIndex}"]`);
+        const customInput = document.querySelector(`input[name="custom_room_type_${roomIndex}"]`);
+        
+        if (select.value === 'other') {
+            customInput.classList.remove('hidden');
+            customInput.required = true;
+        } else {
+            customInput.classList.add('hidden');
+            customInput.required = false;
+        }
+    }
+
+    // Initialize Flatpickr for the index page date inputs
+    flatpickr("#index_check_in", {
+        dateFormat: "d-m-Y",
+        minDate: "today",
+        onChange: function(selectedDates) {
+            indexCheckOutPicker.set('minDate', selectedDates[0]);
+        }
+    });
+
+    const indexCheckOutPicker = flatpickr("#index_check_out", {
+        dateFormat: "d-m-Y",
+        minDate: "today"
+    });
+
+    // Initialize the form with one room when the modal is opened
+    document.getElementById("navRequestBookingBtn").addEventListener("click", function() {
+        updateIndexRoomFields();
+    });
 </script>
 {% endblock %}

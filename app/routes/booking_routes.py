@@ -1,13 +1,14 @@
-from flask import Blueprint, Response, render_template, redirect, url_for, flash, request, jsonify, send_file
+from flask import Blueprint, Response, render_template, redirect, url_for, flash, request, jsonify, send_file, current_app
 from io import StringIO, BytesIO
 import csv
 from flask_login import login_required
 from app import db
-from app.models import User, Hotel, Room, Agency, Booking, Guest, User, Invoice, BookingRequest
+from app.models import User, Hotel, Room, Agency, Booking, Guest, User, Invoice, BookingRequest, RoomRequest
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from app.decorators import roles_required
 from datetime import datetime, timedelta
 from flask_login import current_user
-from sqlalchemy import func
+from sqlalchemy import func, desc
 from decimal import Decimal
 from app.email import send_tentative_email, send_confirmation_email, send_invoice_paid_email, send_invoice_email, \
                         send_tcn_confirmation_email, send_booking_reservation_status
@@ -84,55 +85,6 @@ def search_hotels():
                            location=location,
                            nights=diff_days)
     
-@booking_bp.route('/update_reservation/<int:request_id>', methods=['POST'])
-@login_required
-@roles_required('super_admin', 'admin')
-def update_reservation(request_id):
-    # Fetch the booking request from the database
-    booking_request = BookingRequest.query.get_or_404(request_id)
-
-    # Parse JSON data from the request body
-    data = request.get_json()
-
-    # Extract status and price from the incoming request data
-    status = data.get('status')
-    price = data.get('price', None) 
-
-    # Update the booking request status and price if applicable
-    if status == 'approved':
-        booking_request.status = True
-        send_booking_reservation_status(
-                to=booking_request.agent.email,
-                recipient_name=booking_request.agent.username,
-                agency_name=booking_request.agent.agency.name,
-                check_in=booking_request.check_in.strftime('%d-%m-%Y'),
-                check_out=booking_request.check_out.strftime('%d-%m-%Y'),
-                hotel_name=booking_request.hotel_name,
-                room_type=booking_request.room_type,
-                price=price, 
-                status= booking_request.status)
-    elif status == 'rejected':
-        booking_request.status = False
-        send_booking_reservation_status(
-                to=booking_request.agent.email,
-                recipient_name=booking_request.agent.username,
-                agency_name=booking_request.agent.agency.name,
-                check_in=booking_request.check_in.strftime('%d-%m-%Y'),
-                check_out=booking_request.check_out.strftime('%d-%m-%Y'),
-                hotel_name=booking_request.hotel_name,
-                room_type=booking_request.room_type,
-                price=price, 
-                status= booking_request.status)
-
-    # Commit changes to the database
-    try:
-        db.session.commit()
-        flash('Status updated successfully for booking request','success')
-        return jsonify({'message': f'Request {status} successfully'}), 200
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'error': str(e)}), 500
-
 def is_month_available(hotel, check_in_month):
     """
     Check if the hotel has availability for the given month.
@@ -301,55 +253,257 @@ def book(room_id, booking_id):
 
 @booking_bp.route('/booking_requests', methods=['POST'])
 @login_required
-@roles_required('super_admin', 'admin')
 def booking_requests():
     try:
-        # Get user inputs
-        hotel_name = request.form.get('hotel_name')
-        room_type = request.form.get('room_type')
-        guest_name = request.form.get('guest_name', None)  # Optional field
-        check_in_date = request.form.get('check_in')
-        check_out_date = request.form.get('check_out')
-        
-        # Validate required inputs
-        if not hotel_name or not room_type or not check_in_date or not check_out_date:
-            flash("Missing required fields. Please fill in all required information.", "danger")
-            return redirect(url_for('auth.index'))
-
-        # Convert check-in and check-out dates to Python date objects
-        check_in_date = datetime.strptime(check_in_date, '%d-%m-%Y').date()
-        check_out_date = datetime.strptime(check_out_date, '%d-%m-%Y').date()
-
-        # Create the new booking request
+        # Create the main booking request
         new_request = BookingRequest(
-            hotel_name=hotel_name,
-            room_type=room_type,
-            check_in=check_in_date,
-            check_out=check_out_date,
-            guest_name=guest_name if guest_name else 'N/A',
-            agent_id = current_user.id 
+            destination=request.form.get('destination'),
+            hotel_name=request.form.get('hotel_name'),
+            check_in=datetime.strptime(request.form.get('check_in'), '%Y-%m-%d').date(),
+            check_out=datetime.strptime(request.form.get('check_out'), '%Y-%m-%d').date(),
+            guest_name=request.form.get('lead_guest'),
+            num_rooms=int(request.form.get('num_rooms', 1)),
+            agent_id=current_user.id
         )
-
-        # Add and commit the request to the database
+        
+        # Add room requests
+        for i in range(new_request.num_rooms):
+            room_type = request.form.get(f'room_type_{i}')
+            custom_room_type = request.form.get(f'custom_room_type_{i}')
+            inclusion = request.form.get(f'inclusion_{i}')
+            price_to_beat = request.form.get(f'price_to_beat_{i}')
+            
+            # Use custom room type if 'other' was selected
+            final_room_type = custom_room_type if room_type == 'other' else room_type
+            
+            room_request = RoomRequest(
+                room_type=final_room_type,
+                inclusion=inclusion,
+                price_to_beat=float(price_to_beat) if price_to_beat else None,
+            )
+            new_request.room_requests.append(room_request)
+        
         db.session.add(new_request)
         db.session.commit()
-
-        # Log the successful booking request
-        flash(f"Booking request submitted for {hotel_name} - Room: {room_type} by {current_user.username}", "success")
-    except Exception as e:
-        # Log the error
-        flash(f"Error while submitting booking request: {e}")
-        db.session.rollback()
-        flash("An error occurred while processing your request. Please try again.", "danger")
+        
+        flash(f"Successfully created booking requests for {new_request.hotel_name}", "success")
+        return redirect(url_for('auth.index'))
     
-    return redirect(url_for('auth.index'))
+    except Exception as e:
+        db.session.rollback()
+        flash(f"An error occurred: {str(e)}", "error")
+        return redirect(url_for('auth.index'))
+
+def generate_confirmation_token(request_id):
+    s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+    return s.dumps(request_id, salt=current_app.config['SECURITY_PASSWORD_SALT'])
+
+@booking_bp.route('/update_reservation/<int:request_id>', methods=['POST'])
+@login_required
+def update_reservation(request_id):
+    # Fetch the booking request from the database
+    booking_request = BookingRequest.query.get_or_404(request_id)
+
+    # Parse JSON data from the request body
+    data = request.get_json()
+
+    # Extract status and prices from the incoming request data
+    status = data.get('status')
+    prices = data.get('prices', [])
+
+    token = generate_confirmation_token(request_id) 
+    confirmation_link = url_for('booking.confirm_reservation', token=token, _external=True)
+    
+    # Assign price_offered in room_requests in order
+    for room_request, price in zip(booking_request.room_requests, prices):
+        room_request.price_offered = price
+
+    # Update the booking request status and send notifications
+    if status == 'approved':
+        booking_request.status = True
+        
+        send_booking_reservation_status(
+            to='qshah73@gmail.com',
+            recipient_name=booking_request.agent.username,
+            agency_name=booking_request.agent.agency.name,
+            check_in=booking_request.check_in.strftime('%d-%m-%Y'),
+            check_out=booking_request.check_out.strftime('%d-%m-%Y'),
+            hotel_name=booking_request.hotel_name,
+            room_requests=booking_request.room_requests,
+            status=booking_request.status, 
+            confirmation_link=confirmation_link
+        )
+    elif status == 'rejected':
+        booking_request.status = False
+        send_booking_reservation_status(
+            to=booking_request.agent.email,
+            recipient_name=booking_request.agent.username,
+            agency_name=booking_request.agent.agency.name,
+            check_in=booking_request.check_in.strftime('%d-%m-%Y'),
+            check_out=booking_request.check_out.strftime('%d-%m-%Y'),
+            hotel_name=booking_request.hotel_name,
+            room_requests=booking_request.room_requests,
+            status=booking_request.status,
+            confirmation_link=confirmation_link
+        )
+
+    # Commit changes to the database
+    try:
+        db.session.commit()
+        flash('Status updated successfully for booking request', 'success')
+        return jsonify({'message': f'Request {status} successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+    
+    
+def process_booking_request(booking_request):
+    """
+    Process a booking request by finding or creating hotel and rooms,
+    then create bookings based on the request data.
+    
+    Args:
+        booking_request (BookingRequest): The booking request to process
+    
+    Returns:
+        list[Booking]: List of created booking objects
+    """
+    try:
+        # Step 1: Find or create hotel
+        hotel = Hotel.query.filter_by(name=booking_request.hotel_name).first()
+        agent = User.query.get_or_404(booking_request.agent_id)
+        
+        if not hotel:
+            hotel = Hotel(
+                name=booking_request.hotel_name,
+                location=booking_request.destination,
+                description="Created from booking request",
+                availability=True,
+                stars=3  # Default value
+            )
+            db.session.add(hotel)
+            db.session.flush()
+        
+        bookings = []
+        agency = agent.agency
+        
+        # Step 2: Process each room request
+        for room_request in booking_request.room_requests:
+            # Find or create room
+            room = Room.query.filter_by(
+                hotel_id=hotel.id,
+                type=room_request.room_type,
+                inclusion=room_request.inclusion
+            ).first()
+            
+            if not room:
+                room = Room(
+                    hotel_id=hotel.id,
+                    type=room_request.room_type,
+                    view_type="Standard",  # Default value
+                    availability=True,
+                    rooms_available=1,
+                    inclusion=room_request.inclusion
+                )
+                db.session.add(room)
+                db.session.flush()
+            
+            # Check if a booking already exists for the same parameters
+            existing_booking = Booking.query.filter_by(
+                hotel_id=hotel.id,
+                room_id=room.id,
+                check_in=booking_request.check_in,
+                check_out=booking_request.check_out,
+                agent_id=booking_request.agent_id,
+                room_type = room.type,
+                selling_price = room_request.price_offered                
+            ).first()
+
+            if existing_booking:
+                # If a booking already exists, you might choose to skip creating it
+                continue  # or handle as needed (e.g., return an error message)
+            
+            remaining = agency.credit_limit - agency.used_credit + agency.paid_back
+            try:
+                if  remaining > room_request.price_offered:
+                    # Create booking for this room
+                    new_booking = Booking(
+                        check_in=booking_request.check_in,
+                        check_out=booking_request.check_out,
+                        hotel_id=hotel.id,
+                        hotel_name=hotel.name,
+                        room_type=room.type,
+                        room_id=room.id,
+                        agent_id=booking_request.agent_id,
+                        booking_request_id=booking_request.id,
+                        agency = agent.agency,
+                        selling_price = room_request.price_offered
+                        # You may want to set other fields here
+                    )
+                    
+                    agency.used_credit += Decimal(room_request.price_offered)
+                    
+                     # Add guest information if this is the guest
+                    if booking_request.guest_name:
+                        guest = Guest(
+                            first_name=booking_request.guest_name,
+                            last_name=booking_request.guest_name,
+                            booking=new_booking,
+                        )
+                        db.session.add(guest)
+                    
+                    db.session.add(new_booking)
+                    bookings.append(new_booking)
+            except Exception as e:
+                db.session.rollback()
+                flash("You have exceeded your credit limit. Contact Support Team for further queries.", "danger")
+                raise Exception(f"Failed to process booking request: {str(e)}")
+            
+           
+        
+        # Step 3: Update booking request status
+        booking_request.status = True
+        booking_request.view_status = True
+        
+        db.session.commit()
+        return bookings
+    
+    except Exception as e:
+        db.session.rollback()
+        raise Exception(f"Failed to process booking request: {str(e)}")
+
+@booking_bp.route('/confirm_reservation/<token>', methods=['GET'])
+def confirm_reservation(token):
+    s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+
+    try:
+        # Verify the token, set max_age to 86400 seconds (24 hours)
+        request_id = s.loads(token, salt=current_app.config['SECURITY_PASSWORD_SALT'], max_age=86400)
+    except SignatureExpired:
+        return jsonify({'error': 'The confirmation link has expired.'}), 400
+    except BadSignature:
+        return jsonify({'error': 'Invalid token.'}), 400
+
+    # Fetch the booking request
+    booking_request = BookingRequest.query.get_or_404(request_id)
+    
+
+    # Update booking request status to confirmed (or any other necessary logic)
+    process_booking_request(booking_request)
+
+    try:
+        db.session.commit()
+        return jsonify({'message': 'Reservation confirmed successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
 
 @booking_bp.route('/view_booking_requests', methods=['GET'])
 @login_required
 @roles_required('super_admin', 'admin')
 def view_booking_requests():
-    requests = BookingRequest.query.all()
-    return render_template('booking/view_booking_requests.html', requests=requests)
+    booking_requests = BookingRequest.query.order_by(desc(BookingRequest.id)).all()
+    return render_template('booking/view_booking_requests.html', booking_requests=booking_requests)
     
 @booking_bp.route('/booking_requests/count', methods=['GET'])
 @roles_required('super_admin', 'admin')

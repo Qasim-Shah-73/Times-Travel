@@ -120,7 +120,7 @@ def send_invoice_paid_email(to, recipient_name, agency_name, destination, check_
         ))
     mail.send(msg)
 
-def send_booking_reservation_status(to, recipient_name, agency_name, check_in, check_out, hotel_name, room_type, price, status): 
+def send_booking_reservation_status(to, recipient_name, agency_name, check_in, check_out, hotel_name, room_requests, status,confirmation_link): 
     msg = Message(subject=f"Status for Booking Request",
                   recipients=[to],
                   html=render_template
@@ -130,9 +130,9 @@ def send_booking_reservation_status(to, recipient_name, agency_name, check_in, c
                     check_in=check_in,
                     check_out=check_out,
                     hotel_name=hotel_name,
-                    room_type=room_type,
-                    price = price,
-                    status = status
+                    room_requests = room_requests,
+                    status = status,
+                    confirmation_link = confirmation_link
         ))
     mail.send(msg)
  

@@ -1,7 +1,7 @@
 from datetime import datetime
 from app import db, login
 from flask_login import UserMixin
-from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, BigInteger, Numeric, DateTime, Text, Date
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, BigInteger, Numeric, DateTime, Text, Date, Float
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.sqlite import JSON
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -106,6 +106,7 @@ class Booking(db.Model):
     discount = Column(Numeric(precision=12, scale=2), nullable=True)
     special_requests = Column(String(128), nullable=True)
     remarks = Column(Text, nullable=True)
+    booking_request_id = Column(Integer, ForeignKey('booking_request.id'), nullable=True) # New field to link back to the original booking request
 
     # Relationships
     room = relationship('Room', back_populates='bookings')
@@ -114,6 +115,7 @@ class Booking(db.Model):
     guests = relationship('Guest', back_populates='booking', cascade="all, delete-orphan")
     hotel = relationship('Hotel', back_populates='bookings')
     invoice = relationship('Invoice', back_populates='booking', uselist=False, cascade="all, delete-orphan")
+    booking_request = relationship('BookingRequest', back_populates='bookings')
 
     def __repr__(self):
         return f'<Booking {self.confirmation_number}>'
@@ -144,8 +146,9 @@ class BookingRequest(db.Model):
     __tablename__ = 'booking_request'
 
     id = Column(Integer, primary_key=True)
+    destination = Column(String(128), nullable=False)
     hotel_name = Column(String(128), nullable=False)
-    room_type = Column(String(128), nullable=False)
+    num_rooms = Column(Integer, nullable=False, default=1)
     check_in = Column(Date, nullable=False)
     check_out = Column(Date, nullable=False)
     guest_name = Column(String(128), nullable=True)
@@ -160,8 +163,32 @@ class BookingRequest(db.Model):
         foreign_keys=[agent_id]
     )
 
+    # New fields for room details
+    room_requests = relationship('RoomRequest', back_populates='booking_request', 
+                                cascade='all, delete-orphan')
+    
+     # New relationship to track resulting bookings
+    bookings = relationship('Booking', back_populates='booking_request')
+
     def __repr__(self):
-        return f"<BookingRequest {self.hotel_name}, {self.room_type}, {self.check_in} - {self.check_out}>"
+        return f"<BookingRequest {self.hotel_name}, {self.check_in} - {self.check_out}>"
+    
+# New intermediary model for room requests
+class RoomRequest(db.Model):
+    __tablename__ = 'room_request'
+
+    id = Column(Integer, primary_key=True)
+    booking_request_id = Column(Integer, ForeignKey('booking_request.id'), nullable=False)
+    room_type = Column(String(100), nullable=False)
+    inclusion = Column(String(100), nullable=False)
+    price_to_beat = Column(Float, nullable=True)
+    price_offered = Column(Float, nullable=True)
+    
+    # Relationships
+    booking_request = relationship('BookingRequest', back_populates='room_requests')
+
+    def __repr__(self):
+        return f"<RoomRequest {self.room_type}, Inclusion: {self.inclusion}>"
 
 
 # Define the Hotel model

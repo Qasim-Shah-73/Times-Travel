@@ -37,6 +37,13 @@
             color: #777;
             font-size: 12px;
         }
+        .room {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -47,19 +54,28 @@
         <ul>
             <li><strong>Agency:</strong> {{ agency_name }}</li>
             <li><strong>Hotel:</strong> {{ hotel_name }}</li>
-            <li><strong>Room Type:</strong> {{ room_type }}</li>
             <li><strong>Check-in Date:</strong> {{ check_in }}</li>
             <li><strong>Check-out Date:</strong> {{ check_out }}</li>
         </ul>
 
         {% if status %}
-            <p class="status">Status: Accepted</p>
-            {% if price %}
-                <p>The approved price for this booking is <strong>{{ price }} SAR for all nights</strong>.</p>
-            {% endif %}
+            <p class="status">Status: Quoted</p>
+            <p>The following room requests have been quoted:</p>
+            {% for room in room_requests %}
+                <div class="room">
+                    <p><strong>Room Type:</strong> {{ room.room_type }}</p>
+                    <p><strong>Inclusion:</strong> {{ room.inclusion }}</p>
+                    <p><strong>Price Offered:</strong> {{ room.price_offered }} SAR for all nights</p>
+                </div>
+            {% endfor %}
+            Please click the link below to confirm your reservation if you accept the prices:
+            <a href="{{ confirmation_link }}">{{ confirmation_link }}</a>
+
+            This link will expire in 24 hours.
+
             <p>Your booking request has been accepted. You can now proceed with the necessary arrangements via our system. If you have any questions, feel free to reach out to us.</p>
         {% else %}
-            <p class="status">Status: Rejected</p>
+            <p class="status">Status: Not Available</p>
             <p>Unfortunately, we could not process your booking request at this time. Please contact us if you need further assistance or wish to discuss alternative options.</p>
         {% endif %}
 
