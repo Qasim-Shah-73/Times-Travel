@@ -259,8 +259,8 @@ def booking_requests():
         new_request = BookingRequest(
             destination=request.form.get('destination'),
             hotel_name=request.form.get('hotel_name'),
-            check_in=datetime.strptime(request.form.get('check_in'), '%Y-%m-%d').date(),
-            check_out=datetime.strptime(request.form.get('check_out'), '%Y-%m-%d').date(),
+            check_in=datetime.strptime(request.form.get('check_in'), '%d-%m-%Y').date(),
+            check_out=datetime.strptime(request.form.get('check_out'), '%d-%m-%Y').date(),
             guest_name=request.form.get('lead_guest'),
             num_rooms=int(request.form.get('num_rooms', 1)),
             agent_id=current_user.id
