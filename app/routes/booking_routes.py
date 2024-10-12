@@ -333,7 +333,7 @@ def update_reservation(request_id):
         booking_request.status = True
         
         send_booking_reservation_status(
-            to='qshah73@gmail.com',
+            to=booking_request.agent.email,
             recipient_name=booking_request.agent.username,
             agency_name=booking_request.agent.agency.name,
             check_in=booking_request.check_in.strftime('%d-%m-%Y'),
