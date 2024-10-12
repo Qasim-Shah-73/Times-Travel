@@ -251,6 +251,16 @@ def book(room_id, booking_id):
     
 ################################ Booking Requests ################################################
 
+def parse_date(date_str):
+    # Try to parse the date using multiple formats
+    for fmt in ('%d-%m-%Y', '%Y-%m-%d'):
+        try:
+            return datetime.strptime(date_str, fmt).date()
+        except ValueError:
+            continue
+    # If no formats work, raise an exception
+    raise ValueError(f"Date format for '{date_str}' is invalid.")
+
 @booking_bp.route('/booking_requests', methods=['POST'])
 @login_required
 def booking_requests():
@@ -259,8 +269,8 @@ def booking_requests():
         new_request = BookingRequest(
             destination=request.form.get('destination'),
             hotel_name=request.form.get('hotel_name'),
-            check_in=datetime.strptime(request.form.get('check_in'), '%d-%m-%Y').date(),
-            check_out=datetime.strptime(request.form.get('check_out'), '%d-%m-%Y').date(),
+            check_in = parse_date(request.form.get('check_in')),
+            check_out = parse_date(request.form.get('check_out')),
             guest_name=request.form.get('lead_guest'),
             num_rooms=int(request.form.get('num_rooms', 1)),
             agent_id=current_user.id
