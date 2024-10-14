@@ -489,8 +489,6 @@ def create_invoice():
     # If it's a GET request, just render the form
     return render_template('agency/invoice_form.html')
 
-# Register Arial font
-pdfmetrics.registerFont(TTFont('Arial', 'Arial.ttf'))
 
 def generate_invoice(output_filename, invoice_data):
     doc = SimpleDocTemplate(output_filename, pagesize=A4, 
@@ -540,7 +538,6 @@ def generate_invoice(output_filename, invoice_data):
     guest_info_table = Table(guest_info_data, colWidths=[3*cm, 6*cm, 3*cm, 3*cm])
     guest_info_table.setStyle(TableStyle([
         ('BOX', (0, 0), (-1, -1), 1, colors.black),
-        ('FONTNAME', (0, 0), (-1, -1), 'Arial'),
         ('FONTSIZE', (0, 0), (-1, -1), 9),
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
@@ -562,7 +559,6 @@ def generate_invoice(output_filename, invoice_data):
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#002060')),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Arial'),
         ('FONTSIZE', (0, 0), (-1, 0), 9),
         ('BACKGROUND', (0, 1), (-1, -1), colors.white),
         ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
@@ -589,7 +585,6 @@ def generate_invoice(output_filename, invoice_data):
     financial_table.setStyle(TableStyle([
         ('ALIGN', (0, 0), (0, -1), 'LEFT'),
         ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
-        ('FONTNAME', (0, 0), (-1, -1), 'Arial'),
         ('FONTSIZE', (0, 0), (-1, -1), 9),
         ('TOPPADDING', (0, 0), (-1, -1), 1),
         ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
@@ -630,7 +625,6 @@ def generate_invoice(output_filename, invoice_data):
     ]
     bank_table = Table(bank_details, colWidths=[8*cm])
     bank_table.setStyle(TableStyle([
-        ('FONTNAME', (0, 0), (-1, -1), 'Arial'),
         ('FONTSIZE', (0, 0), (-1, -1), 9),
         ('TOPPADDING', (0, 0), (-1, -1), 1),
         ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
@@ -645,7 +639,6 @@ def generate_invoice(output_filename, invoice_data):
     ]
     thanks_table = Table(thanks_data, colWidths=[8*cm])
     thanks_table.setStyle(TableStyle([
-        ('FONTNAME', (0, 0), (-1, -1), 'Arial'),
         ('FONTSIZE', (0, 0), (-1, -1), 9),
         ('TOPPADDING', (0, 0), (-1, -1), 1),
         ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
