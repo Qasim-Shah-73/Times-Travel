@@ -498,10 +498,10 @@ def generate_invoice(output_filename, invoice_data):
 
     # Styles
     styles = getSampleStyleSheet()
-    normal_style = ParagraphStyle('Normal', fontName='Arial', fontSize=9, leading=12)
-    title_style = ParagraphStyle('Title', fontName='Arial', fontSize=12, leading=14, alignment=1, spaceAfter=6)
-    bold_style = ParagraphStyle('Bold', fontName='Arial', fontSize=9, leading=12, spaceBefore=6, spaceAfter=6)
-    header_style = ParagraphStyle('Header', fontName='Arial', fontSize=9, leading=11, alignment=1, textColor=colors.white)
+    normal_style = ParagraphStyle('Normal', fontSize=9, leading=12)
+    title_style = ParagraphStyle('Title', fontSize=12, leading=14, alignment=1, spaceAfter=6)
+    bold_style = ParagraphStyle('Bold', fontSize=9, leading=12, spaceBefore=6, spaceAfter=6)
+    header_style = ParagraphStyle('Header', fontSize=9, leading=11, alignment=1, textColor=colors.white)
 
     # Add logo
     logo_path = os.path.join(current_app.root_path, 'static', 'images', 'Times_logo-high.png')
@@ -563,7 +563,6 @@ def generate_invoice(output_filename, invoice_data):
         ('BACKGROUND', (0, 1), (-1, -1), colors.white),
         ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('FONTNAME', (0, 1), (-1, -1), 'Arial'),
         ('FONTSIZE', (0, 1), (-1, -1), 8),
         ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
         ('TOPPADDING', (0, 0), (-1, -1), 4),
