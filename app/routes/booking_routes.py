@@ -519,7 +519,7 @@ def view_booking_requests():
 @roles_required('super_admin', 'admin')
 @login_required
 def get_booking_request_count():
-    count = BookingRequest.query.filter_by(view_status=False).count()  # Assuming status False means new requests
+    count = BookingRequest.query.filter_by(view_status=False).count()
     return jsonify(count=count)
 
 @booking_bp.route('/update_view_status/<int:request_id>', methods=['POST'])

@@ -1,15 +1,32 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, Response
-from flask_login import current_user, login_required
-from io import StringIO
+import os
 import csv
-from app import db
-from app.models import Agency, User, Booking, Invoice, Guest
+import tempfile
+from datetime import datetime
+from io import StringIO
+
+from flask import (
+    Blueprint, render_template, redirect, url_for, flash, request, 
+    Response, send_file, after_this_request, current_app
+)
+from flask_login import current_user, login_required
+
 from sqlalchemy import func, case, and_
 from sqlalchemy.orm import joinedload
-from datetime import datetime
+
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.lib.units import cm, inch
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+
+from app import db
+from app.models import Agency, User, Booking, Invoice, Guest
 from app.forms import AgencyForm, UpdateAgencyForm
 from app.decorators import roles_required
 from .utils import is_super_admin
+
 
 agency_bp = Blueprint('agency', __name__)
 
@@ -420,3 +437,223 @@ def delete_agency(agency_id):
     
     flash('Agency deleted successfully!', 'success')
     return redirect(url_for('agency.view_agencies'))
+
+@agency_bp.route('/create_invoice', methods=['GET', 'POST'])
+@login_required
+@roles_required('super_admin')
+def create_invoice():
+    if request.method == 'POST':
+        # Process form data
+        invoice_data = {
+            'date': request.form.get('date', ''),
+            'hcn': request.form.get('hcn', ''),
+            'hotel_name': request.form.get('hotel_name', ''),
+            'guest_name': request.form.get('guest_name', ''),
+            'total_pax': request.form.get('total_pax', ''),
+            'qty': request.form.get('qty', ''),
+            'room_type': request.form.get('room_type', ''),
+            'checkin': request.form.get('checkin', ''),
+            'nights': request.form.get('nights', ''),
+            'checkout': request.form.get('checkout', ''),
+            'view': request.form.get('view', ''),
+            'meal_plan': request.form.get('meal_plan', ''),
+            'room_rate': request.form.get('room_rate', ''),
+            'net_accommodation_charges': request.form.get('net_accommodation_charges', '0'),
+            'total_net_value': request.form.get('total_net_value', '0'),
+            'balance': request.form.get('balance', '0'),
+            'remarks': request.form.get('remarks', ''),
+            'vat': request.form.get('vat', '0'),  # Added VAT field
+            'total_receipts': request.form.get('total_receipts', '0'),  # Added Total Receipts field
+        }
+        
+        # Generate invoice
+        try:
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as temp_file:
+                generate_invoice(temp_file.name, invoice_data)
+                temp_file_path = temp_file.name
+
+            @after_this_request
+            def remove_file(response):
+                try:
+                    os.remove(temp_file_path)
+                except Exception as error:
+                    current_app.logger.error(f"Error removing file {temp_file_path}: {error}")
+                return response
+            
+            return send_file(temp_file_path, mimetype='application/pdf', as_attachment=True, download_name='invoice.pdf')
+        
+        except Exception as e:
+            current_app.logger.error(f"Error generating invoice: {e}")
+            return "Error generating invoice", 500
+    
+    # If it's a GET request, just render the form
+    return render_template('agency/invoice_form.html')
+
+# Register Arial font
+pdfmetrics.registerFont(TTFont('Arial', 'Arial.ttf'))
+
+def generate_invoice(output_filename, invoice_data):
+    doc = SimpleDocTemplate(output_filename, pagesize=A4, 
+                            topMargin=0.5*inch, bottomMargin=0.5*inch,
+                            leftMargin=0.5*inch, rightMargin=0.5*inch)
+    elements = []
+
+    # Styles
+    styles = getSampleStyleSheet()
+    normal_style = ParagraphStyle('Normal', fontName='Arial', fontSize=9, leading=12)
+    title_style = ParagraphStyle('Title', fontName='Arial', fontSize=12, leading=14, alignment=1, spaceAfter=6)
+    bold_style = ParagraphStyle('Bold', fontName='Arial', fontSize=9, leading=12, spaceBefore=6, spaceAfter=6)
+    header_style = ParagraphStyle('Header', fontName='Arial', fontSize=9, leading=11, alignment=1, textColor=colors.white)
+
+    # Add logo
+    logo_path = os.path.join(current_app.root_path, 'static', 'images', 'Times_logo-high.png')
+    if os.path.exists(logo_path):
+        logo = Image(logo_path, width=2.5*inch, height=1*inch)
+        logo.hAlign = 'LEFT'  # Align logo to left
+
+        elements.append(Paragraph(f"Date: {invoice_data['date']}", normal_style))
+        elements.append(Spacer(1, 0.2*inch))
+
+        # Header Section (Date, Logo, and Title)
+        header_table_data = [
+            ['', 
+             logo, 
+             ]
+        ]
+        header_table = Table(header_table_data)
+        header_table.setStyle(TableStyle([
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('ALIGN', (0, 0), (0, 0), 'LEFT'),
+            ('ALIGN', (2, 0), (2, 0), 'LEFT'),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.white),
+        ]))
+        elements.append(header_table)
+        elements.append(Paragraph("Definite Confirmation", title_style))
+        elements.append(Spacer(1, 0.2*inch))
+        
+
+    # Guest Information Table
+    guest_info_data = [
+        [Paragraph("HCN #", bold_style), invoice_data['hcn'], Paragraph("Hotel Name", bold_style), invoice_data['hotel_name']],
+        [Paragraph("Guest Name", bold_style), invoice_data['guest_name'], Paragraph("Total PAX", bold_style), invoice_data['total_pax']],
+    ]
+    guest_info_table = Table(guest_info_data, colWidths=[3*cm, 6*cm, 3*cm, 3*cm])
+    guest_info_table.setStyle(TableStyle([
+        ('BOX', (0, 0), (-1, -1), 1, colors.black),
+        ('FONTNAME', (0, 0), (-1, -1), 'Arial'),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.white)
+    ]))
+    elements.append(Spacer(1, 0.1*inch))
+    elements.append(guest_info_table)
+    elements.append(Spacer(1, 0.2*inch))
+
+    # Room Details
+    room_data = [
+        ['QTY', 'Room Type', 'Checkin', 'Nights', 'Checkout', 'View', 'Meal Plan', 'Room Rate'],
+        [invoice_data['qty'], invoice_data['room_type'], invoice_data['checkin'], 
+         invoice_data['nights'], invoice_data['checkout'], invoice_data['view'], 
+         invoice_data['meal_plan'], f"SAR {invoice_data['room_rate']}"]
+    ]
+    room_table = Table(room_data, colWidths=[1.5*cm, 3*cm, 2.5*cm, 1.5*cm, 2.5*cm, 2*cm, 2*cm, 2*cm])
+    room_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#002060')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Arial'),
+        ('FONTSIZE', (0, 0), (-1, 0), 9),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+        ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 1), (-1, -1), 'Arial'),
+        ('FONTSIZE', (0, 1), (-1, -1), 8),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('TOPPADDING', (0, 0), (-1, -1), 4),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+    ]))
+    elements.append(room_table)
+    elements.append(Spacer(1, 0.2*inch))
+
+    # Financial Details
+    financial_data = [
+        ['Net Accommodation Charges SAR:', f"SAR {invoice_data['net_accommodation_charges']}"],
+        ['VAT SAR:', f"SAR {invoice_data.get('vat', 'N/A')}"],
+        ['Total Net Value SAR:', f"SAR {invoice_data['total_net_value']}"],
+        ['Total Receipts SAR:', f"SAR {invoice_data.get('total_receipts', 'N/A')}"],
+        ['Balance SAR:', f"SAR {invoice_data['balance']}"],
+    ]
+    
+    financial_table = Table(financial_data, colWidths=[8*cm, 4*cm])
+    financial_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+        ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+        ('FONTNAME', (0, 0), (-1, -1), 'Arial'),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('TOPPADDING', (0, 0), (-1, -1), 1),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+    ]))
+    elements.append(financial_table)
+    elements.append(Spacer(1, 0.2*inch))
+
+    # Remarks Section
+    elements.append(Paragraph(f"Remarks: {invoice_data['remarks']}", bold_style))
+    elements.append(Spacer(1, 0.1*inch))
+
+    # Terms and Conditions in a single bordered table (with outer border only)
+    terms = [
+        "* We hope the reservation is in accordance with your request.",
+        "* Kindly make the payment by the option date to avoid automatic release of the reservation without any prior notice.",
+        "* The rates mentioned above are in Saudi Riyals.",
+        "* The rates mentioned above are including 15% VAT and 5% Municipality taxes, and are non-commissionable.",
+        "* Any amendment to the booking is subject to availability.",
+        "* Reservation can only be secured on a 100% confirmed basis through complete payment to avoid cancellation.",
+        "* Cancellation Policy - The booking is non-refundable once confirmed on a definite basis."
+    ]
+    terms_table_data = [[Paragraph(term, normal_style)] for term in terms]
+    terms_table = Table(terms_table_data)
+    
+    elements.append(terms_table)
+
+    # Add a space before Bank Details and Thanks section
+    elements.append(Spacer(1, 0.5*inch))
+
+    # Bank Details (Bottom Left) and "Thanks & Regards" (Bottom Right)
+    bank_details = [
+        [Paragraph("Our Bank Details:", bold_style)],
+        [Paragraph("Natwest bank.", normal_style)],
+        [Paragraph("Title: Times travel ltd", normal_style)],
+        [Paragraph("Acc #: 12333034", normal_style)],
+        [Paragraph("Sort code: 603003", normal_style)],
+    ]
+    bank_table = Table(bank_details, colWidths=[8*cm])
+    bank_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, -1), 'Arial'),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('TOPPADDING', (0, 0), (-1, -1), 1),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
+    ]))
+
+    print_date = datetime.now().strftime('%d/%m/%Y')
+    thanks_data = [
+        [Paragraph(f"Thanks & Regards,", normal_style)],
+        [Paragraph(f"Times Travel,", normal_style)],
+        [Paragraph(f"Reservation", normal_style)],
+        [Paragraph(f"Print Date: {print_date}", normal_style)],
+    ]
+    thanks_table = Table(thanks_data, colWidths=[8*cm])
+    thanks_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, -1), 'Arial'),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('TOPPADDING', (0, 0), (-1, -1), 1),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
+    ]))
+
+    # Positioning both at the bottom: one left and one right
+    footer_table = Table([[bank_table, thanks_table]], colWidths=[8*cm, 8*cm])
+    elements.append(footer_table)
+    
+    # Build PDF
+    doc.build(elements)

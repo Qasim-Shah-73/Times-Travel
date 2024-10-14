@@ -8,14 +8,25 @@
     <!-- Header section -->
     <div class="bg-blue-500 text-white py-4 px-6 flex justify-between items-center">
       <h1 class="font-bold text-2xl">Agencies</h1>
-      {% if current_user.role == 'super_admin' or current_user.role == 'admin' %}
-        <a
-          href="{{ url_for('agency.create_agency') }}"
-          class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded transition-colors duration-200"
-        >
-          <i class="fas fa-plus mr-2"></i> New Agency
-        </a>
-      {% endif %}
+      <div class="flex space-x-4 mb-4">
+        {% if current_user.role == 'super_admin' or current_user.role == 'admin' %}
+            <a
+                href="{{ url_for('agency.create_agency') }}"
+                class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded transition-colors duration-200"
+            >
+                <i class="fas fa-plus mr-2"></i> New Agency
+            </a>
+        {% endif %}
+        {% if current_user.role == 'super_admin' %}
+          <a
+              href="{{ url_for('agency.create_invoice') }}"
+              class="bg-orange-600 hover:bg-orange-700 text-white font-semibold py-2 px-4 rounded transition-colors duration-200"
+          >
+                <i class="fas fa-file-invoice mr-2"></i> New Invoice
+            </a>
+        {% endif %}
+    </div>
+    
     </div>
     <!-- Content section -->
     <div class="py-6 px-6">
