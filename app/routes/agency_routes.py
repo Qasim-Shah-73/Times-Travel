@@ -489,7 +489,6 @@ def create_invoice():
     # If it's a GET request, just render the form
     return render_template('agency/invoice_form.html')
 
-
 def generate_invoice(output_filename, invoice_data):
     doc = SimpleDocTemplate(output_filename, pagesize=A4, 
                             topMargin=0.5*inch, bottomMargin=0.5*inch,
@@ -509,50 +508,55 @@ def generate_invoice(output_filename, invoice_data):
         logo = Image(logo_path, width=2.5*inch, height=1*inch)
         logo.hAlign = 'LEFT'  # Align logo to left
 
-        elements.append(Paragraph(f"Date: {invoice_data['date']}", normal_style))
-        elements.append(Spacer(1, 0.2*inch))
-
         # Header Section (Date, Logo, and Title)
         header_table_data = [
-            ['', 
+            [Paragraph(f"Date: {invoice_data['date']}", normal_style), 
              logo, 
-             ]
+             Paragraph("Definite Confirmation", title_style)]
         ]
-        header_table = Table(header_table_data)
+        header_table = Table(header_table_data, colWidths=[2.5*inch, 2.5*inch, 2.5*inch])
         header_table.setStyle(TableStyle([
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
             ('ALIGN', (0, 0), (0, 0), 'LEFT'),
-            ('ALIGN', (2, 0), (2, 0), 'LEFT'),
+            ('ALIGN', (1, 0), (1, 0), 'CENTER'),
+            ('ALIGN', (2, 0), (2, 0), 'RIGHT'),
             ('BACKGROUND', (0, 0), (-1, 0), colors.white),
         ]))
         elements.append(header_table)
-        elements.append(Paragraph("Definite Confirmation", title_style))
         elements.append(Spacer(1, 0.2*inch))
-        
 
     # Guest Information Table
     guest_info_data = [
-        [Paragraph("HCN #", bold_style), invoice_data['hcn'], Paragraph("Hotel Name", bold_style), invoice_data['hotel_name']],
-        [Paragraph("Guest Name", bold_style), invoice_data['guest_name'], Paragraph("Total PAX", bold_style), invoice_data['total_pax']],
+        [Paragraph("HCN #", bold_style), Paragraph(invoice_data['hcn'], normal_style),
+         Paragraph("Hotel Name", bold_style), Paragraph(invoice_data['hotel_name'], normal_style)],
+        [Paragraph("Guest Name", bold_style), Paragraph(invoice_data['guest_name'], normal_style),
+         Paragraph("Total PAX", bold_style), Paragraph(invoice_data['total_pax'], normal_style)],
     ]
-    guest_info_table = Table(guest_info_data, colWidths=[3*cm, 6*cm, 3*cm, 3*cm])
+    guest_info_table = Table(guest_info_data, colWidths=[2*cm, 7*cm, 2*cm, 7*cm])
     guest_info_table.setStyle(TableStyle([
         ('BOX', (0, 0), (-1, -1), 1, colors.black),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
         ('FONTSIZE', (0, 0), (-1, -1), 9),
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('BACKGROUND', (0, 0), (-1, 0), colors.white)
+        ('BACKGROUND', (0, 0), (-1, 0), colors.white),
+        ('TOPPADDING', (0, 0), (-1, -1), 3),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
     ]))
-    elements.append(Spacer(1, 0.1*inch))
     elements.append(guest_info_table)
     elements.append(Spacer(1, 0.2*inch))
 
     # Room Details
     room_data = [
         ['QTY', 'Room Type', 'Checkin', 'Nights', 'Checkout', 'View', 'Meal Plan', 'Room Rate'],
-        [invoice_data['qty'], invoice_data['room_type'], invoice_data['checkin'], 
-         invoice_data['nights'], invoice_data['checkout'], invoice_data['view'], 
-         invoice_data['meal_plan'], f"SAR {invoice_data['room_rate']}"]
+        [Paragraph(str(invoice_data['qty']), normal_style),
+         Paragraph(invoice_data['room_type'], normal_style),
+         Paragraph(invoice_data['checkin'], normal_style),
+         Paragraph(str(invoice_data['nights']), normal_style),
+         Paragraph(invoice_data['checkout'], normal_style),
+         Paragraph(invoice_data['view'], normal_style),
+         Paragraph(invoice_data['meal_plan'], normal_style),
+         Paragraph(f"SAR {invoice_data['room_rate']}", normal_style)]
     ]
     room_table = Table(room_data, colWidths=[1.5*cm, 3*cm, 2.5*cm, 1.5*cm, 2.5*cm, 2*cm, 2*cm, 2*cm])
     room_table.setStyle(TableStyle([
@@ -606,9 +610,15 @@ def generate_invoice(output_filename, invoice_data):
         "* Reservation can only be secured on a 100% confirmed basis through complete payment to avoid cancellation.",
         "* Cancellation Policy - The booking is non-refundable once confirmed on a definite basis."
     ]
-    terms_table_data = [[Paragraph(term, normal_style)] for term in terms]
-    terms_table = Table(terms_table_data)
-    
+    terms_table_data = [[Paragraph(term, ParagraphStyle('Terms', fontSize=8, leading=10))] for term in terms]
+    terms_table = Table(terms_table_data, colWidths=[7.5*inch])
+    terms_table.setStyle(TableStyle([
+        ('BOX', (0, 0), (-1, -1), 1, colors.black),
+        ('TOPPADDING', (0, 0), (-1, -1), 2),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+        ('LEFTPADDING', (0, 0), (-1, -1), 5),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 5),
+    ]))
     elements.append(terms_table)
 
     # Add a space before Bank Details and Thanks section
@@ -641,6 +651,7 @@ def generate_invoice(output_filename, invoice_data):
         ('FONTSIZE', (0, 0), (-1, -1), 9),
         ('TOPPADDING', (0, 0), (-1, -1), 1),
         ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
+        ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
     ]))
 
     # Positioning both at the bottom: one left and one right
