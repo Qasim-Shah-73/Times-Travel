@@ -141,7 +141,8 @@ class RoomForm(FlaskForm):
     rooms_available = IntegerField('Rooms Available', validators=[DataRequired()])
     inclusion = SelectField('Inclusion', choices=[
         ('Room Only', 'Room Only'),
-        ('Bread & Breakfast', 'Bread & Breakfast')])
+        ('Bread & Breakfast', 'Bread & Breakfast'),
+        ('Half Board', 'Half Board')])
     approval = StringField('Approved by')
     notes = StringField('Notes')
     january_rates = FormField(RatesForm)
@@ -176,7 +177,8 @@ class UpdateRoomForm(FlaskForm):
     rooms_available = IntegerField('Rooms Available', validators=[DataRequired()])
     inclusion = SelectField('Inclusion', choices=[
         ('Room Only', 'Room Only'),
-        ('Bread & Breakfast', 'Bread & Breakfast')
+        ('Bread & Breakfast', 'Bread & Breakfast'),
+        ('Half Board', 'Half Board')
     ], validators=[DataRequired()])
     approval = StringField('Approved by')
     notes = StringField('Notes')

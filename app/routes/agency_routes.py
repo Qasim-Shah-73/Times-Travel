@@ -20,6 +20,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.enums import TA_CENTER, TA_RIGHT
 
 from app import db
 from app.models import Agency, User, Booking, Invoice, Guest
@@ -443,28 +444,38 @@ def delete_agency(agency_id):
 @roles_required('super_admin')
 def create_invoice():
     if request.method == 'POST':
-        # Process form data
+        # Get the number of rooms
+        qty = int(request.form.get('qty', 1))
+        
+        # Process base invoice data
         invoice_data = {
             'date': request.form.get('date', ''),
             'hcn': request.form.get('hcn', ''),
             'hotel_name': request.form.get('hotel_name', ''),
             'guest_name': request.form.get('guest_name', ''),
             'total_pax': request.form.get('total_pax', ''),
-            'qty': request.form.get('qty', ''),
-            'room_type': request.form.get('room_type', ''),
-            'checkin': request.form.get('checkin', ''),
-            'nights': request.form.get('nights', ''),
-            'checkout': request.form.get('checkout', ''),
-            'view': request.form.get('view', ''),
-            'meal_plan': request.form.get('meal_plan', ''),
-            'room_rate': request.form.get('room_rate', ''),
+            'qty': qty,
             'net_accommodation_charges': request.form.get('net_accommodation_charges', '0'),
             'total_net_value': request.form.get('total_net_value', '0'),
             'balance': request.form.get('balance', '0'),
             'remarks': request.form.get('remarks', ''),
-            'vat': request.form.get('vat', '0'),  # Added VAT field
-            'total_receipts': request.form.get('total_receipts', '0'),  # Added Total Receipts field
+            'vat': str(float(request.form.get('total_net_value', '0')) * 0.15),  # 15% VAT
+            'total_receipts': '0',
+            'rooms': []
         }
+
+        # Process each room's data
+        for i in range(qty):
+            room_data = {
+                'room_type': request.form.get(f'room_type_{i}', ''),
+                'checkin': request.form.get(f'checkin_{i}', ''),
+                'nights': request.form.get(f'nights_{i}', ''),
+                'checkout': request.form.get(f'checkout_{i}', ''),
+                'view': request.form.get(f'view_{i}', ''),
+                'meal_plan': request.form.get(f'meal_plan_{i}', ''),
+                'room_rate': request.form.get(f'room_rate_{i}', '0')
+            }
+            invoice_data['rooms'].append(room_data)
         
         # Generate invoice
         try:
@@ -490,40 +501,138 @@ def create_invoice():
     return render_template('agency/invoice_form.html')
 
 def generate_invoice(output_filename, invoice_data):
+    # Set page size and margins
     doc = SimpleDocTemplate(output_filename, pagesize=A4, 
-                            topMargin=0.5*inch, bottomMargin=0.5*inch,
-                            leftMargin=0.5*inch, rightMargin=0.5*inch)
+                          topMargin=0.5*inch, bottomMargin=0.5*inch,  
+                          leftMargin=0.75*inch, rightMargin=0.75*inch)
     elements = []
+    
+    # Calculate available width for consistent table sizing
+    available_width = doc.width
+    
+    # Enhanced Styles
+    normal_style = ParagraphStyle(
+        'Normal',
+        fontSize=11,
+        leading=12,
+        fontName='Helvetica'
+    )
+    title_style = ParagraphStyle(
+        'Title',
+        fontSize=16,  # Increased size for Definite Booking
+        leading=18,
+        alignment=1,
+        spaceAfter=6,
+        fontName='Helvetica-Bold',
+        textColor=colors.HexColor('#1a237e')
+    )
+    date_style = ParagraphStyle(
+        'Date',
+        fontSize=10,
+        leading=12,
+        fontName='Helvetica',
+        textColor=colors.HexColor('#1a237e')
+    )
+    bold_style = ParagraphStyle(
+        'Bold',
+        fontSize=11,
+        leading=12,
+        spaceBefore=4,
+        spaceAfter=4,
+        fontName='Helvetica-Bold',
+        textColor=colors.HexColor('#1a237e')
+    )
 
-    # Styles
-    styles = getSampleStyleSheet()
-    normal_style = ParagraphStyle('Normal', fontSize=9, leading=12)
-    title_style = ParagraphStyle('Title', fontSize=12, leading=14, alignment=1, spaceAfter=6)
-    bold_style = ParagraphStyle('Bold', fontSize=9, leading=12, spaceBefore=6, spaceAfter=6)
-    header_style = ParagraphStyle('Header', fontSize=9, leading=11, alignment=1, textColor=colors.white)
-
-    # Add logo
     logo_path = os.path.join(current_app.root_path, 'static', 'images', 'Times_logo-high.png')
     if os.path.exists(logo_path):
-        logo = Image(logo_path, width=2.5*inch, height=1*inch)
-        logo.hAlign = 'LEFT'  # Align logo to left
-
-        # Header Section (Date, Logo, and Title)
-        header_table_data = [
-            [Paragraph(f"Date: {invoice_data['date']}", normal_style), 
-             logo, 
-             Paragraph("Definite Confirmation", title_style)]
-        ]
-        header_table = Table(header_table_data, colWidths=[2.5*inch, 2.5*inch, 2.5*inch])
-        header_table.setStyle(TableStyle([
-            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-            ('ALIGN', (0, 0), (0, 0), 'LEFT'),
-            ('ALIGN', (1, 0), (1, 0), 'CENTER'),
-            ('ALIGN', (2, 0), (2, 0), 'RIGHT'),
-            ('BACKGROUND', (0, 0), (-1, 0), colors.white),
+        # Logo styling with stretched dimensions
+        logo = Image(logo_path, width=2.2*inch, height=0.9*inch)  # Increased both width and height
+        logo.hAlign = 'RIGHT'
+        
+        # Date styling with right alignment
+        date_style = ParagraphStyle(
+            'DateStyle',
+            parent=getSampleStyleSheet()['Normal'],
+            fontSize=10,
+            fontName='Helvetica-Bold',
+            alignment=TA_RIGHT,
+            spaceAfter=6
+        )
+        
+        # Title styling
+        title_style = ParagraphStyle(
+            'TitleStyle',
+            parent=getSampleStyleSheet()['Normal'],
+            fontSize=16,
+            fontName='Helvetica-Bold',
+            alignment=TA_CENTER,
+            spaceAfter=8,
+            textColor=colors.HexColor('#1a237e')
+        )
+        
+        # Create the logo and date column (right side)
+        logo_date_table = Table([
+            [logo],
+            [Paragraph(f"Date: {invoice_data['date']}", date_style)]
+        ], colWidths=[2.4*inch])  # Increased column width to accommodate stretched logo
+        
+        logo_date_table.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('TOPPADDING', (0, 1), (-1, 1), 8),  # Increased space between logo and date
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 0),  # Reduced right padding to allow logo to extend
         ]))
+        
+        # Main header content
+        header_content = [
+            [
+                '',  # Empty left column
+                Paragraph("Definite Booking", title_style),  # Center: Title
+                logo_date_table  # Right: Logo and date
+            ]
+        ]
+        
+        # Create main header table with adjusted column widths
+        header_table = Table(
+            header_content,
+            colWidths=[
+                2*inch,  # Empty left space
+                available_width - 4.8*inch,  # Title width (adjusted for larger logo)
+                2.8*inch  # Increased width for logo and date
+            ],
+            rowHeights=[1.5*inch]  # Increased height to accommodate stretched logo
+        )
+        
+        # Apply professional styling to main header
+        header_table.setStyle(TableStyle([
+            # Alignment
+            ('ALIGN', (1, 0), (1, 0), 'CENTER'),  # Title center
+            ('ALIGN', (2, 0), (2, 0), 'RIGHT'),   # Logo and date right
+            
+            # Vertical alignment
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            
+            # Padding
+            ('TOPPADDING', (0, 0), (-1, 0), 12),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('LEFTPADDING', (0, 0), (-1, 0), 0),
+            ('RIGHTPADDING', (0, 0), (-1, 0), 0),
+        ]))
+        
         elements.append(header_table)
-        elements.append(Spacer(1, 0.2*inch))
+        elements.append(Spacer(1, 0.15*inch))
+
+    # Rest of the styles and header definitions remain the same
+    header_style = ParagraphStyle(
+        'Header',
+        fontSize=12,
+        leading=12,
+        alignment=1,
+        spaceAfter=4,
+        textColor=colors.white,
+        fontName='Helvetica-Bold'
+    )
 
     # Guest Information Table
     guest_info_data = [
@@ -532,45 +641,68 @@ def generate_invoice(output_filename, invoice_data):
         [Paragraph("Guest Name", bold_style), Paragraph(invoice_data['guest_name'], normal_style),
          Paragraph("Total PAX", bold_style), Paragraph(invoice_data['total_pax'], normal_style)],
     ]
-    guest_info_table = Table(guest_info_data, colWidths=[2*cm, 7*cm, 2*cm, 7*cm])
+    
+    # Use available width for consistent table sizing
+    guest_info_table = Table(guest_info_data, colWidths=[available_width/4]*4)
     guest_info_table.setStyle(TableStyle([
-        ('BOX', (0, 0), (-1, -1), 1, colors.black),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('BOX', (0, 0), (-1, -1), 1, colors.HexColor('#1a237e')),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e3f2fd')),
+        ('FONTSIZE', (0, 0), (-1, -1), 11),
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('BACKGROUND', (0, 0), (-1, 0), colors.white),
-        ('TOPPADDING', (0, 0), (-1, -1), 3),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+        ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#f5f5f5')),
+        ('TOPPADDING', (0, 0), (-1, -1), 8),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+        ('LEFTPADDING', (0, 0), (-1, -1), 12),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 12),
     ]))
     elements.append(guest_info_table)
     elements.append(Spacer(1, 0.2*inch))
 
-    # Room Details
-    room_data = [
-        ['QTY', 'Room Type', 'Checkin', 'Nights', 'Checkout', 'View', 'Meal Plan', 'Room Rate'],
-        [Paragraph(str(invoice_data['qty']), normal_style),
-         Paragraph(invoice_data['room_type'], normal_style),
-         Paragraph(invoice_data['checkin'], normal_style),
-         Paragraph(str(invoice_data['nights']), normal_style),
-         Paragraph(invoice_data['checkout'], normal_style),
-         Paragraph(invoice_data['view'], normal_style),
-         Paragraph(invoice_data['meal_plan'], normal_style),
-         Paragraph(f"SAR {invoice_data['room_rate']}", normal_style)]
+    # Room Details Table with fixed column widths
+    room_header = ['QTY', 'Room Type', 'Checkin', 'Nights', 'Checkout', 'View', 'Meal Plan', 'Room Rate']
+    room_data = [[Paragraph(header, header_style) for header in room_header]]
+    
+    # Calculate proportional column widths that sum to available_width
+    room_col_widths = [
+        available_width * 0.10,  # QTY (6%)
+        available_width * 0.10,  # Room Type (20%)
+        available_width * 0.15,  # Checkin (13%)
+        available_width * 0.12,  # Nights (8%)
+        available_width * 0.15,  # Checkout (13%)
+        available_width * 0.13,  # View (13%)
+        available_width * 0.10,  # Meal Plan (13%)
+        available_width * 0.14   # Room Rate (14%)
     ]
-    room_table = Table(room_data, colWidths=[1.5*cm, 3*cm, 2.5*cm, 1.5*cm, 2.5*cm, 2*cm, 2*cm, 2*cm])
+    
+    for room in invoice_data['rooms']:
+        room_row = [
+            Paragraph("1", normal_style),
+            Paragraph(room['room_type'], normal_style),
+            Paragraph(room['checkin'], normal_style),
+            Paragraph(str(room['nights']), normal_style),
+            Paragraph(room['checkout'], normal_style),
+            Paragraph(room['view'], normal_style),
+            Paragraph(room['meal_plan'], normal_style),
+            Paragraph(f"SAR {room['room_rate']}", normal_style)
+        ]
+        room_data.append(room_row)
+
+    room_table = Table(room_data, colWidths=room_col_widths)
     room_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#002060')),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1a237e')),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('FONTSIZE', (0, 0), (-1, 0), 9),
+        ('FONTSIZE', (0, 0), (-1, 0), 11),
         ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-        ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('FONTSIZE', (0, 1), (-1, -1), 8),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-        ('TOPPADDING', (0, 0), (-1, -1), 4),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e3f2fd')),
+        ('BOX', (0, 0), (-1, -1), 1, colors.HexColor('#1a237e')),
+        ('TOPPADDING', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 10),
+        ('ALIGN', (0, 1), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f5f5f5')]),
+        ('WORDWRAP', (0, 0), (-1, -1), True),
     ]))
     elements.append(room_table)
     elements.append(Spacer(1, 0.2*inch))
@@ -578,29 +710,44 @@ def generate_invoice(output_filename, invoice_data):
     # Financial Details
     financial_data = [
         ['Net Accommodation Charges SAR:', f"SAR {invoice_data['net_accommodation_charges']}"],
-        ['VAT SAR:', f"SAR {invoice_data.get('vat', 'N/A')}"],
-        ['Total Net Value SAR:', f"SAR {invoice_data['total_net_value']}"],
-        ['Total Receipts SAR:', f"SAR {invoice_data.get('total_receipts', 'N/A')}"],
         ['Balance SAR:', f"SAR {invoice_data['balance']}"],
     ]
     
-    financial_table = Table(financial_data, colWidths=[8*cm, 4*cm])
+    financial_table = Table(financial_data, colWidths=[available_width * 0.7, available_width * 0.3])
     financial_table.setStyle(TableStyle([
         ('ALIGN', (0, 0), (0, -1), 'LEFT'),
         ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
-        ('FONTSIZE', (0, 0), (-1, -1), 9),
-        ('TOPPADDING', (0, 0), (-1, -1), 1),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('FONTSIZE', (0, 0), (-1, -1), 11),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('LEFTPADDING', (0, 0), (-1, -1), 12),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 12),
+        ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#e3f2fd')),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#1a237e')),
+        ('BOX', (0, 0), (-1, -1), 1, colors.HexColor('#1a237e')),
+        ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
+        ('TEXTCOLOR', (0, -1), (-1, -1), colors.HexColor('#1a237e')),
     ]))
     elements.append(financial_table)
     elements.append(Spacer(1, 0.2*inch))
 
-    # Remarks Section
-    elements.append(Paragraph(f"Remarks: {invoice_data['remarks']}", bold_style))
-    elements.append(Spacer(1, 0.1*inch))
+    # Remarks Section with box
+    elements.append(Paragraph("Remarks", bold_style))
+    remarks_table = Table([[Paragraph(invoice_data['remarks'], normal_style)]], 
+                         colWidths=[available_width])
+    remarks_table.setStyle(TableStyle([
+        ('BOX', (0, 0), (-1, -1), 1, colors.HexColor('#1a237e')),
+        ('TOPPADDING', (0, 0), (-1, -1), 8),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+        ('LEFTPADDING', (0, 0), (-1, -1), 12),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 12),
+        ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#f5f5f5')),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e3f2fd')),
+    ]))
+    elements.append(remarks_table)
+    elements.append(Spacer(1, 0.2*inch))
 
-    # Terms and Conditions in a single bordered table (with outer border only)
+    # Terms and Conditions with box
     terms = [
         "* We hope the reservation is in accordance with your request.",
         "* Kindly make the payment by the option date to avoid automatic release of the reservation without any prior notice.",
@@ -610,52 +757,63 @@ def generate_invoice(output_filename, invoice_data):
         "* Reservation can only be secured on a 100% confirmed basis through complete payment to avoid cancellation.",
         "* Cancellation Policy - The booking is non-refundable once confirmed on a definite basis."
     ]
-    terms_table_data = [[Paragraph(term, ParagraphStyle('Terms', fontSize=8, leading=10))] for term in terms]
-    terms_table = Table(terms_table_data, colWidths=[7.5*inch])
+    elements.append(Paragraph("Terms and Conditions", bold_style))
+    terms_content = []
+    for term in terms:
+        terms_content.append([Paragraph(term, ParagraphStyle(
+            'Terms',
+            fontSize=10,
+            leading=12,
+            fontName='Helvetica'
+        ))])
+    
+    terms_table = Table(terms_content, colWidths=[available_width])
     terms_table.setStyle(TableStyle([
-        ('BOX', (0, 0), (-1, -1), 1, colors.black),
-        ('TOPPADDING', (0, 0), (-1, -1), 2),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
-        ('LEFTPADDING', (0, 0), (-1, -1), 5),
-        ('RIGHTPADDING', (0, 0), (-1, -1), 5),
+        ('BOX', (0, 0), (-1, -1), 1, colors.HexColor('#1a237e')),
+        ('TOPPADDING', (0, 0), (-1, -1), 4),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+        ('LEFTPADDING', (0, 0), (-1, -1), 12),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 12),
+        ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#f5f5f5')),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e3f2fd')),
     ]))
     elements.append(terms_table)
 
-    # Add a space before Bank Details and Thanks section
-    elements.append(Spacer(1, 0.5*inch))
+    # Footer section
+    elements.append(Spacer(1, 0.2*inch))
 
-    # Bank Details (Bottom Left) and "Thanks & Regards" (Bottom Right)
     bank_details = [
-        [Paragraph("Our Bank Details:", bold_style)],
-        [Paragraph("Natwest bank.", normal_style)],
+        [Paragraph("Our Bank Details", bold_style)],
+        [Paragraph("Natwest bank", normal_style)],
         [Paragraph("Title: Times travel ltd", normal_style)],
         [Paragraph("Acc #: 12333034", normal_style)],
         [Paragraph("Sort code: 603003", normal_style)],
     ]
-    bank_table = Table(bank_details, colWidths=[8*cm])
+    bank_table = Table(bank_details, colWidths=[available_width/2])
     bank_table.setStyle(TableStyle([
-        ('FONTSIZE', (0, 0), (-1, -1), 9),
-        ('TOPPADDING', (0, 0), (-1, -1), 1),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
+        ('FONTSIZE', (0, 0), (-1, -1), 11),
+        ('TOPPADDING', (0, 0), (-1, -1), 3),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+        ('LEFTPADDING', (0, 0), (-1, -1), 0),
     ]))
 
     print_date = datetime.now().strftime('%d/%m/%Y')
     thanks_data = [
-        [Paragraph(f"Thanks & Regards,", normal_style)],
-        [Paragraph(f"Times Travel,", normal_style)],
-        [Paragraph(f"Reservation", normal_style)],
+        [Paragraph("Thanks & Regards,", normal_style)],
+        [Paragraph("Times Travel,", bold_style)],
+        [Paragraph("Reservation", normal_style)],
         [Paragraph(f"Print Date: {print_date}", normal_style)],
     ]
-    thanks_table = Table(thanks_data, colWidths=[8*cm])
+    thanks_table = Table(thanks_data, colWidths=[available_width/2])
     thanks_table.setStyle(TableStyle([
-        ('FONTSIZE', (0, 0), (-1, -1), 9),
-        ('TOPPADDING', (0, 0), (-1, -1), 1),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
+        ('FONTSIZE', (0, 0), (-1, -1), 11),
+        ('TOPPADDING', (0, 0), (-1, -1), 3),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
         ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
     ]))
 
-    # Positioning both at the bottom: one left and one right
-    footer_table = Table([[bank_table, thanks_table]], colWidths=[8*cm, 8*cm])
+    footer_table = Table([[bank_table, thanks_table]], 
+                        colWidths=[available_width/2]*2)
     elements.append(footer_table)
     
     # Build PDF

@@ -9,88 +9,180 @@
         body {
             font-family: 'Arial', sans-serif;
         }
+        .room-section {
+            border-left: 4px solid #3b82f6;
+            margin: 1rem 0;
+            padding-left: 1rem;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body class="bg-gray-50">
     <div class="container mx-auto p-8">
         <h1 class="text-4xl font-bold text-center text-gray-800 mb-8">Invoice Generation</h1>
-        <form action="{{ url_for('agency.create_invoice') }}" method="post" class="bg-white shadow-lg rounded-lg p-10 mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2" for="date">Date</label>
-                    <input class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" id="date" name="date" type="date" required>
-                </div>
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2" for="hcn">HCN #</label>
-                    <input class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" id="hcn" name="hcn" type="text" required>
-                </div>
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2" for="hotel_name">Hotel Name</label>
-                    <input class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" id="hotel_name" name="hotel_name" type="text" required>
-                </div>
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2" for="guest_name">Guest Name</label>
-                    <input class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" id="guest_name" name="guest_name" type="text" required>
-                </div>
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2" for="total_pax">Total PAX</label>
-                    <input class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" id="total_pax" name="total_pax" type="number" required>
-                </div>
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2" for="qty">QTY</label>
-                    <input class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" id="qty" name="qty" type="number" required>
-                </div>
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2" for="room_type">Room Type</label>
-                    <input class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" id="room_type" name="room_type" type="text" required>
-                </div>
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2" for="checkin">Check-in</label>
-                    <input class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" id="checkin" name="checkin" type="date" required>
-                </div>
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2" for="nights">Nights</label>
-                    <input class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" id="nights" name="nights" type="number" required>
-                </div>
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2" for="checkout">Check-out</label>
-                    <input class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" id="checkout" name="checkout" type="date" required>
-                </div>
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2" for="view">View</label>
-                    <input class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" id="view" name="view" type="text" required>
-                </div>
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2" for="meal_plan">Meal Plan</label>
-                    <input class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" id="meal_plan" name="meal_plan" type="text" required>
-                </div>
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2" for="room_rate">Room Rate (SAR)</label>
-                    <input class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" id="room_rate" name="room_rate" type="number" step="0.01" required>
-                </div>
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2" for="net_accommodation_charges">Net Accommodation Charges (SAR)</label>
-                    <input class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" id="net_accommodation_charges" name="net_accommodation_charges" type="number" step="0.01" required>
-                </div>
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2" for="total_net_value">Total Net Value (SAR)</label>
-                    <input class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" id="total_net_value" name="total_net_value" type="number" step="0.01" required>
-                </div>
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2" for="balance">Balance (SAR)</label>
-                    <input class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" id="balance" name="balance" type="number" step="0.01" required>
-                </div>
-                <div class="mb-4 col-span-2">
-                    <label class="block text-gray-700 font-semibold mb-2" for="remarks">Remarks</label>
-                    <textarea class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" id="remarks" name="remarks" rows="3"></textarea>
+        
+        <form id="invoiceForm" action="{{ url_for('agency.create_invoice') }}" method="post" class="bg-white shadow-lg rounded-lg p-10 mb-6">
+            <!-- General Information Section -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-700 mb-6 pb-2 border-b">General Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2" for="date">Date</label>
+                        <input class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" id="date" name="date" type="date" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2" for="hcn">HCN #</label>
+                        <input class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" id="hcn" name="hcn" type="text" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2" for="hotel_name">Hotel Name</label>
+                        <input class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" id="hotel_name" name="hotel_name" type="text" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2" for="guest_name">Guest Name</label>
+                        <input class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" id="guest_name" name="guest_name" type="text" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2" for="total_pax">Total PAX</label>
+                        <input class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" id="total_pax" name="total_pax" type="number" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2" for="qty">Number of Rooms</label>
+                        <input class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" id="qty" name="qty" type="number" min="1" value="1" required onchange="updateRoomSections(this.value)">
+                    </div>
                 </div>
             </div>
-            <div class="flex items-center justify-end mt-6">
-                <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded focus:outline-none focus:shadow-outline" type="submit">
+
+            <!-- Room Sections Container -->
+            <div id="roomSectionsContainer"></div>
+
+            <!-- Financial Information Section -->
+            <div class="mt-8">
+                <h2 class="text-2xl font-semibold text-gray-700 mb-6 pb-2 border-b">Financial Summary</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2" for="net_accommodation_charges">Net Accommodation Charges (SAR)</label>
+                        <input class="shadow border rounded w-full py-3 px-4 text-gray-700 bg-gray-50" id="net_accommodation_charges" name="net_accommodation_charges" type="number" step="0.01" readonly>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2" for="total_net_value">Total Net Value (SAR)</label>
+                        <input class="shadow border rounded w-full py-3 px-4 text-gray-700 bg-gray-50" id="total_net_value" name="total_net_value" type="number" step="0.01" readonly>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2" for="balance">Balance (SAR)</label>
+                        <input class="shadow border rounded w-full py-3 px-4 text-gray-700 bg-gray-50" id="balance" name="balance" type="number" step="0.01" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Remarks Section -->
+            <div class="mt-8">
+                <label class="block text-gray-700 font-semibold mb-2" for="remarks">Remarks</label>
+                <textarea class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" id="remarks" name="remarks" rows="3"></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex items-center justify-end mt-8">
+                <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg focus:outline-none focus:shadow-outline transition duration-300" type="submit">
                     Generate Invoice
                 </button>
             </div>
         </form>
     </div>
+
+    <script>
+        function createRoomSection(index) {
+            return `
+                <div class="room-section animate-fade-in" id="room-${index}">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Room ${index + 1}</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2" for="room_type_${index}">Room Type</label>
+                            <input class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" 
+                                id="room_type_${index}" name="room_type_${index}" type="text" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2" for="checkin_${index}">Check-in</label>
+                            <input class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" 
+                                id="checkin_${index}" name="checkin_${index}" type="date" required onchange="calculateNights(${index})">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2" for="checkout_${index}">Check-out</label>
+                            <input class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" 
+                                id="checkout_${index}" name="checkout_${index}" type="date" required onchange="calculateNights(${index})">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2" for="nights_${index}">Nights</label>
+                            <input class="shadow border rounded w-full py-3 px-4 text-gray-700 bg-gray-50" 
+                                id="nights_${index}" name="nights_${index}" type="number" readonly>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2" for="view_${index}">View</label>
+                            <input class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" 
+                                id="view_${index}" name="view_${index}" type="text" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2" for="meal_plan_${index}">Meal Plan</label>
+                            <input class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" 
+                                id="meal_plan_${index}" name="meal_plan_${index}" type="text" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2" for="room_rate_${index}">Room Rate (SAR)</label>
+                            <input class="shadow border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring focus:ring-blue-200" 
+                                id="room_rate_${index}" name="room_rate_${index}" type="number" step="0.01" required onchange="calculateTotals()">
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateRoomSections(quantity) {
+            const container = document.getElementById('roomSectionsContainer');
+            container.innerHTML = '';
+            for (let i = 0; i < quantity; i++) {
+                container.innerHTML += createRoomSection(i);
+            }
+        }
+
+        function calculateNights(index) {
+            const checkin = document.getElementById(`checkin_${index}`).value;
+            const checkout = document.getElementById(`checkout_${index}`).value;
+            
+            if (checkin && checkout) {
+                const start = new Date(checkin);
+                const end = new Date(checkout);
+                const diffTime = Math.abs(end - start);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                document.getElementById(`nights_${index}`).value = diffDays;
+                calculateTotals();
+            }
+        }
+
+        function calculateTotals() {
+            const qty = parseInt(document.getElementById('qty').value) || 0;
+            let totalAccommodation = 0;
+
+            for (let i = 0; i < qty; i++) {
+                const nights = parseInt(document.getElementById(`nights_${i}`).value) || 0;
+                const rate = parseFloat(document.getElementById(`room_rate_${i}`).value) || 0;
+                totalAccommodation += nights * rate;
+            }
+
+            document.getElementById('net_accommodation_charges').value = totalAccommodation.toFixed(2);
+            document.getElementById('total_net_value').value = totalAccommodation.toFixed(2);
+            document.getElementById('balance').value = totalAccommodation.toFixed(2);
+        }
+
+        // Initialize the form with one room section
+        document.addEventListener('DOMContentLoaded', () => {
+            updateRoomSections(1);
+        });
+    </script>
 </body>
 </html>
