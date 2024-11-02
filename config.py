@@ -10,10 +10,10 @@ class Config:
     
     load_dotenv()  # Load environment variables from .env file
 
-    MAIL_SERVER = os.getenv('MAIL_SERVER')
-    MAIL_PORT = int(os.getenv('MAIL_PORT', 465))
-    MAIL_USERNAME = os.getenv('MAIL_USERNAME')
-    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
-    MAIL_USE_TLS = os.getenv('MAIL_USE_TLS') == 'True'
-    MAIL_USE_SSL = os.getenv('MAIL_USE_SSL') == 'True'
-    MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER')
+    MAIL_SERVER = 'mail.booksaudiservices.com'
+    MAIL_PORT = 465
+    MAIL_USERNAME = 'info@booksaudiservices.com'
+    MAIL_PASSWORD = 'Timestravel567#'
+    MAIL_USE_TLS = False
+    MAIL_USE_SSL = True
+    MAIL_DEFAULT_SENDER = 'info@booksaudiservices.com'
