@@ -39,10 +39,15 @@
                     {{ form.rooms_available.label(class="block text-sm font-medium text-gray-700") }}
                     {{ form.rooms_available(class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
                 </div>
-    
-                <div>
+
+                <!-- Inclusion field with dynamic "Other" option -->
+                <div class="col-span-2">
                     {{ form.inclusion.label(class="block text-sm font-medium text-gray-700") }}
-                    {{ form.inclusion(class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
+                    {{ form.inclusion(class="mt-1 block w-full py-3 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", onchange="toggleOtherInclusion()") }}
+                    <div id="other-inclusion-container" class="mt-2 hidden">
+                        {{ form.other_inclusion.label(class="block text-sm font-medium text-gray-700") }}
+                        {{ form.other_inclusion(class="mt-1 block w-full py-3 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
+                    </div>
                 </div>
             </div>
 
@@ -110,19 +115,23 @@
         </form>
     </div>
 </div>
+
 <script>
     function toggleOtherType() {
         var typeSelect = document.getElementById('type');
         var otherTypeContainer = document.getElementById('other-type-container');
-        
-        if (typeSelect.value === 'Other') {
-            otherTypeContainer.classList.remove('hidden');
-        } else {
-            otherTypeContainer.classList.add('hidden');
-        }
+        otherTypeContainer.classList.toggle('hidden', typeSelect.value !== 'Other');
     }
 
-    // Call the function on page load to ensure correct initial state
-    document.addEventListener('DOMContentLoaded', toggleOtherType);
+    function toggleOtherInclusion() {
+        var inclusionSelect = document.getElementById('inclusion');
+        var otherInclusionContainer = document.getElementById('other-inclusion-container');
+        otherInclusionContainer.classList.toggle('hidden', inclusionSelect.value !== 'Other');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleOtherType();
+        toggleOtherInclusion();
+    });
 </script>
 {% endblock %}

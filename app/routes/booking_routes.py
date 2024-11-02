@@ -281,14 +281,14 @@ def booking_requests():
             room_type = request.form.get(f'room_type_{i}')
             custom_room_type = request.form.get(f'custom_room_type_{i}')
             inclusion = request.form.get(f'inclusion_{i}')
+            custom_inclusion = request.form.get(f'custom_inclusion_{i}')
             price_to_beat = request.form.get(f'price_to_beat_{i}')
             
-            # Use custom room type if 'other' was selected
             final_room_type = custom_room_type if room_type == 'other' else room_type
-            
+            final_inclusion = custom_inclusion if inclusion == 'other' else inclusion
             room_request = RoomRequest(
                 room_type=final_room_type,
-                inclusion=inclusion,
+                inclusion=final_inclusion,
                 price_to_beat=float(price_to_beat) if price_to_beat else None,
             )
             new_request.room_requests.append(room_request)

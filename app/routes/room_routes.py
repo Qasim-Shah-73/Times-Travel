@@ -41,6 +41,10 @@ def create_room(hotel_id):
         room_type = form.type.data
         if room_type == 'Other':
             room_type = form.other_type.data
+        
+        inclusion = form.inclusion.data            
+        if inclusion == 'Other':
+            inclusion = form.other_inclusion.data
 
         # Create Room object with rate dictionaries
         new_room = Room(
@@ -49,7 +53,7 @@ def create_room(hotel_id):
             view_type=form.view_type.data,
             availability=form.availability.data,
             rooms_available=form.rooms_available.data,
-            inclusion=form.inclusion.data,
+            inclusion=inclusion,
             approval=current_user.role,
             notes=form.notes.data,
             january_rates={f'Day{i+1}': rate if rate is not None else 0 for i, rate in enumerate(form.january_rates.rates.data)},
@@ -150,11 +154,14 @@ def update_room(hotel_id, room_id):
         if room_type == 'Other':
             room_type = form.other_type.data
 
+        room.inclusion = form.inclusion.data            
+        if room.inclusion == 'Other':
+            room.inclusion = form.other_inclusion.data
+
         room.type = room_type
         room.view_type = form.view_type.data
         room.availability = form.availability.data
         room.rooms_available = form.rooms_available.data
-        room.inclusion = form.inclusion.data
         room.notes = form.notes.data
         room.approval = current_user.role
 

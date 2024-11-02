@@ -64,12 +64,19 @@
                     {% endfor %}
                 </div>
                 <!-- Adjust inclusion to take more space -->
-                <div class="sm:col-span-2">
-                    {{ form.inclusion.label(class="block text-sm font-medium text-gray-700") }}
-                    {{ form.inclusion(class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
-                    {% for error in form.inclusion.errors %}
-                        <p class="mt-2 text-sm text-red-600">{{ error }}</p>
-                    {% endfor %}
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <!-- Inclusion Field with dynamic "Other" option -->
+                    <div class="col-span-2">
+                        {{ form.inclusion.label(class="block text-sm font-medium text-gray-700") }}
+                        {{ form.inclusion(class="mt-1 block w-full py-3 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", onchange="toggleOtherInclusion()") }}
+                        {% for error in form.inclusion.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                        <div id="other-inclusion-container" class="mt-4 hidden">
+                            {{ form.other_inclusion.label(class="block text-sm font-medium text-gray-700") }}
+                            {{ form.other_inclusion(class="mt-1 block w-full py-3 px-4 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm") }}
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -106,19 +113,31 @@
 </div>
 
 <script>
-function toggleOtherType() {
-    var typeSelect = document.getElementById('type');
-    var otherTypeContainer = document.getElementById('other-type-container');
-    if (typeSelect.value === 'Other') {
-        otherTypeContainer.classList.remove('hidden');
-    } else {
-        otherTypeContainer.classList.add('hidden');
+    function toggleOtherType() {
+        var typeSelect = document.getElementById('type');
+        var otherTypeContainer = document.getElementById('other-type-container');
+        if (typeSelect.value === 'Other') {
+            otherTypeContainer.classList.remove('hidden');
+        } else {
+            otherTypeContainer.classList.add('hidden');
+        }
     }
-}
-
-// Call the function on page load to set the initial state
-document.addEventListener('DOMContentLoaded', function() {
-    toggleOtherType();
-});
+    
+    function toggleOtherInclusion() {
+        var inclusionSelect = document.getElementById('inclusion');
+        var otherInclusionContainer = document.getElementById('other-inclusion-container');
+        if (inclusionSelect.value === 'Other') {
+            otherInclusionContainer.classList.remove('hidden');
+        } else {
+            otherInclusionContainer.classList.add('hidden');
+        }
+    }
+    
+    // Call the functions on page load to set the initial state
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleOtherType();
+        toggleOtherInclusion();
+    });
 </script>
+    
 {% endblock %}
