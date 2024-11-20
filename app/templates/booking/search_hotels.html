@@ -92,7 +92,7 @@
 <div class="container mx-auto">
     <div class="flex items-center justify-between my-8">
         <h1 class="text-4xl font-bold text-blue-700">
-            {{ hotels|length }} Available Hotels in {{ location }}
+            Available Hotels in {{ location }}
             <span class="block text-lg font-medium text-gray-600 mt-2">
                 Check-in: {{ check_in }} | Check-out: {{ check_out }} | Total Nights: {{ nights }}
             </span>
@@ -105,58 +105,63 @@
 
     {% if hotels %}
         {% for hotel in hotels %}
-        <div class="hotel-container">
-            <img class="hotel-image" src="{{ url_for('static', filename='images/' ~ hotel.image) if hotel.image else url_for('static', filename='images/hotel_2.jpg') }}" alt="{{ hotel.name }}">
-            <div class="hotel-info">
-                <div class="flex">
-                    <h2 class="hotel-name">{{ hotel.name }}</h2>
-                    <div class="stars-spacing">
-                        {% for star in range(1, 6) %}
-                            {% if star <= hotel.stars %}
-                              <i style="color: gold;" class="fas fa-star text-yellow-500"></i>
-                            {% else %}
-                                <i class="far fa-star text-gray-300"></i>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
-                <div class="hotel-location">
-                    <i class="fas fa-map-marker-alt mr-2 text-blue-700"></i>
-                    <span>{{ hotel.description }}</span>
-                </div>
+        {% set hotel_index = loop.index %}
+            {% for room in hotel.rooms %}
+                {% if room.approval == 'super_admin' and room.availability and room.rooms_available > 0 %}
+                    <div class="hotel-container">
+                        <img class="hotel-image" src="{{ url_for('static', filename='images/' ~ hotel.image) if hotel.image else url_for('static', filename='images/hotel_2.jpg') }}" alt="{{ hotel.name }}">
+                        <div class="hotel-info">
+                            <div class="flex">
+                                <h2 class="hotel-name">{{ hotel.name }}</h2>
+                                <div class="stars-spacing">
+                                    {% for star in range(1, 6) %}
+                                        {% if star <= hotel.stars %}
+                                        <i style="color: gold;" class="fas fa-star text-yellow-500"></i>
+                                        {% else %}
+                                            <i class="far fa-star text-gray-300"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="hotel-location">
+                                <i class="fas fa-map-marker-alt mr-2 text-blue-700"></i>
+                                <span>{{ hotel.description }}</span>
+                            </div>
 
-                {% if hotel.rooms %}
-                    <button onclick="toggleRoomDetails({{ hotel.id }})" class="view-rooms-btn">View Rooms</button>
-                    <div id="room-details-{{ hotel.id }}" class="room-details" style="display: none;">
-                        {% for room in hotel.rooms %}
-                            {% if room.approval == 'super_admin' and room.availability and room.rooms_available > 0 %}
-                                <div class="room-info">
-                                    <h3 style="text-align: left;"><strong>{{ room.type }} with {{ room.view_type }} View</strong></h3>
-                                    <p style="text-align: left;"><strong>Price:</strong> {{ room.total_price | int }} (SAR)</p>
-                                    <p style="text-align: left;"><strong>Inclusion:</strong> {{ room.inclusion }}</p>
-                                    <p style="text-align: left;"><strong>Notes:</strong> {{ room.notes }}</p>
-                                    <form action="{{ url_for('booking.booking_form', hotel_id=hotel.id, room_id=room.id) }}" method="GET" style="text-align: left;">
-                                        <input type="hidden" name="hotel_id" value="{{ hotel.id }}">
-                                        <input type="hidden" name="room_id" value="{{ room.id }}">
-                                        <input type="hidden" name="location" value="{{ location }}">
-                                        <input type="hidden" name="check_in" value="{{ check_in }}">
-                                        <input type="hidden" name="check_out" value="{{ check_out }}">
-                                        <input type="hidden" name="nights" value="{{ nights }}">
-                                        <input type="hidden" name="price" value="{{ room.total_price }}">
-                                        <button type="submit" class="book-now-btn">Book Now</button>
-                                    </form>
+                            {% if hotel.rooms %}
+                                <button onclick="toggleRoomDetails({{ hotel.id }})" class="view-rooms-btn">View Rooms</button>
+                                <div id="room-details-{{ hotel.id }}" class="room-details" style="display: none;">
+                                    {% for room in hotel.rooms %}
+                                        {% if room.approval == 'super_admin' and room.availability and room.rooms_available > 0 %}
+                                            <div class="room-info">
+                                                <h3 style="text-align: left;"><strong>{{ room.type }} with {{ room.view_type }} View</strong></h3>
+                                                <p style="text-align: left;"><strong>Price:</strong> {{ room.total_price | int }} (SAR)</p>
+                                                <p style="text-align: left;"><strong>Inclusion:</strong> {{ room.inclusion }}</p>
+                                                <p style="text-align: left;"><strong>Notes:</strong> {{ room.notes }}</p>
+                                                <form action="{{ url_for('booking.booking_form', hotel_id=hotel.id, room_id=room.id) }}" method="GET" style="text-align: left;">
+                                                    <input type="hidden" name="hotel_id" value="{{ hotel.id }}">
+                                                    <input type="hidden" name="room_id" value="{{ room.id }}">
+                                                    <input type="hidden" name="location" value="{{ location }}">
+                                                    <input type="hidden" name="check_in" value="{{ check_in }}">
+                                                    <input type="hidden" name="check_out" value="{{ check_out }}">
+                                                    <input type="hidden" name="nights" value="{{ nights }}">
+                                                    <input type="hidden" name="price" value="{{ room.total_price }}">
+                                                    <button type="submit" class="book-now-btn">Book Now</button>
+                                                </form>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
                                 </div>
                             {% endif %}
-                        {% endfor %}
+                        </div>
                     </div>
                 {% endif %}
-            </div>
-        </div>
-        </div>
+            {% endfor %}
         {% endfor %}
     {% else %}
         <p class="text-left text-gray-600 mt-8">No hotels available for the selected location and dates.</p>
     {% endif %}
+</div>
 
     <!-- Updated Booking Modal -->
     <div id="bookingModal" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center">
